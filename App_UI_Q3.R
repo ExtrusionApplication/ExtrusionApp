@@ -860,6 +860,9 @@ ui<-navbarPage("Extrusion Application",
                                                 uiOutput("PCMIRD_input")
                                               )))
                                    ), #end Special Operation
+                                   fluidRow(
+                                     downloadButton('downloadData','download')
+                                   ),
 
                                    fluidRow(
                                      DT::dataTableOutput("mytable2")
@@ -1471,6 +1474,7 @@ ui<-navbarPage("Extrusion Application",
                                    )
                           )
                ),
+               
                
                #Shopping Cart
                #'This renders the shopping cart in an absolute panels that is always visible and
