@@ -32,8 +32,7 @@ ui<-navbarPage("Extrusion Application",
                                                  condition="input.PCSPN_d",   #If it were Ture, then there will have a search box for Part Number under checkbox
                                                  selectizeInput("PCSPN",label = NULL,multiple=TRUE,
                                                                 c("All",unique(as.character(single_pps_data$`Part Number`))),
-                                                                selected="All",
-                                                                onchange = 'Shiny.onInputChange(\"testbutton\",  this.id)')
+                                                                selected="All")
                                                  ))),
                                      # Part Description
                                      column(2,
