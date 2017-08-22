@@ -34,6 +34,7 @@ ui<-navbarPage("Extrusion Application",
                                                                 c("All",unique(as.character(single_pps_data$`Part Number`))),
                                                                 selected="All"
                                                                 )
+
                                                  ))),
                                      # Part Description
                                      column(2,
@@ -869,6 +870,9 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCMIRD",label = NULL,choices=c("All","yes","NA"))
                                               )))
                                    ), #end Special Operation
+                                   fluidRow(
+                                     downloadButton('downloadData','download')
+                                   ),
 
                                    fluidRow(
                                      DT::dataTableOutput("mytable2")
@@ -1488,6 +1492,7 @@ ui<-navbarPage("Extrusion Application",
                                    )
                           )
                ),
+               
                
                #Shopping Cart
                #'This renders the shopping cart in an absolute panels that is always visible and
