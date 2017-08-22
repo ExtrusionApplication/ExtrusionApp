@@ -587,27 +587,30 @@ server<-function(input,output,session){
   
   #PCM
   Col_PCM=c()
+  #obtain the result of the checkout boxes
   show_vars2<-reactive({
     as.numeric(c(input$PCMPN_d,input$PCMPD_d,input$PCMRN_d,input$PCMRD_d,input$PCMPPSN_d,input$PCMDS_d,input$PCMDLL_d,input$PCMTS_d,input$PCMTLL_d,input$PCMSP_d,input$PCMFT_d,
                  input$PCMBZT1_d,input$PCMBZT2_d,input$PCMBZT3_d,input$PCMCT_d,input$PCMAT_d,input$PCMDT1_d,input$PCMDT2_d,input$PCMIDI_d,input$PCMODI_d,input$PCMIWT_d,input$PCMMWT_d,
                  input$PCMOWT_d,input$PCMTWT_d,input$PCMOR_d,input$PCMCCT_d,input$PCMLength_d,input$PCMToLength_d,input$PCMPPD_d,input$PCMNEXIV_d,input$PCMAnnealed_d,input$PCMCaliper_d,
                  input$PCMOS_d,input$PCMMP_d,input$PCMHT_d,input$PCMSPD_d,input$PCMSLD_d,input$PCMDLN_d,input$PCMULT_d,input$PCMVC_d,input$PCMIRD_d))})
   
+  
+  
+  #All Table Filter works are done below, and output a modified talbe. This table will be used by the renderdatatable, and download button
+  datasetInput<-reactive({
+    col_var2=show_vars2()
+    for (i in 1:length(col_var2)){
+      if (col_var2[i]!=0){
+        Col_PCM=c(Col_PCM,i) # obtain the selected columns' number
+      }
+    } 
+    data_PCM<-multi_pps_data[,Col_PCM]
+    data_PCM
+  })
   output$mytable2 <- DT::renderDataTable({
     DT::datatable({
       
-      col_var2=show_vars2()
-      for (i in 1:length(col_var2)){
-        if (col_var2[i]!=0){
-          Col_PCM=c(Col_PCM,i)
-        }
-      } 
-  
-      data_PCM<-multi_pps_data[,Col_PCM]
-      
-      
-      
-      data_PCM
+     datasetInput()
     },
     options = list(orderClasses = TRUE, 
                    columnDefs = list(list(className = 'dt-center', 
@@ -619,6 +622,8 @@ server<-function(input,output,session){
                    autoWidth=TRUE))
   },
   filter = "top")#END Multi Extrusion PPS Data
+  
+  
   
   
   
@@ -1185,6 +1190,15 @@ server<-function(input,output,session){
     escape = FALSE,
     server = FALSE) #for the shoppingcart
   
+  #*************The next part is the download button*******************
+  output$downloadData<-downloadHandler(
+  filename=function(){
+    paste('multi Extrusion PPS Data','.csv',sep='')
+  },
+  content=function(file){
+    write.csv(datasetInput(),file)
+  }
+    )
 
 }
 
