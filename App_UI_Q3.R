@@ -29,11 +29,10 @@ ui<-navbarPage("Extrusion Application",
                                              fluidRow(checkboxInput("PCSPN_d", "Part Number", value = TRUE)),  #Show the checkbox for Part number. it will return a True/False value
                                              fluidRow(
                                                conditionalPanel(
-                                                 condition="input.PCSPN_d",   #If it were Ture, then there will have a search box for Part Number under checkbox
+                                                 condition="input.PCSPN_d",   #If it were True, then there will have a search box for Part Number under checkbox
                                                  selectizeInput("PCSPN",label = NULL,multiple=TRUE,
                                                                 c("All",unique(as.character(single_pps_data$`Part Number`))),
-                                                                selected="All",
-                                                                onchange = 'Shiny.onInputChange(\"testbutton\",  this.id)')
+                                                                selected="All")
                                                  ))),
                                      # Part Description
                                      column(2,
@@ -867,7 +866,7 @@ ui<-navbarPage("Extrusion Application",
                                    )
                           ),#end multi Extrusion PPS Data
                           
-                          #Tepered Extrusion PPS Data--UI
+                          #Tapered Extrusion PPS Data--UI
                           tabPanel("Tapered Extrusion PPS Data",
                                    #Part Resin
                                    fluidRow(

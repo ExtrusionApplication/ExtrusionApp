@@ -59,6 +59,7 @@ scrapcode_filepath <- paste(path, scrapcode_file, sep = "/")
 
 single_pps_data <- read.csv(single_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                             check.names = FALSE)
+single_pps_names <- names(single_pps_data)
 single_tari_data <- read.csv(single_tari_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                              check.names = FALSE)
 multi_pps_data <- read.csv(multi_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
