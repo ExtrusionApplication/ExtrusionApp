@@ -5,8 +5,317 @@
 #PCT: Part Catalog--Tapered Extrusion PPS
 
 server<-function(input,output,session){
+  #' Split up into five sections: 
+  #' 1) The environments and the setter and getter methods
+  #' 2) The observe functions for the input variables
+  #' 3) The single extrusion data set cleaning
+  #' 4) The multi layered extrusion data set cleaning
+  #' 5) The tapered extrusion data set cleaning
   
-  #Part Catalog--Sinlge Extrusion PPS Data
+  e1 <- new.env(
+    #This environment will store variable of inputs and stack that are used for comparison
+    #of the input parameters that have been selected and changed
+    #' variables to contain:
+    #' sivector - a vector that will store the inputs of the single extrusion parameters
+    #' sistack - the stack for the single inputs
+  ) #creates a new environment to store instance variables
+  
+  
+  ## These are the setter and getter function ##
+  
+  setSIVector <- function(vector){
+    #this sets the values for the single input vector
+    assign("sivector", vector, env = e1)
+  } #end setSIVector
+  
+  getSIVector <- function(){
+    #returns sivector
+    
+    if(exists("sivector", e1)){
+      return(get("sivector", e1))
+    }
+    else{
+      return(NA)
+    }
+    
+  } #end getSIVector
+  
+  setSIStack <- function(stack){
+    #this sets the stack for the single inputs
+    assign("sistack", stack, env = e1)
+  } #end setSIStack
+  
+  getSIStack <- function(){
+    #returns sivector
+    if(exists("sistack", e1)){
+      return(get("sistack", e1))
+    }
+    else{
+      return(NA)
+    }
+    
+  } #end getSIStack
+  
+  getSIStack.length <- function(){
+    #returns the length of the SIStack
+    
+    if(exists("sistack", e1)){
+      #if it exists, return the length
+      return(length(getSIStack()))
+    }
+    else{
+      #else return NA
+      return(NA)
+    }
+    
+  }#end getSIStack.length
+  
+  addSIStack <- function(name){
+    #this function adds a new parameter to the stack
+    #it will only add to the stack if it is a unique name
+    
+    stack <- get("sistack", e1)
+    
+    if (length(grep(name, stack)) == 0){
+      #the name is not currently in the stack
+      stack <- c(stack, name) #add the name to the top of the stack (the right most)
+      setSIStack(stack) #set the stack
+    }
+    else{
+      #do nothing because the name is already present
+    }
+    
+  } #end  addSIStack
+  
+  setDFList <- function(list){
+    #sets the DFList
+    assign("df_list", stack, env = e1)
+  }#end setDFList
+  
+  getDFList <- function(){
+    #returns the df_list
+    if(exists("df_list", e1)){
+      #if it exists, return the length
+      return((get("df_list", e1)))
+    }
+    else{
+      #else return NA
+      return(NA)
+    }
+    
+  }#end getDFList
+  
+  
+  dfSeries <- function(index, index_name, value){
+    #this creates the series of successively more narrow data frames based on the number of parameters
+    #the user has searched by. 3 parameters means there is the original data frame and three ones
+    #that have been successively narrowed.
+    
+    if (exists("df_list", e1)){
+      #if the list already exists
+      
+      if(index > getSIStack.length()){
+        #if the index is larger than the list length, we have a new parameter that will be added
+        df_list <- getDFList() #gets latest df_list
+        latest_df <- df_list[[index-1]] #the index should only be 1 greater than the list
+        
+        new_df <- generateNewDF(latest_df, index_name, value)
+        df_list[[index]] <- new_df #add the new data frame
+        setDFList(df_list) #set the new list
+        
+        current_df <- new_df #set the data table to this
+        
+      }
+      else{
+        #the index is within the stack which means we means a previous parameter is being changed
+        stack <- isolate(getSIStack())
+        stack_length <- isolate(getSIStack.length())
+        
+        input_values <- isolate(getSIVector())
+        
+        df_list <- getDFList() #gets latest df_list
+        
+        if (index == 1){
+          #if it is starting from the beginning
+          
+          new_df <- generateNewDF(single_pps_data, index_name, value) #starts from this initial one
+          df_list[[index]] <- new_df #add the new data frame
+          setDFList(df_list) #set the new list
+          
+          count <- index
+          
+          while (count < stack_length + 1){
+            
+            current_df <- df_list[[count]]
+            current_parameter <- stack[count]
+            current_parameter_value <- input_values[current_parameter]
+            
+            new_df <- generateNewDF(current_df, current_parameter, current_parameter_value)
+            count <- count + 1
+            df_list[[count]] <- new_df #add the new data frame
+          }#end while creating new DFs
+          
+          setDFList(df_list) #set the new list
+          current_df <- new_df #set the data table to this
+          
+        }
+        else{
+          
+          count <- index - 1
+          
+          while (count < stack_length + 1){
+            
+            current_df <- df_list[[count]]
+            current_parameter <- stack[count]
+            current_parameter_value <- input_values[current_parameter]
+            
+            new_df <- generateNewDF(current_df, current_parameter, current_parameter_value)
+            count <- count + 1
+            df_list[[count]] <- new_df #add the new data frame
+          }#end while creating new DFs
+          
+          setDFList(df_list) #set the new list
+          current_df <- new_df #set the data table to this
+          
+        }#end if-else for index value
+        
+      }#end if else for the index length
+      
+    }
+    else{
+      assign("df_list", list("hello", "hi"), env = e1) #if the list does not yet exist, it creates it
+      #creates two dummy variables otherwise the list does not initialize correctly
+      
+      new_df <- generateNewDF(single_pps_data, index_name, value) #starts from this initial one
+      df_list <- getDFList() #gets latest df_list
+      print(df_list)
+      print(head(new_df))
+      print(index)
+      df_list[[index]] <- new_df #add the new data frame
+      df_list[[2]] <- NULL #removes the previous dummy variable
+      print(df_list)
+      
+      setDFList(df_list) #set the new list
+      current_df <- new_df #set the data table to this
+      
+    }#end if-else for the df_list existing
+    
+  } #end dfSeries
+  
+  generateNewDF <- function(df, index_name, value){
+    #this determines whether the index is max, min, or other. And then it cleans up the df based
+    #on that and generates a new clean df
+    
+    if (length(grep("min", index_name, ignore.case = TRUE)) != 0){
+      #if min was found in the index_name
+      
+      parameter_name <- gsub(" Min", "", index_name)
+      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
+      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      
+      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      
+      new_df <- df[df[,column_index] > value,]
+      return(new_df)
+      
+    }
+    else if(length(grep("max", index_name, ignore.case = TRUE)) != 0){
+      #if max was found in the index_name
+      
+      parameter_name <- gsub(" Max", "", index_name)
+      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
+      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      
+      
+      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      
+      print(parameter_name)
+      print(head(df))
+      print(names(df))
+      print(column_index)
+      print(value)
+      
+      new_df <- df[df[,column_index] < value,]
+      return(new_df)
+      
+    }
+    else{
+      #this is not a min or a max, but instead is a select input
+      
+      parameter_name <- index_name
+      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
+      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      
+      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      
+      if (value == "All"){
+        #if 'All' is selectec
+        new_df <- df
+      }
+      else{
+        #a specific value was selected
+        new_df <- df[df[,column_index] == value,]
+      }
+      
+      return(new_df)
+      
+    }#end if-else on the types of parameters
+    
+  }#end generateNewDf
+  
+  current_df <- reactive(
+    data <- single_pps_data
+  ) #end reactive for current_df
+  
+  observeEvent(single_inputs(),{
+    #'This will observe if any of the inputs of the parameters for single extrusion have changed
+    #'It does not check to see if the input has been selected, but rather, if the user has changed
+    #'the search input.
+    
+    if (exists("sivector", e1)){
+      #checks to see if the vector has been created yet. This is to prevent the initialization
+      #of the program
+      
+      old_sivector <- getSIVector() #get the old sivector before inputs were changed
+      current_sivector <- single_inputs()
+      
+      vector_length <- length(old_sivector) #gets the length
+      straight_vector <- c(1:vector_length) #creates a vector from 1 to the vector length
+      overlap <- which(current_sivector %in% old_sivector) #gets the indices of identical elements
+      
+      index_differ <- setdiff(straight_vector, overlap) #returns the index of the element that
+      #has been changed
+      index_name <- names(current_sivector[index_differ])
+      value <- setdiff(current_sivector, old_sivector) #gets the value of the new parameter
+      
+      addSIStack(index_name) #adds the name to the stack
+      current_sistack <- getSIStack() #gets the newstack
+      
+      print(current_sistack)
+      
+      #This needs to be updated because of the parenthese
+      updated_index_name <- gsub("\\(", "\\\\(", index_name)
+      updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+      
+      stack_index <- grep(updated_index_name, current_sistack) #gets the index in the stack
+      
+      print(stack_index)
+      
+      print("TO THE NEXT Method!!!!!!!!!")
+      dfSeries(stack_index, index_name, value) #updates the df_list and sets the datatable output df
+      
+    }
+    else{
+      #if it has not been created, it sets the vector and stack
+      #this is mainly to initialize data. The df_list does not need to be initialize as that is done
+      #in the dfSeries()
+      
+      setSIVector(single_inputs())
+      setSIStack(c()) #creates an empty stack since no parameters have been changed yet
+    }
+  })
+  
+  
   
   # obtain the output of checkbox from functions and make a list to store them----Single Extrusion PPS Data
   Col_PCS=c()
@@ -16,9 +325,54 @@ server<-function(input,output,session){
                  input$PCSOR_d,input$PCSCCT_d,input$PCSLength_d,input$PCSPPD_d,input$PCSNEXIV_d,input$PCSAnnealed_d,input$PCSCaliper_d,input$PCSOS_d,input$PCSMP_d,input$PCSHT_d,
                  input$PCSSPD_d,input$PCSSLD_d,input$PCSDLN_d,input$PCSULT_d,input$PCSVC_d,input$PCSIRD_d))})
   
-  observeEvent(input$testbutton,
-               print("It Worked!"))
+  #this variable will store all the inputs of of the single extrusions
+  single_inputs <- reactive({
+    #this variable will store all the inputs of of the single extrusions
+    inputs <- c(input$PCSPN, input$PCSPD, input$PCSRN, input$PCSRD, input$PCSPPSN, 
+                   input$PCSDS_min, input$PCSDS_max, input$PCSDLL, input$PCSTS_min, input$PCSTS_max,
+                   input$PCSTLL, input$PCSSP, 
+                   input$PCSFT_min, input$PCSFT_max, input$PCSBZT1_min, input$PCSBZT1_max,
+                   input$PCSBZT2_min, input$PCSBZT2_max, input$PCSBZT3_min, input$PCSBZT3_max,
+                   input$PCSCT_min, input$PCSCT_max, input$PCSAT_min, input$PCSAT_max,
+                   input$PCSDT1_min, input$PCSDT1_max, input$PCSDT2_min, input$PCSDT2_max,
+                   input$PCSIDI_min, input$PCSIDI_max, input$PCSODI_min, input$PCSODI_max,
+                   input$PCSWT_min, input$PCSWT_max, input$PCSOR_min, input$PCSOR_max, 
+                   input$PCSCCT_min, input$PCSCCT_max, input$PCSLength_min, input$PCSLength_max,
+                   input$PCSPPD,
+                   input$PCSNEXIV, input$PCSAnnealed, input$PCSCaliper, input$PCSOS,
+                   input$PCSMP, input$PCSHT, input$PCSSPD, input$PCSSLD, input$PCSDLN, input$PCSULT,
+                   input$PCSVC, input$PCSIRD
+                   )
+    names(inputs) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+                       "PPS Number",
+                       "Die Size (in) Min", "Die Size (in) Max", "Die Land (in) Length", 
+                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land (in) Length", "Screw Print",
+                       "Feedthroat Temperature  F Min", "Feedthroat Temperature  F Max",
+                       "Barrel Zone 1 Temperature  F Min", "Barrel Zone 1 Temperature  F Max",
+                       "Barrel Zone 2 Temperature  F Min", "Barrel Zone 2 Temperature  F Max",
+                       "Barrel Zone 3 Temperature  F Min", "Barrel Zone 3 Temperature  F Max",
+                       "Clamp Temperature  F Min", "Clamp Temperature  F Max",
+                       "Adapter Temperature  F Min", "Adapter Temperature  F Max",
+                       "Die 1 Temperature  F Min", "Die 1 Temperature  F Max",
+                       "Die 2 Temperature  F Min", "Die 2 Temperature  F Max",
+                       "Inner Diameter (in) Min", "Inner Diameter (in) Max", "Outer Diameter (in) Min",
+                       "Outer Diameter (in) Max", "Wall Thickness (in) Min", "Wall Thickness (in) Max",
+                       "Out of Roudness (in) Min", "Out of Roundness (in) Max", 
+                       "Concentricity (in) Min", "Concentricity (in) Max",
+                       "Length (in) Min", "Length (in) Max", "Perpendicularity (in", 
+                       "Nexiv", "Annealed", "Caliper", "OD Sort", "Melt Pump", "Hypo Tip",
+                       "Sparker Die", "Slicking Die", "Delamination", "Ultrasonic",
+                       "Vacuum Calibration", "Irradiated")
+    return(inputs)
+  })
+  
 
+  
+  
+  
+  
+  
+  #### Extra ####
 
   # use all the input values from UI to modify table 1 and show the modified table
   output$mytable1 <- DT::renderDataTable({
@@ -30,185 +384,7 @@ server<-function(input,output,session){
         }
       }
       
-      data_PCS<-single_pps_data[,Col_PCS]
-      
-      if(input$PCSPN!="All"){
-        data_PCS<-data_PCS[data_PCS$`Part Number`==input$PCSPN,]
-      }
-      if(input$PCSPD!="All"){
-        data_PCS<-data_PCS[data_PCS$`Part Description`==input$PCSPD,]
-      }
-      if(input$PCSRN!="All"){
-        data_PCS<-data_PCS[data_PCS$`Resin Number`==input$PCSRN,]
-      }
-      if(input$PCSRD!="All"){
-        data_PCS<-data_PCS[data_PCS$`Resin Descriptionr`==input$PCSRD,]
-      }
-      if(input$PCSPPSN!="All"){
-        data_PCS<-data_PCS[data_PCS$`PPS Number`==input$PCSPPSN,]
-      }
-      if(input$PCSDS_min!=PCSDSmin || input$PCSDS_max!=PCSDSmax){
-        data_PCS<-data_PCS[data_PCS$`Die Size (in)`>=input$PCSDS_min & data_PCS$`Die Size (in)`<=input$PCSDS_max,]
-      }
-      if(input$PCSDLL!="All"){
-        data_PCS<-data_PCS[data_PCS$`Die Land Length (in)`==input$PCSDLL,]
-      }
-      if(input$PCSTS_min!=PCSTSmin || input$PCSTS_max!=PCSTSmax){
-        data_PCS<-data_PCS[data_PCS$`Die Size (in)`>=input$PCSTS_min & data_PCS$`Die Size (in)`<=input$PCSTS_max,]
-      }
-      if(input$PCSTLL!="All"){
-        data_PCS<-data_PCS[data_PCS$`Tip Land Length (in)`==input$PCSTLL,]
-      }      
-      if(input$PCSSP!="All"){
-        data_PCS<-data_PCS[data_PCS$`Screw Print`==input$PCSSP,]
-      }
-      if(input$PCSFT_min!=PCSFTmin || input$PCSFT_max!=PCSFTmax){
-        data_PCS<-data_PCS[data_PCS$`Feedthroat Temperature  F`>=input$PCSFT_min & data_PCS$`Feedthroat Temperature  F`<=input$PCSFT_max,]
-      }
-      if(input$PCSBZT1_min!=PCSBZT1min || input$PCSBZT1_max!=PCSBZT1max){
-        data_PCS<-data_PCS[data_PCS$`Barrel Zone 1 Temperature  F`>=input$PCSBZT1_min & data_PCS$`Barrel Zone 1 Temperature  F`<=input$PCSBZT1_max,]
-      }
-      if(input$PCSBZT2_min!=PCSBZT2min || input$PCSBZT2_max!=PCSBZT2max){
-        data_PCS<-data_PCS[data_PCS$`Barrel Zone 2 Temperature  F`>=input$PCSBZT2_min & data_PCS$`Barrel Zone 2 Temperature  F`<=input$PCSBZT2_max,]
-      }
-      if(input$PCSBZT3_min!=PCSBZT3min || input$PCSBZT3_max!=PCSBZT3max){
-        data_PCS<-data_PCS[data_PCS$`Barrel Zone 3 Temperature  F`>=input$PCSBZT3_min & data_PCS$`Barrel Zone 3 Temperature  F`<=input$PCSBZT3_max,]
-      }
-      
-      
-      if(input$PCSCT_min!=PCSCTmin || input$PCSCT_max!=PCSCTmax){
-        data_PCS<-data_PCS[data_PCS$`Clamp Temperature  F`>=input$PCSCT_min & data_PCS$`Clamp Temperature  F`<=input$PCSCT_max,]
-      }
-      if(input$PCSAT_min!=PCSATmin || input$PCSAT_max!=PCSATmax){
-        data_PCS<-data_PCS[data_PCS$`Adapter Temperature  F`>=input$PCSAT_min & data_PCS$`Adapter Temperature  F`<=input$PCSAT_max,]
-      }
-      if(input$PCSDT1_min!=PCSDT1min || input$PCSDT1_max!=PCSDT1max){
-        data_PCS<-data_PCS[data_PCS$`Die 1 Temperature  F`>=input$PCSDT1_min & data_PCS$`Die 1 Temperature  F`<=input$PCSDT1_max,]
-      }
-      if(input$PCSDT2_min!=PCSDT2min || input$PCSDT2_max!=PCSDT2max){
-        data_PCS<-data_PCS[data_PCS$`Die 2 Temperature  F`>=input$PCSDT2_min & data_PCS$`Die 2 Temperature  F`<=input$PCSDT2_max,]
-      }
-      if(input$PCSIDI_min!=PCSIDImin || input$PCSIDI_max!=PCSIDImax){
-        data_PCS<-data_PCS[data_PCS$`Inner Diameter (in)`>=input$PCSIDI_min & data_PCS$`Inner Diameter (in)`<=input$PCSIDI_max,]
-      }
-      if(input$PCSODI_min!=PCSODImin || input$PCSODI_max!=PCSODImax){
-        data_PCS<-data_PCS[data_PCS$`Outer Diameter (in)`>=input$PCSODI_min & data_PCS$`Outer Diameter (in)`<=input$PCSODI_max,]
-      }
-      if(input$PCSWT_min!=PCSWTmin || input$PCSWT_max!=PCSWTmax){
-        data_PCS<-data_PCS[data_PCS$`Wall Thickness (in)`>=input$PCSWT_min & data_PCS$`Wall Thickness (in)`<=input$PCSWT_max,]
-      }
-      if(input$PCSOR_min!=PCSORmin || input$PCSOR_max!=PCSORmax){
-        data_PCS<-data_PCS[data_PCS$`Out of Roundness (in)`>=input$PCSOR_min & data_PCS$`Out of Roundness (in)`<=input$PCSOR_max,]
-      }
-      if(input$PCSCCT_min!=PCSCCTmin || input$PCSCCT_max!=PCSCCTmax){
-        data_PCS<-data_PCS[data_PCS$`Concentricity (in)`>=input$PCSCCT_min & data_PCS$`Concentricity (in)`<=input$PCSCCT_max,]
-      }
-      if(input$PCSLength_min!=PCSLengthmin || input$PCSLength_max!=PCSLengthmax){
-        data_PCS<-data_PCS[data_PCS$`Length (in)`>=input$PCSLength_min & data_PCS$`Length (in)`<=input$PCSLength_max,]
-      }
-      
-    # For sepcial operation, it user choose yes or Na instead of All, then only the selected value will be showed
-      if(input$PCSNEXIV!="All"){
-        if(input$PCSNEXIV=="yes"){
-          data_PCS<-data_PCS[data_PCS$`NEXIV`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`NEXIV`=="",]
-        }
-      }
-      if(input$PCSAnnealed!="All"){
-        if(input$PCSAnnealed=="yes"){
-          data_PCS<-data_PCS[data_PCS$`Annealed`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`Annealed`=="",]
-        }
-      }
-      if(input$PCSCaliper!="All"){
-        if(input$PCSCaliper=="yes"){
-          data_PCS<-data_PCS[data_PCS$`Caliper`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`Caliper`=="",]
-        }
-      }
-      if(input$PCSOS!="All"){
-        if(input$PCSOS=="yes"){
-          data_PCS<-data_PCS[data_PCS$`OD Sort`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`OD Sort`=="",]
-        }
-      }
-      if(input$PCSMP!="All"){
-        if(input$PCSMP=="yes"){
-          data_PCS<-data_PCS[data_PCS$`Melt Pump`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`Melt Pump`=="",]
-        }
-      }
-      if(input$PCSHT!="All"){
-        if(input$PCSHT=="yes"){
-          data_PCS<-data_PCS[data_PCS$`Hypo Tip`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`Hypo Tip`=="",]
-        }
-      }
-      if(input$PCSSPD!="All"){
-        if(input$PCSSPD=="yes"){
-          data_PCS<-data_PCS[data_PCS$`Sparker Die`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`Sparker Die`=="",]
-        }
-      }
-      if(input$PCSSLD!="All"){
-        if(input$PCSSLD=="yes"){
-          data_PCS<-data_PCS[data_PCS$`Slicking Die`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`Slicking Die`=="",]
-        }
-      }
-      if(input$PCSDLN!="All"){
-        if(input$PCSDLN=="yes"){
-          data_PCS<-data_PCS[data_PCS$`Delamination`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`Delamination`=="",]
-        }
-      }
-      if(input$PCSULT!="All"){
-        if(input$PCSULT=="yes"){
-          data_PCS<-data_PCS[data_PCS$`Ultrasonic`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`Ultrasonic`=="",]
-        }
-      }
-      if(input$PCSVC!="All"){
-        if(input$PCSVC=="yes"){
-          data_PCS<-data_PCS[data_PCS$`Vacuum Calibration`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`Vacuum Calibration`=="",]
-        }
-      }
-      if(input$PCSIRD!="All"){
-        if(input$PCSIRD=="yes"){
-          data_PCS<-data_PCS[data_PCS$`Irradiated`=="yes",]
-        } else{
-          data_PCS<-data_PCS[data_PCS$`Irradiated`=="",]
-        }
-      }
-      #*******************The next lines add a first column that contains buttons to add parts to the shopping cart****************
-      rows <- nrow(data_PCS)
-      vectorofbuttons <- c(rep(0, rows))
-      row_count <- 1
-      
-      while(row_count < rows + 1){
-        #this creates a vector of html action buttons to add to the table
-        vectorofbuttons[row_count] <- as.character(
-          actionButton(inputId = paste0("button_", data_PCS[row_count,1]),
-                       label = "Add Part",
-                       onclick = 'Shiny.onInputChange(\"add_button\",  this.id)')
-        )
-        row_count <- row_count + 1
-      } #end while adding the html stuff
-      
-      data_PCS$"" <- vectorofbuttons
-      data_PCS <- data_PCS[,c(ncol(data_PCS), 1:(ncol(data_PCS)-1))]
+      data_PCS <- current_df()
       return(data_PCS)
     }
     )
