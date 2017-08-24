@@ -12,6 +12,9 @@ server<-function(input,output,session){
   #' 4) The multi layered extrusion data set cleaning
   #' 5) The tapered extrusion data set cleaning
   
+  
+  #### Single PPS  ####
+  
   e1 <- new.env(
     #This environment will store variable of inputs and stack that are used for comparison
     #of the input parameters that have been selected and changed
@@ -802,14 +805,6 @@ server<-function(input,output,session){
     return(inputs)
   })
   
-
-  
-  
-  
-  
-  
-  #### Extra ####
-
   # use all the input values from UI to modify table 1 and show the modified table
   
   
@@ -851,7 +846,7 @@ server<-function(input,output,session){
   
   
 
-  #Part Catalog--multi Extrusion PPS Data
+  #### Multi-Layer PPS ####
   #Checkbox
   output$PCMPN_s<-renderUI({
     checkboxInput("PCMPN_d","Part Number",value=TRUE)
@@ -1244,7 +1239,7 @@ server<-function(input,output,session){
   
   
   
-  #Part Catalog--Tpaered Extrusion PPS Data
+  #### Tapered PPS ####
   
   #Checkbox
   output$PCTPN_s<-renderUI({
@@ -1672,6 +1667,9 @@ server<-function(input,output,session){
     )
   },
   filter = "top") #end Tapered Extrusion PPS Data
+  
+  
+  #### EXTRA ####
   
 
   output$MESparameters <- renderDataTable({
