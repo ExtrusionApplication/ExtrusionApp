@@ -23,6 +23,23 @@ server<-function(input,output,session){
   
   ## These are the setter and getter function ##
   
+  setSCBVector <- function(vector){
+    #this sets the values for the single input vector
+    assign("scbvector", vector, env = e1)
+  } #end setSCVector
+  
+  getSCBVector <- function(vector){
+    #this gets the values for the single checkbox vector
+    
+    if(exists("scbvector", e1)){
+      return(get("scbvector", e1))
+    }
+    else{
+      return(NA)
+    }
+    
+  } #end getSCBVector
+  
   setSIVector <- function(vector){
     #this sets the values for the single input vector
     assign("sivector", vector, env = e1)
@@ -76,7 +93,12 @@ server<-function(input,output,session){
     
     stack <- get("sistack", e1)
     
-    if (length(grep(name, stack)) == 0){
+    
+    #edit name
+    rep_name <- gsub("\\(", "\\\\(", name)
+    rep_name <- gsub("\\)", "\\\\)", rep_name)
+    
+    if (length(grep(rep_name, stack)) == 0){
       #the name is not currently in the stack
       stack <- c(stack, name) #add the name to the top of the stack (the right most)
       setSIStack(stack) #set the stack
@@ -89,7 +111,7 @@ server<-function(input,output,session){
   
   setDFList <- function(list){
     #sets the DFList
-    assign("df_list", stack, env = e1)
+    assign("df_list", list, env = e1)
   }#end setDFList
   
   getDFList <- function(){
@@ -106,7 +128,7 @@ server<-function(input,output,session){
   }#end getDFList
   
   
-  dfSeries <- function(index, index_name, value){
+  addDFSeries <- function(index, index_name, value){
     #this creates the series of successively more narrow data frames based on the number of parameters
     #the user has searched by. 3 parameters means there is the original data frame and three ones
     #that have been successively narrowed.
@@ -114,7 +136,7 @@ server<-function(input,output,session){
     if (exists("df_list", e1)){
       #if the list already exists
       
-      if(index > getSIStack.length()){
+      if(index == getSIStack.length() + 1){
         #if the index is larger than the list length, we have a new parameter that will be added
         df_list <- getDFList() #gets latest df_list
         latest_df <- df_list[[index-1]] #the index should only be 1 greater than the list
@@ -123,15 +145,27 @@ server<-function(input,output,session){
         df_list[[index]] <- new_df #add the new data frame
         setDFList(df_list) #set the new list
         
-        current_df <- new_df #set the data table to this
+        single_df_output$data <- new_df #set the data table to this
         
+      }
+      else if(index > getSIStack.length() + 1){
+        #if there was an error in the index and it was too large
+        print("The index for the stack was too large and greater than the allowable limit")
+        print(paste0("The stack index is: ", index, ". The stack length is: ", getSIStack.length(), "."))
+        stopApp()
+      }
+      else if(index < 1){
+        #error in the index
+        print("The index for the stack was zero or negative")
+        print(paste0("The stack index is: ", index, ". The stack length is: ", getSIStack.length(), "."))
+        stopApp()
       }
       else{
         #the index is within the stack which means we means a previous parameter is being changed
-        stack <- isolate(getSIStack())
-        stack_length <- isolate(getSIStack.length())
+        stack <- getSIStack()
+        stack_length <- getSIStack.length()
         
-        input_values <- isolate(getSIVector())
+        input_values <- getSIVector()
         
         df_list <- getDFList() #gets latest df_list
         
@@ -140,42 +174,43 @@ server<-function(input,output,session){
           
           new_df <- generateNewDF(single_pps_data, index_name, value) #starts from this initial one
           df_list[[index]] <- new_df #add the new data frame
+          
+          count <- index + 1
+          
+          while (count < stack_length + 1){
+            
+            previous_df <- df_list[[count-1]]
+            current_parameter <- stack[count]
+            current_parameter_value <- input_values[current_parameter]
+            
+            new_df <- generateNewDF(previous_df, current_parameter, current_parameter_value)
+            count <- count + 1
+            df_list[[count]] <- new_df #add the new data frame
+          }#end while creating new DFs
+          
           setDFList(df_list) #set the new list
+          single_df_output$data <- new_df #set the data table to this
+          
+        }
+        else{
           
           count <- index
           
           while (count < stack_length + 1){
             
-            current_df <- df_list[[count]]
+            previous_df <- df_list[[count-1]] #gets the previous df
             current_parameter <- stack[count]
             current_parameter_value <- input_values[current_parameter]
             
-            new_df <- generateNewDF(current_df, current_parameter, current_parameter_value)
-            count <- count + 1
+            new_df <- generateNewDF(previous_df, current_parameter, current_parameter_value)
+            
             df_list[[count]] <- new_df #add the new data frame
+            
+            count <- count + 1
           }#end while creating new DFs
           
           setDFList(df_list) #set the new list
-          current_df <- new_df #set the data table to this
-          
-        }
-        else{
-          
-          count <- index - 1
-          
-          while (count < stack_length + 1){
-            
-            current_df <- df_list[[count]]
-            current_parameter <- stack[count]
-            current_parameter_value <- input_values[current_parameter]
-            
-            new_df <- generateNewDF(current_df, current_parameter, current_parameter_value)
-            count <- count + 1
-            df_list[[count]] <- new_df #add the new data frame
-          }#end while creating new DFs
-          
-          setDFList(df_list) #set the new list
-          current_df <- new_df #set the data table to this
+          single_df_output$data <- new_df #set the data table to this
           
         }#end if-else for index value
         
@@ -188,19 +223,15 @@ server<-function(input,output,session){
       
       new_df <- generateNewDF(single_pps_data, index_name, value) #starts from this initial one
       df_list <- getDFList() #gets latest df_list
-      print(df_list)
-      print(head(new_df))
-      print(index)
       df_list[[index]] <- new_df #add the new data frame
       df_list[[2]] <- NULL #removes the previous dummy variable
-      print(df_list)
       
       setDFList(df_list) #set the new list
-      current_df <- new_df #set the data table to this
+      single_df_output$data <- new_df #set the data table to this
       
     }#end if-else for the df_list existing
     
-  } #end dfSeries
+  } #end addDFSeries
   
   generateNewDF <- function(df, index_name, value){
     #this determines whether the index is max, min, or other. And then it cleans up the df based
@@ -229,12 +260,6 @@ server<-function(input,output,session){
       
       column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
       
-      print(parameter_name)
-      print(head(df))
-      print(names(df))
-      print(column_index)
-      print(value)
-      
       new_df <- df[df[,column_index] < value,]
       return(new_df)
       
@@ -249,7 +274,7 @@ server<-function(input,output,session){
       column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
       
       if (value == "All"){
-        #if 'All' is selectec
+        #if 'All' is selected
         new_df <- df
       }
       else{
@@ -263,14 +288,14 @@ server<-function(input,output,session){
     
   }#end generateNewDf
   
-  current_df <- reactive(
-    data <- single_pps_data
-  ) #end reactive for current_df
+  single_df_output <- reactiveValues(data = single_pps_data) #end reactive for single_df_output
   
   observeEvent(single_inputs(),{
     #'This will observe if any of the inputs of the parameters for single extrusion have changed
     #'It does not check to see if the input has been selected, but rather, if the user has changed
-    #'the search input.
+    #'the search input.'
+    
+    print("Event Observeds")
     
     if (exists("sivector", e1)){
       #checks to see if the vector has been created yet. This is to prevent the initialization
@@ -278,52 +303,151 @@ server<-function(input,output,session){
       
       old_sivector <- getSIVector() #get the old sivector before inputs were changed
       current_sivector <- single_inputs()
+      setSIVector(current_sivector) #updates the sivector with the new inputs
       
-      vector_length <- length(old_sivector) #gets the length
-      straight_vector <- c(1:vector_length) #creates a vector from 1 to the vector length
-      overlap <- which(current_sivector %in% old_sivector) #gets the indices of identical elements
+      #produces a vector fo TRUE and FALSE. There should be one element that is different and
+      #grep 'FALSE' will find that index.
+      index_differ <- grep("FALSE", (current_sivector == old_sivector))
       
-      index_differ <- setdiff(straight_vector, overlap) #returns the index of the element that
-      #has been changed
-      index_name <- names(current_sivector[index_differ])
-      value <- setdiff(current_sivector, old_sivector) #gets the value of the new parameter
-      
-      addSIStack(index_name) #adds the name to the stack
-      current_sistack <- getSIStack() #gets the newstack
-      
-      print(current_sistack)
-      
-      #This needs to be updated because of the parenthese
-      updated_index_name <- gsub("\\(", "\\\\(", index_name)
-      updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
-      
-      stack_index <- grep(updated_index_name, current_sistack) #gets the index in the stack
-      
-      print(stack_index)
-      
-      print("TO THE NEXT Method!!!!!!!!!")
-      dfSeries(stack_index, index_name, value) #updates the df_list and sets the datatable output df
+      if (length(index_differ) == 0){
+        #Nothing will be analyzed
+        print("A parameter was changed but the value was changed to what the previous value was")
+      }
+      else{
+        
+        index_name <- names(current_sivector[index_differ])
+        value <- current_sivector[index_differ] #gets the value of the new parameter
+        
+        if (is.null(value) || is.na(value)){
+          #Nothing will be analyzed
+          print("The value is null or na")
+        }
+        else{
+          addSIStack(index_name) #adds the name to the stack
+          current_sistack <- getSIStack() #gets the newstack
+          
+          #This needs to be updated because of the parenthese
+          updated_index_name <- gsub("\\(", "\\\\(", index_name)
+          updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          
+          stack_index <- grep(updated_index_name, current_sistack) #gets the index in the stack
+          
+          if (length(stack_index) != 1){
+            print("The Stack Index has a length != 0")
+            print(paste0("The Stack Index is: ", stack_index))
+            stopApp() #terminate the program
+          }
+          else{
+            addDFSeries(stack_index, index_name, value) #updates the df_list and sets the datatable output df
+          } #end if-else for the length of the stack index
+          
+        }#end if-else for the value being na or null
+        
+      } #end if-else for the length of index_differ
       
     }
     else{
       #if it has not been created, it sets the vector and stack
       #this is mainly to initialize data. The df_list does not need to be initialize as that is done
-      #in the dfSeries()
+      #in the addDFSeries()
       
       setSIVector(single_inputs())
       setSIStack(c()) #creates an empty stack since no parameters have been changed yet
     }
-  })
+  })#end observeEvent for the user inputs
+  
+  observeEvent(show_vars1(),{
+    #' this function will observe when a user checks unchecks an input. If the input is uncheck,
+    #' it removes any of the data cleaning it did in the stack and also resets the value of the 
+    #' input to the initialized value from the start of the session
+    
+    print("Checkbox Observed")
+    
+    if (exists("scbvector", e1)){
+      
+      old_scbvector <- getSCBVector() #get the old scbvector before inputs were changed
+      current_scbvector <- show_vars1()
+      setSCBVector(current_scbvector) #updates the scbvector with the new inputs
+      
+      #produces a vector fo TRUE and FALSE. There should be one element that is different and
+      #grep 'FALSE' will find that index.
+      index_differ <- grep("FALSE", (current_scbvector == old_scbvector))
+      
+      if (length(index_differ) == 0){
+        #Nothing will be analyzed
+        print("A checkbox was changed but the value was changed to what the previous value was")
+      }
+      else{
+        
+        index_name <- names(current_sivector[index_differ])
+        value <- current_sivector[index_differ] #gets the value of the new parameter
+        
+        if (is.null(value) || is.na(value)){
+          #Nothing will be analyzed
+          print("The value is null or na")
+        }
+        else{
+          addSIStack(index_name) #adds the name to the stack
+          current_sistack <- getSIStack() #gets the newstack
+          
+          #This needs to be updated because of the parenthese
+          updated_index_name <- gsub("\\(", "\\\\(", index_name)
+          updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          
+          stack_index <- grep(updated_index_name, current_sistack) #gets the index in the stack
+          
+          if (length(stack_index) != 1){
+            print("The Stack Index has a length != 0")
+            print(paste0("The Stack Index is: ", stack_index))
+            stopApp() #terminate the program
+          }
+          else{
+            addDFSeries(stack_index, index_name, value) #updates the df_list and sets the datatable output df
+          } #end if-else for the length of the stack index
+          
+        }#end if-else for the value being na or null
+        
+      } #end if-else for the length of index_differ
+      
+    }
+    else{
+      #if it has not been created, it sets the vector
+      #this is mainly to initialize data.
+      
+      setSIVector(show_vars1())
+      
+    } #end if-else for scbvector existing
+    
+    
+  })#end observeEvent for the checkboxes
   
   
   
   # obtain the output of checkbox from functions and make a list to store them----Single Extrusion PPS Data
-  Col_PCS=c()
   show_vars1<-reactive({
-    as.numeric(c(input$PCSPN_d,input$PCSPD_d,input$PCSRN_d,input$PCSRD_d,input$PCSPPSN_d,input$PCSDS_d,input$PCSDLL_d,input$PCSTS_d,input$PCSTLL_d,input$PCSSP_d,input$PCSFT_d,
+    checkboxes <- as.numeric(c(input$PCSPN_d,input$PCSPD_d,input$PCSRN_d,input$PCSRD_d,input$PCSPPSN_d,input$PCSDS_d,input$PCSDLL_d,input$PCSTS_d,input$PCSTLL_d,input$PCSSP_d,input$PCSFT_d,
                  input$PCSBZT1_d,input$PCSBZT2_d,input$PCSBZT3_d,input$PCSCT_d,input$PCSAT_d,input$PCSDT1_d,input$PCSDT2_d,input$PCSIDI_d,input$PCSODI_d,input$PCSWT_d,
                  input$PCSOR_d,input$PCSCCT_d,input$PCSLength_d,input$PCSPPD_d,input$PCSNEXIV_d,input$PCSAnnealed_d,input$PCSCaliper_d,input$PCSOS_d,input$PCSMP_d,input$PCSHT_d,
-                 input$PCSSPD_d,input$PCSSLD_d,input$PCSDLN_d,input$PCSULT_d,input$PCSVC_d,input$PCSIRD_d))})
+                 input$PCSSPD_d,input$PCSSLD_d,input$PCSDLN_d,input$PCSULT_d,input$PCSVC_d,input$PCSIRD_d))
+    
+    names(checkboxes) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+                           "PPS Number",
+                           "Die Size (in)", "Die Land (in)", 
+                           "Tip Size (in)", "Tip Land (in)", "Screw Print",
+                           "Feedthroat Temperature  F", 
+                           "Barrel Zone 1 Temperature  F", "Barrel Zone 2 Temperature  F", 
+                           "Barrel Zone 3 Temperature  F","Clamp Temperature  F", 
+                           "Adapter Temperature  F","Die 1 Temperature  F", "Die 2 Temperature  F",
+                           "Inner Diameter (in)", "Outer Diameter (in)",
+                           "Wall Thickness (in)", "Out of Roundness (in)", 
+                           "Concentricity (in)", "Length (in)", "Perpendicularity (in", 
+                           "Nexiv", "Annealed", "Caliper", "OD Sort", "Melt Pump", "Hypo Tip",
+                           "Sparker Die", "Slicking Die", "Delamination", "Ultrasonic",
+                           "Vacuum Calibration", "Irradiated")
+    
+    return(checkboxes)
+    
+  })
   
   #this variable will store all the inputs of of the single extrusions
   single_inputs <- reactive({
@@ -375,16 +499,26 @@ server<-function(input,output,session){
   #### Extra ####
 
   # use all the input values from UI to modify table 1 and show the modified table
+  
+  
   output$mytable1 <- DT::renderDataTable({
     DT::datatable({
+      
+      Col_PCS=c() #initialized the variable
+      
       col_var1=show_vars1()
       for (i in 1:length(col_var1)){
+        #this will go through col_var1 and determine which parameters have been checked
+        #only the parameters that have been checked will be displayed on the table
         if (col_var1[i]!=0){
           Col_PCS=c(Col_PCS,i)
         }
       }
       
-      data_PCS <- current_df()
+      data_PCS <- single_df_output$data #the data frame is set
+      data_PCS <- data_PCS[,Col_PCS] #only get the columns that have been checked
+      
+      
       return(data_PCS)
     }
     )
