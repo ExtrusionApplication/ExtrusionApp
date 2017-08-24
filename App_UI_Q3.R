@@ -30,9 +30,8 @@ ui<-navbarPage("Extrusion Application",
                                              fluidRow(
                                                conditionalPanel(
                                                  condition="input.PCSPN_d",   #If it were True, then there will have a search box for Part Number under checkbox
-                                                 selectizeInput("PCSPN",label = NULL,multiple=TRUE,
-                                                                c("All",unique(as.character(single_pps_data$`Part Number`))),
-                                                                selected="All")
+                                                 selectInput("PCSPN",label = NULL,
+                                                                c("All",unique(as.character(single_pps_data$`Part Number`))))
                                                  ))),
                                      # Part Description
                                      column(2,

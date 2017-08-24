@@ -20,8 +20,44 @@ server<-function(input,output,session){
     #' sistack - the stack for the single inputs
   ) #creates a new environment to store instance variables
   
+  #the assign will initialize the siidvector
+  assign("siidvector", 
+         c("PCSPN", "PCSPD", "PCSRN", "PCSRD", "PCSPPSN", 
+           "PCSDS_min", "PCSDS_max", "PCSDLL", "PCSTS_min", "PCSTS_max",
+           "PCSTLL", "PCSSP", 
+           "PCSFT_min", "PCSFT_max", "PCSBZT1_min", "PCSBZT1_max",
+           "PCSBZT2_min", "PCSBZT2_max", "PCSBZT3_min", "PCSBZT3_max",
+           "PCSCT_min", "PCSCT_max", "PCSAT_min", "PCSAT_max",
+           "PCSDT1_min", "PCSDT1_max", "PCSDT2_min", "PCSDT2_max",
+           "PCSIDI_min", "PCSIDI_max", "PCSODI_min", "PCSODI_max",
+           "PCSWT_min", "PCSWT_max", "PCSOR_min", "PCSOR_max", 
+           "PCSCCT_min", "PCSCCT_max", "PCSLength_min", "PCSLength_max",
+           "PCSPPD",
+           "PCSNEXIV", "PCSAnnealed", "PCSCaliper", "PCSOS",
+           "PCSMP", "PCSHT", "PCSSPD", "PCSSLD", "PCSDLN", "PCSULT",
+           "PCSVC", "PCSIRD"), 
+         envir = e1)
+  
   
   ## These are the setter and getter function ##
+  
+  setSIIDVector <- function(vector){
+    #set the vector for the input ids
+    
+    assign("siidvector", vector, env = e1)
+    
+  } #end setSIIDVector
+  
+  getSIIDVector <- function(){
+    #returns the IDs of the inputs
+    
+    if(exists("siidvector", e1)){
+      return(get("siidvector", e1))
+    }
+    else{
+      return(NA)
+    }
+  } #end SIIDVector
   
   setSCBVector <- function(vector){
     #this sets the values for the single input vector
@@ -39,6 +75,23 @@ server<-function(input,output,session){
     }
     
   } #end getSCBVector
+  
+  setOriginalSCBVector <- function(vector){
+    #this sets the values for the original min and max input values
+    assign("originalscbvector", vector, env = e1)
+  } #end setOriginalSCBVector
+  
+  getOriginalSCBVector <- function(vector){
+    #this gets the values for the original min and max input values
+    
+    if(exists("originalscbvector", e1)){
+      return(get("originalscbvector", e1))
+    }
+    else{
+      return(NA)
+    }
+    
+  } #end getOriginalSCBVector
   
   setSIVector <- function(vector){
     #this sets the values for the single input vector
@@ -109,6 +162,90 @@ server<-function(input,output,session){
     
   } #end  addSIStack
   
+  removeSIStack <- function(name){
+    #this function removes the inputs associated with the checkbox name from the stack
+    
+    print("removeSIStack: We are in the removeSIStack")
+    
+    stack <- get("sistack", e1)
+    
+    
+    #edit name
+    rep_name <- gsub("\\(", "\\\\(", name)
+    rep_name <- gsub("\\)", "\\\\)", rep_name)
+    
+    if (length(grep(rep_name, stack)) != 0){
+      #the name is not currently in the stack
+      indices <- grep(rep_name, stack)
+      
+      if (length(indices) == length(stack)){
+        #if the length of the indices are equal to the stack
+        print("removeSIStack: The length of the indices are equal to the stack")
+        stack <- c()
+      }
+      else if (length(indices) == 1){
+        print("removeSIStack: There was only one match in the stack")
+        #if there is only one match
+        if (indices == 1){
+          #if the first matches is 1 or the only match is one
+          stack <- stack[c(2:length(stack))] # removes the first element
+        }
+        else if (indices == length(stack)){
+          stack <- stack[c(1:(indices - 1))]
+        }
+        else{
+          #removes the index from the stack
+          stack <- stack[c(1:(indices-1), (indices + 1):length(stack))]
+        }#end if-else for the vallue of indices
+      }
+      else if (length(indices) == 2){
+        print("removeSIStack: There were multiple matches to the stack")
+        #if there are multiple indices
+        if (indices[1] == 1){
+          #if the first matches is 1 or the only match is one
+          
+          if (indices[2] == 2){
+            stack <- stack[c(3:length(stack))] # removes the first and second element
+          }
+          else if (indices[2] == length(stack)){
+            stack <- stack[c(2:(indices[2] - 1))]
+          }
+          else{
+            stack <- stack[c(2:(indices[2] - 1), (indices[2] + 1):length(stack))] # the indices
+          }#end if-else for the value of the second index
+          
+        }
+        else if(indices[1] == (length(stack) - 1)){
+          #if the first index is length(stack)-1, then the second index is the length of the stack
+          stack <- stack[c(1:(indices[1] - 1))]
+        }
+        else if (indices[1] == (indices[2] + 1)){
+          #if the indices are right next to each other but are not at the ends of the stack
+          stack <- stack[c(1:(indices[1]-1), (indices[2] + 1):length(stack))]
+        }
+        else{
+          #removes the indices from the stack
+          stack <- stack[c(1:(indices[1]-1), (indices[1] + 1):(indices[2] - 1), (indices[2] + 1):length(stack))]
+        }#end if-else for the value of indices
+        
+      }#end if-else for the length of indices
+      else{
+        #if it was neither, there was an error and the app shoudl stop
+        print("The indices in the removeSIStack were more than 2")
+        print(paste0("The indices are: ", indices))
+        stop()
+      }
+      
+      
+      setSIStack(stack) #set the stack
+    }
+    else{
+      #do nothing because the name is not in the stack
+      print("removeSIStack: Nothing was done because the name was not in the stack")
+    }
+    
+  } #end  removeSIStack
+  
   setDFList <- function(list){
     #sets the DFList
     assign("df_list", list, env = e1)
@@ -126,7 +263,6 @@ server<-function(input,output,session){
     }
     
   }#end getDFList
-  
   
   addDFSeries <- function(index, index_name, value){
     #this creates the series of successively more narrow data frames based on the number of parameters
@@ -233,6 +369,90 @@ server<-function(input,output,session){
     
   } #end addDFSeries
   
+  removeDFSeries <- function(){
+    #this removes the data frames that were in the df_list because of the parameters. It is called
+    #when a checkbox is unchecked and one of the parameters were present
+    
+    print("removeDFSeries: We are in removeDFSeries")
+    
+    if (exists("df_list", e1)){
+      #if the list already exists
+      
+      print("removeDFSeries: df_list exists")
+      
+      stack <- getSIStack() #gets the stack
+      stack_length <- getSIStack.length()
+      
+      if(stack_length == 0){
+        #if when the input parameters were removed from the stack, all the parameters were removed
+        #because the removed ones were the only parameters present
+        setDFList(NULL) #sets the list to NULL so it can be reinitialized
+        single_df_output$data <- single_pps_data
+        
+        print("removeDFSeries: The stack_length was zero")
+        
+      }
+      else{
+        #if there is still a stack present
+        
+        print("removeDFSeries: The stack_length was NOT zero")
+        
+        input_values <- getSIVector() #gets the input_values
+        df_list <- getDFList() #gets latest df_list
+        
+        current_parameter <- stack[1] #gets the first parameter in the stack
+        current_parameter_value <- input_values[current_parameter] #gets the parameters value
+        
+        new_df <- generateNewDF(single_pps_data, current_parameter, current_parameter_value) #starts from this initial one
+        df_list[[1]] <- new_df #add the new data frame
+        
+        count <- 2
+        
+        while (count < stack_length + 1){
+          
+          previous_df <- df_list[[count-1]]
+          current_parameter <- stack[count]
+          current_parameter_value <- input_values[current_parameter]
+          
+          new_df <- generateNewDF(previous_df, current_parameter, current_parameter_value)
+          count <- count + 1
+          df_list[[count]] <- new_df #add the new data frame
+        }#end while creating new DFs
+        
+        if (count < (length(df_list) + 1)){
+          #'because we recreate the df_list from the original df_list and th new df_list will not
+          #'have the dataframes from the removed parameters, this new df_list will be shorter than
+          #'the original before the parameters were removed. Thus we resize the df_list
+          
+          while ((length(df_list) + 1) > count){
+            #the df_list will continually be resized as the inputs are made null, thus the condition
+            #is met when all the element greater than an index of count are removed
+            
+            df_list[[count]] <- NULL
+            
+          } #end while for making the elements NULL
+          
+          
+        }#end if for the count compared to the df_list length
+        
+        print(head(new_df[,1:4]))
+        
+        setDFList(df_list) #set the new list
+        single_df_output$data <- new_df #set the data table to this
+        
+      }#end if-else for the stack length
+        
+    }
+    else{
+      #there was an error and the list did not exist when it should have because it observed a
+      #unchecked checkbox and the stack length was not zero
+      print("The df_list does not exist but you attempted to remove something from it")
+      stopApp()
+    }#end if else for the list existing
+      
+    
+  } #end removeDFSeries
+  
   generateNewDF <- function(df, index_name, value){
     #this determines whether the index is max, min, or other. And then it cleans up the df based
     #on that and generates a new clean df
@@ -246,7 +466,7 @@ server<-function(input,output,session){
       
       column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
       
-      new_df <- df[df[,column_index] > value,]
+      new_df <- df[df[,column_index] >= value,]
       return(new_df)
       
     }
@@ -260,7 +480,7 @@ server<-function(input,output,session){
       
       column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
       
-      new_df <- df[df[,column_index] < value,]
+      new_df <- df[df[,column_index] <= value,]
       return(new_df)
       
     }
@@ -288,6 +508,73 @@ server<-function(input,output,session){
     
   }#end generateNewDf
   
+  resetSI <- function(checkbox_name){
+    #this resets the inputs for a checkbox
+    
+    print("resetSI: Resetting the Input Values")
+    print(paste0("resetSI: checkbox_name is - ", checkbox_name))
+    
+    grepname <- gsub("\\(", "\\\\(", checkbox_name)
+    grepname <- gsub("\\)", "\\\\)", grepname)
+    
+    inputs <- names(isolate(single_inputs()))
+    input_ids <- getSIIDVector()
+    original_inputs <- getOriginalSCBVector()
+    print(original_inputs)
+    
+    input_indices <- grep(grepname, inputs)
+    
+    print(paste0("resetSI: input_indices is: ", input_indices))
+    
+    count <- 1
+    
+    while (count < length(input_indices) + 1){
+      #goes through all the input_indices that matches
+      
+      print("resetSI: In the while loop.")
+      
+      index <- input_indices[count]
+      input_name <- inputs[index]
+      id <- input_ids[index]
+      value <- original_inputs[[index]]
+      
+      print(paste0("resetSI: index is: ", index))
+      print(paste0("resetSI: input_name is: ", input_name))
+      print(paste0("resetSI: id is: ", id))
+      print(paste0("resetSI: value is: ", value))
+      
+      if (length(grep(" min", input_name, ignore.case = TRUE)) > 0){
+        print("resetSI: In the min")
+        updateNumericInput(session,
+                          inputId = id,
+                          label = NULL,
+                          value = value
+                          )
+      }
+      else if (length(grep(" max", input_name, ignore.case = TRUE)) > 0){
+        print("resetSI: In the max")
+        updateNumericInput(session,
+                          inputId = id,
+                          label = NULL,
+                          value = value
+                          )
+      }
+      else{
+        print("resetSI: In the else")
+        updateSelectInput(session, 
+                        id,
+                        label = NULL,
+                        choices = c("All",unique(as.character(single_pps_data[,checkbox_name]))),
+                        selected =  "All"
+                        )
+      }#end if-else for grep the input_name
+      
+      count <- count + 1
+    }#end while for length of input_indices
+    
+    
+  }#end resetSI
+  
   single_df_output <- reactiveValues(data = single_pps_data) #end reactive for single_df_output
   
   observeEvent(single_inputs(),{
@@ -295,7 +582,7 @@ server<-function(input,output,session){
     #'It does not check to see if the input has been selected, but rather, if the user has changed
     #'the search input.'
     
-    print("Event Observeds")
+    print("Input Observed")
     
     if (exists("sivector", e1)){
       #checks to see if the vector has been created yet. This is to prevent the initialization
@@ -355,98 +642,123 @@ server<-function(input,output,session){
       setSIStack(c()) #creates an empty stack since no parameters have been changed yet
     }
   })#end observeEvent for the user inputs
-  
+
   observeEvent(show_vars1(),{
-    #' this function will observe when a user checks unchecks an input. If the input is uncheck,
-    #' it removes any of the data cleaning it did in the stack and also resets the value of the 
+    #' this function will observe when a user checks or unchecks an input. If the input is unchecked,
+    #' it removes any of the data cleaning it did in the stack and also resets the value of the
     #' input to the initialized value from the start of the session
-    
-    print("Checkbox Observed")
-    
+
+    print("observeEvent(show_vars1): Checkbox Observed")
+
     if (exists("scbvector", e1)){
       
+      print("observeEvent(show_vars1): The scbvector Exists")
+
       old_scbvector <- getSCBVector() #get the old scbvector before inputs were changed
       current_scbvector <- show_vars1()
       setSCBVector(current_scbvector) #updates the scbvector with the new inputs
-      
+
       #produces a vector fo TRUE and FALSE. There should be one element that is different and
       #grep 'FALSE' will find that index.
       index_differ <- grep("FALSE", (current_scbvector == old_scbvector))
-      
+
       if (length(index_differ) == 0){
-        #Nothing will be analyzed
-        print("A checkbox was changed but the value was changed to what the previous value was")
+        #Nothing will be analyzed since the value was changed to TRUE
       }
       else{
         
-        index_name <- names(current_sivector[index_differ])
-        value <- current_sivector[index_differ] #gets the value of the new parameter
-        
+        print("observeEvent(show_vars1): The Checkbox Index_Differ Worked")
+
+        index_name <- names(current_scbvector[index_differ])
+        value <- current_scbvector[index_differ] #gets the value of the new parameter
+
         if (is.null(value) || is.na(value)){
           #Nothing will be analyzed
-          print("The value is null or na")
+          print("observeEvent(show_vars1): The checkbox value is null or na")
+          stopApp()
         }
-        else{
-          addSIStack(index_name) #adds the name to the stack
-          current_sistack <- getSIStack() #gets the newstack
+        else if (value == FALSE){
+          #this ensures that the checkbox was unchecked instead of checked
           
+          print("observeEvent(show_vars1): The Value of the Checkbox was FALSE")
+          
+          current_sistack <- getSIStack() #gets the newstack
+
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
-          
+
           stack_index <- grep(updated_index_name, current_sistack) #gets the index in the stack
-          
-          if (length(stack_index) != 1){
-            print("The Stack Index has a length != 0")
-            print(paste0("The Stack Index is: ", stack_index))
-            stopApp() #terminate the program
+
+          if (length(stack_index) == 0){
+            print("observeEvent(show_vars1): The Input was not in the Stack")
+            #the input that was unchecked is not in the stack, so do nothing
+          }
+          else if (length(stack_index) == 1 || length(stack_index) == 2){
+            #the parameter that was unchecked is in the stack
+            #it can be of length 1 or 2 depending of the input parameter had a min and max value
+            #if it is a selectize input, there will only be one match (length of 1)
+            
+            print("observeEvent(show_vars1): The Input was in the Stack")
+            print(paste0("observeEvent(show_vars1): The Checkboxname is: ", index_name))
+            
+            resetSI(index_name) #resets the values of the inputs of the checkbox
+            removeSIStack(index_name)
+            removeDFSeries() #removes the inputs associated with the checkbox
           }
           else{
-            addDFSeries(stack_index, index_name, value) #updates the df_list and sets the datatable output df
+            #none of the conditions were met, most likely multiple matches greater than 2
+            print("observeEvent(show_vars1): The Stack Index for the Checkboxes ObserveEvent has a length > 2 or negative")
+            stopApp()
           } #end if-else for the length of the stack index
-          
+
+        }
+        else{
+          #if it is not false, do nothing
+          print("observeEvent(show_vars1): The Checkbox value was TRUE")
         }#end if-else for the value being na or null
-        
+
       } #end if-else for the length of index_differ
-      
+
     }
     else{
       #if it has not been created, it sets the vector
       #this is mainly to initialize data.
-      
-      setSIVector(show_vars1())
-      
+
+      setOriginalSCBVector(single_inputs()) #initialize the original values
+      setSCBVector(show_vars1()) #initialize the input values that will be changing with the app
+
     } #end if-else for scbvector existing
-    
-    
+
+
   })#end observeEvent for the checkboxes
-  
-  
-  
+
+
+
   # obtain the output of checkbox from functions and make a list to store them----Single Extrusion PPS Data
   show_vars1<-reactive({
     checkboxes <- as.numeric(c(input$PCSPN_d,input$PCSPD_d,input$PCSRN_d,input$PCSRD_d,input$PCSPPSN_d,input$PCSDS_d,input$PCSDLL_d,input$PCSTS_d,input$PCSTLL_d,input$PCSSP_d,input$PCSFT_d,
                  input$PCSBZT1_d,input$PCSBZT2_d,input$PCSBZT3_d,input$PCSCT_d,input$PCSAT_d,input$PCSDT1_d,input$PCSDT2_d,input$PCSIDI_d,input$PCSODI_d,input$PCSWT_d,
                  input$PCSOR_d,input$PCSCCT_d,input$PCSLength_d,input$PCSPPD_d,input$PCSNEXIV_d,input$PCSAnnealed_d,input$PCSCaliper_d,input$PCSOS_d,input$PCSMP_d,input$PCSHT_d,
                  input$PCSSPD_d,input$PCSSLD_d,input$PCSDLN_d,input$PCSULT_d,input$PCSVC_d,input$PCSIRD_d))
-    
+
     names(checkboxes) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
                            "PPS Number",
-                           "Die Size (in)", "Die Land (in)", 
+                           "Die Size (in)", "Die Land (in)",
                            "Tip Size (in)", "Tip Land (in)", "Screw Print",
-                           "Feedthroat Temperature  F", 
-                           "Barrel Zone 1 Temperature  F", "Barrel Zone 2 Temperature  F", 
-                           "Barrel Zone 3 Temperature  F","Clamp Temperature  F", 
+                           "Feedthroat Temperature  F",
+                           "Barrel Zone 1 Temperature  F", "Barrel Zone 2 Temperature  F",
+                           "Barrel Zone 3 Temperature  F","Clamp Temperature  F",
                            "Adapter Temperature  F","Die 1 Temperature  F", "Die 2 Temperature  F",
                            "Inner Diameter (in)", "Outer Diameter (in)",
-                           "Wall Thickness (in)", "Out of Roundness (in)", 
-                           "Concentricity (in)", "Length (in)", "Perpendicularity (in", 
+                           "Wall Thickness (in)", "Out of Roundness (in)",
+                           "Concentricity (in)", "Length (in)", "Perpendicularity (in)",
                            "Nexiv", "Annealed", "Caliper", "OD Sort", "Melt Pump", "Hypo Tip",
                            "Sparker Die", "Slicking Die", "Delamination", "Ultrasonic",
                            "Vacuum Calibration", "Irradiated")
-    
+
     return(checkboxes)
-    
+
   })
   
   #this variable will store all the inputs of of the single extrusions
