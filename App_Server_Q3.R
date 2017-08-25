@@ -12,6 +12,61 @@ server<-function(input,output,session){
   #' 4) The multi layered extrusion data set cleaning
   #' 5) The tapered extrusion data set cleaning
   
+  generateNewDF <- function(df, index_name, value){
+    #this determines whether the index is max, min, or other. And then it cleans up the df based
+    #on that and generates a new clean df
+    
+    if (length(grep("min", index_name, ignore.case = TRUE)) != 0){
+      #if min was found in the index_name
+      
+      parameter_name <- gsub(" Min", "", index_name)
+      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
+      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      
+      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      
+      new_df <- df[df[,column_index] >= value,]
+      return(new_df)
+      
+    }
+    else if(length(grep("max", index_name, ignore.case = TRUE)) != 0){
+      #if max was found in the index_name
+      
+      parameter_name <- gsub(" Max", "", index_name)
+      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
+      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      
+      
+      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      
+      new_df <- df[df[,column_index] <= value,]
+      return(new_df)
+      
+    }
+    else{
+      #this is not a min or a max, but instead is a select input
+      
+      parameter_name <- index_name
+      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
+      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      
+      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      
+      if (value == "All"){
+        #if 'All' is selected
+        new_df <- df
+      }
+      else{
+        #a specific value was selected
+        new_df <- df[df[,column_index] == value,]
+      }
+      
+      return(new_df)
+      
+    }#end if-else on the types of parameters
+    
+  }#end generateNewDf
+  
   
   #### Single PPS  ####
   
@@ -79,12 +134,12 @@ server<-function(input,output,session){
     
   } #end getSCBVector
   
-  setOriginalSCBVector <- function(vector){
+  setOriginalSIVector <- function(vector){
     #this sets the values for the original min and max input values
     assign("originalscbvector", vector, env = e1)
-  } #end setOriginalSCBVector
+  } #end setOriginalSIVector
   
-  getOriginalSCBVector <- function(vector){
+  getOriginalSIVector <- function(vector){
     #this gets the values for the original min and max input values
     
     if(exists("originalscbvector", e1)){
@@ -94,7 +149,7 @@ server<-function(input,output,session){
       return(NA)
     }
     
-  } #end getOriginalSCBVector
+  } #end getOriginalSIVector
   
   setSIVector <- function(vector){
     #this sets the values for the single input vector
@@ -249,12 +304,12 @@ server<-function(input,output,session){
     
   } #end  removeSIStack
   
-  setDFList <- function(list){
+  setSDFList <- function(list){
     #sets the DFList
     assign("df_list", list, env = e1)
-  }#end setDFList
+  }#end setSDFList
   
-  getDFList <- function(){
+  getSDFList <- function(){
     #returns the df_list
     if(exists("df_list", e1)){
       #if it exists, return the length
@@ -265,9 +320,9 @@ server<-function(input,output,session){
       return(NA)
     }
     
-  }#end getDFList
+  }#end getSDFList
   
-  addDFSeries <- function(index, index_name, value){
+  addSDFSeries <- function(index, index_name, value){
     #this creates the series of successively more narrow data frames based on the number of parameters
     #the user has searched by. 3 parameters means there is the original data frame and three ones
     #that have been successively narrowed.
@@ -277,12 +332,12 @@ server<-function(input,output,session){
       
       if(index == getSIStack.length() + 1){
         #if the index is larger than the list length, we have a new parameter that will be added
-        df_list <- getDFList() #gets latest df_list
+        df_list <- getSDFList() #gets latest df_list
         latest_df <- df_list[[index-1]] #the index should only be 1 greater than the list
         
         new_df <- generateNewDF(latest_df, index_name, value)
         df_list[[index]] <- new_df #add the new data frame
-        setDFList(df_list) #set the new list
+        setSDFList(df_list) #set the new list
         
         single_df_output$data <- new_df #set the data table to this
         
@@ -306,7 +361,7 @@ server<-function(input,output,session){
         
         input_values <- getSIVector()
         
-        df_list <- getDFList() #gets latest df_list
+        df_list <- getSDFList() #gets latest df_list
         
         if (index == 1){
           #if it is starting from the beginning
@@ -327,7 +382,7 @@ server<-function(input,output,session){
             df_list[[count]] <- new_df #add the new data frame
           }#end while creating new DFs
           
-          setDFList(df_list) #set the new list
+          setSDFList(df_list) #set the new list
           single_df_output$data <- new_df #set the data table to this
           
         }
@@ -348,7 +403,7 @@ server<-function(input,output,session){
             count <- count + 1
           }#end while creating new DFs
           
-          setDFList(df_list) #set the new list
+          setSDFList(df_list) #set the new list
           single_df_output$data <- new_df #set the data table to this
           
         }#end if-else for index value
@@ -361,27 +416,27 @@ server<-function(input,output,session){
       #creates two dummy variables otherwise the list does not initialize correctly
       
       new_df <- generateNewDF(single_pps_data, index_name, value) #starts from this initial one
-      df_list <- getDFList() #gets latest df_list
+      df_list <- getSDFList() #gets latest df_list
       df_list[[index]] <- new_df #add the new data frame
       df_list[[2]] <- NULL #removes the previous dummy variable
       
-      setDFList(df_list) #set the new list
+      setSDFList(df_list) #set the new list
       single_df_output$data <- new_df #set the data table to this
       
     }#end if-else for the df_list existing
     
-  } #end addDFSeries
+  } #end addSDFSeries
   
-  removeDFSeries <- function(){
+  removeSDFSeries <- function(){
     #this removes the data frames that were in the df_list because of the parameters. It is called
     #when a checkbox is unchecked and one of the parameters were present
     
-    print("removeDFSeries: We are in removeDFSeries")
+    print("removeSDFSeries: We are in removeSDFSeries")
     
     if (exists("df_list", e1)){
       #if the list already exists
       
-      print("removeDFSeries: df_list exists")
+      print("removeSDFSeries: df_list exists")
       
       stack <- getSIStack() #gets the stack
       stack_length <- getSIStack.length()
@@ -389,19 +444,19 @@ server<-function(input,output,session){
       if(stack_length == 0){
         #if when the input parameters were removed from the stack, all the parameters were removed
         #because the removed ones were the only parameters present
-        setDFList(NULL) #sets the list to NULL so it can be reinitialized
+        setSDFList(NULL) #sets the list to NULL so it can be reinitialized
         single_df_output$data <- single_pps_data
         
-        print("removeDFSeries: The stack_length was zero")
+        print("removeSDFSeries: The stack_length was zero")
         
       }
       else{
         #if there is still a stack present
         
-        print("removeDFSeries: The stack_length was NOT zero")
+        print("removeSDFSeries: The stack_length was NOT zero")
         
         input_values <- getSIVector() #gets the input_values
-        df_list <- getDFList() #gets latest df_list
+        df_list <- getSDFList() #gets latest df_list
         
         current_parameter <- stack[1] #gets the first parameter in the stack
         current_parameter_value <- input_values[current_parameter] #gets the parameters value
@@ -438,9 +493,7 @@ server<-function(input,output,session){
           
         }#end if for the count compared to the df_list length
         
-        print(head(new_df[,1:4]))
-        
-        setDFList(df_list) #set the new list
+        setSDFList(df_list) #set the new list
         single_df_output$data <- new_df #set the data table to this
         
       }#end if-else for the stack length
@@ -454,62 +507,7 @@ server<-function(input,output,session){
     }#end if else for the list existing
       
     
-  } #end removeDFSeries
-  
-  generateNewDF <- function(df, index_name, value){
-    #this determines whether the index is max, min, or other. And then it cleans up the df based
-    #on that and generates a new clean df
-    
-    if (length(grep("min", index_name, ignore.case = TRUE)) != 0){
-      #if min was found in the index_name
-      
-      parameter_name <- gsub(" Min", "", index_name)
-      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
-      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
-      
-      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
-      
-      new_df <- df[df[,column_index] >= value,]
-      return(new_df)
-      
-    }
-    else if(length(grep("max", index_name, ignore.case = TRUE)) != 0){
-      #if max was found in the index_name
-      
-      parameter_name <- gsub(" Max", "", index_name)
-      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
-      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
-      
-      
-      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
-      
-      new_df <- df[df[,column_index] <= value,]
-      return(new_df)
-      
-    }
-    else{
-      #this is not a min or a max, but instead is a select input
-      
-      parameter_name <- index_name
-      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
-      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
-      
-      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
-      
-      if (value == "All"){
-        #if 'All' is selected
-        new_df <- df
-      }
-      else{
-        #a specific value was selected
-        new_df <- df[df[,column_index] == value,]
-      }
-      
-      return(new_df)
-      
-    }#end if-else on the types of parameters
-    
-  }#end generateNewDf
+  } #end removeSDFSeries
   
   resetSI <- function(checkbox_name){
     #this resets the inputs for a checkbox
@@ -522,7 +520,7 @@ server<-function(input,output,session){
     
     inputs <- names(isolate(single_inputs()))
     input_ids <- getSIIDVector()
-    original_inputs <- getOriginalSCBVector()
+    original_inputs <- getOriginalSIVector()
     print(original_inputs)
     
     input_indices <- grep(grepname, inputs)
@@ -628,7 +626,7 @@ server<-function(input,output,session){
             stopApp() #terminate the program
           }
           else{
-            addDFSeries(stack_index, index_name, value) #updates the df_list and sets the datatable output df
+            addSDFSeries(stack_index, index_name, value) #updates the df_list and sets the datatable output df
           } #end if-else for the length of the stack index
           
         }#end if-else for the value being na or null
@@ -639,7 +637,7 @@ server<-function(input,output,session){
     else{
       #if it has not been created, it sets the vector and stack
       #this is mainly to initialize data. The df_list does not need to be initialize as that is done
-      #in the addDFSeries()
+      #in the addSDFSeries()
       
       setSIVector(single_inputs())
       setSIStack(c()) #creates an empty stack since no parameters have been changed yet
@@ -707,7 +705,7 @@ server<-function(input,output,session){
             
             resetSI(index_name) #resets the values of the inputs of the checkbox
             removeSIStack(index_name)
-            removeDFSeries() #removes the inputs associated with the checkbox
+            removeSDFSeries() #removes the inputs associated with the checkbox
           }
           else{
             #none of the conditions were met, most likely multiple matches greater than 2
@@ -728,7 +726,7 @@ server<-function(input,output,session){
       #if it has not been created, it sets the vector
       #this is mainly to initialize data.
 
-      setOriginalSCBVector(single_inputs()) #initialize the original values
+      setOriginalSIVector(single_inputs()) #initialize the original values
       setSCBVector(show_vars1()) #initialize the input values that will be changing with the app
 
     } #end if-else for scbvector existing
@@ -747,8 +745,8 @@ server<-function(input,output,session){
 
     names(checkboxes) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
                            "PPS Number",
-                           "Die Size (in)", "Die Land (in)",
-                           "Tip Size (in)", "Tip Land (in)", "Screw Print",
+                           "Die Size (in)", "Die Land Length (in)",
+                           "Tip Size (in)", "Tip Land Length (in)", "Screw Print",
                            "Feedthroat Temperature  F",
                            "Barrel Zone 1 Temperature  F", "Barrel Zone 2 Temperature  F",
                            "Barrel Zone 3 Temperature  F","Clamp Temperature  F",
@@ -764,7 +762,7 @@ server<-function(input,output,session){
 
   })
   
-  #this variable will store all the inputs of of the single extrusions
+  #this variable will store all the inputs of the single extrusions
   single_inputs <- reactive({
     #this variable will store all the inputs of of the single extrusions
     inputs <- c(input$PCSPN, input$PCSPD, input$PCSRN, input$PCSRD, input$PCSPPSN, 
@@ -847,372 +845,836 @@ server<-function(input,output,session){
   
 
   #### Multi-Layer PPS ####
-  #Checkbox
-  output$PCMPN_s<-renderUI({
-    checkboxInput("PCMPN_d","Part Number",value=TRUE)
-  })
-  output$PCMPD_s<-renderUI({
-    checkboxInput("PCMPD_d","Part Description",value=TRUE)
-  })
-  output$PCMRN_s<-renderUI({
-    checkboxInput("PCMRN_d","Resin Number",value=TRUE)
-  })
-  output$PCMRD_s<-renderUI({
-    checkboxInput("PCMRD_d","Resin Description",value=TRUE)
-  })
-  output$PCMPPSN_s<-renderUI({
-    checkboxInput("PCMPPSN_d","PPS Number",value=F)
-  })
-  #Tooling
-  output$PCMDS_s<-renderUI({
-    checkboxInput("PCMDS_d","Die Size (in)",value=T)
-  })
-  output$PCMDLL_s<-renderUI({
-    checkboxInput("PCMDLL_d","Die Land Length (in)",value=F)
-  })
-  output$PCMTS_s<-renderUI({
-    checkboxInput("PCMTS_d","Tip Size (in)",value=T)
-  })
-  output$PCMTLL_s<-renderUI({
-    checkboxInput("PCMTLL_d","Tip Land Length (in)",value=F)
-  })
-  output$PCMSP_s<-renderUI({
-    checkboxInput("PCMSP_d","Screw Print",value=F)
-  })
+  
+  generateNewMDF <- function(df, index_name, value){
+    #this determines whether the index is max, min, or other. And then it cleans up the df based
+    #on that and generates a new clean df
+    
+    if (length(grep("min", index_name, ignore.case = TRUE)) != 0){
+      #if min was found in the index_name
+      
+      parameter_name <- gsub(" Min", "", index_name)
+      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
+      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      
+      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      
+      middle_df <- df[df[,column_index] >= value,]
+      
+      part_numbers <- middle_df[,"Part Number"]#then it gets the unique part numbers
+      new_df <- df[df[,"Part Number"] %in% part_numbers,]#then it cleans up the original df
+      
+      return(new_df)
+      
+    }
+    else if(length(grep("max", index_name, ignore.case = TRUE)) != 0){
+      #if max was found in the index_name
+      
+      parameter_name <- gsub(" Max", "", index_name)
+      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
+      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      
+      
+      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      
+      middle_df <- df[df[,column_index] <= value,]
+      
+      part_numbers <- middle_df[,"Part Number"]#then it gets the unique part numbers
+      new_df <- df[df[,"Part Number"] %in% part_numbers,]#then it cleans up the original df
+      
+      return(new_df)
+      
+    }
+    else{
+      #this is not a min or a max, but instead is a select input
+      
+      parameter_name <- index_name
+      parameter_name <- gsub("\\(", "\\\\(", parameter_name)
+      parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      
+      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      
+      if (value == "All"){
+        #if 'All' is selected
+        new_df <- df
+      }
+      else{
+        #a specific value was selected
+        middle_df <- df[df[,column_index] == value,] #first it searches by the parameters
+        part_numbers <- middle_df[,"Part Number"]#then it gets the unique part numbers
+        new_df <- df[df[,"Part Number"] %in% part_numbers,]#then it cleans up the original df
+      }
+      
+      return(new_df)
+      
+    }#end if-else on the types of parameters
+    
+  }#end generateNewMDf
+  
+  e2 <- new.env(
+    #This environment will store variable of inputs and stack that are used for comparison
+    #of the input parameters that have been selected and changed
+    #' variables to contain:
+    #' mivector - a vector that will store the inputs of the multi extrusion parameters
+    #' mistack - the stack for the multi inputs
+  ) #creates a new environment to store instance variables
+  
+  #the assign will initialize the miidvector
+  assign("miidvector", 
+         c("PCMPN", "PCMPD", "PCMRN", "PCMRD", "PCMPPSN", 
+           "PCMDS_min", "PCMDS_max", "PCMDLL", "PCMTS_min", "PCMTS_max",
+           "PCMTLL", "PCMSP", 
+           "PCMFT_min", "PCMFT_max", "PCMBZT1_min", "PCMBZT1_max",
+           "PCMBZT2_min", "PCMBZT2_max", "PCMBZT3_min", "PCMBZT3_max",
+           "PCMCT_min", "PCMCT_max", "PCMAT_min", "PCMAT_max",
+           "PCMDT1_min", "PCMDT1_max", "PCMDT2_min", "PCMDT2_max",
+           "PCMIDI_min", "PCMIDI_max", "PCMODI_min", "PCMODI_max",
+           "PCMIWT_min", "PCMIWT_max", "PCMMWT_min", "PCMMWT_max", 
+           "PCMOWT_min", "PCMOWT_max", "PCMTWT_min", "PCMTWT_max", 
+           "PCMOR_min", "PCMOR_max", 
+           "PCMCCT_min", "PCMCCT_max", "PCMLength_min", "PCMLength_max",
+           "PCMToLength_min", "PCMToLength_max",
+           "PCMPPD",
+           "PCMNEXIV", "PCMAnnealed", "PCMCaliper", "PCMOS",
+           "PCMMP", "PCMHT", "PCMSPD", "PCMSLD", "PCMDLN", "PCMULT",
+           "PCMVC", "PCMIRD"), 
+         envir = e2)
   
   
-  output$PCMFT_s<-renderUI({
-    checkboxInput("PCMFT_d","Feedthroat Temperature F",value=F)
-  })
-  output$PCMBZT1_s<-renderUI({
-    checkboxInput("PCMBZT1_d","Barrel Zone 1 Temperature F",value=F)
-  })
-  output$PCMBZT2_s<-renderUI({
-    checkboxInput("PCMBZT2_d","Barrel Zone 2 Temperature F",value=F)
-  })
-  output$PCMBZT3_s<-renderUI({
-    checkboxInput("PCMBZT3_d","Barrel Zone 3 Temperature F",value=F)
-  })
+  ## These are the setter and getter function ##
   
+  setMIIDVector <- function(vector){
+    #set the vector for the input ids
+    
+    assign("miidvector", vector, env = e2)
+    
+  } #end setMIIDVector
   
-  output$PCMCT_s<-renderUI({
-    checkboxInput("PCMCT_d","Clamp Temperature F",value=F)
-  })
-  output$PCMAT_s<-renderUI({
-    checkboxInput("PCMAT_d","Adapter Temperature F",value=F)
-  })
-  output$PCMDT1_s<-renderUI({
-    checkboxInput("PCMDT1_d","Die 1 Temperature F",value=F)
-  })
-  output$PCMDT2_s<-renderUI({
-    checkboxInput("PCMDT2_d","Die 2 Temperature F",value=F)
-  })
+  getMIIDVector <- function(){
+    #returns the IDs of the inputs
+    
+    if(exists("miidvector", e2)){
+      return(get("miidvector", e2))
+    }
+    else{
+      return(NA)
+    }
+  } #end getMIIDVector
   
-  output$PCMIDI_s<-renderUI({
-    checkboxInput("PCMIDI_d","Inner Diameter (in)",value=TRUE)
-  })
-  output$PCMODI_s<-renderUI({
-    checkboxInput("PCMODI_d","Outer Diameter (in)",value=TRUE)
-  })
+  setMCBVector <- function(vector){
+    #this sets the values for the multi input vector
+    assign("mcbvector", vector, env = e2)
+  } #end setMCVector
   
+  getMCBVector <- function(vector){
+    #this gets the values for the multi checkbox vector
+    
+    if(exists("mcbvector", e2)){
+      return(get("mcbvector", e2))
+    }
+    else{
+      return(NA)
+    }
+    
+  } #end getMCBVector
   
-  output$PCMIWT_s<-renderUI({
-    checkboxInput("PCMIWT_d","Inner Wall Thickness (in)",value=TRUE)
-  })
-  output$PCMMWT_s<-renderUI({
-    checkboxInput("PCMMWT_d","Middle Wall Thickness (in)",value=TRUE)
-  })
-  output$PCMOWT_s<-renderUI({
-    checkboxInput("PCMOWT_d","Outer Wall Thickness (in)",value=TRUE)
-  })
-  output$PCMTWT_s<-renderUI({
-    checkboxInput("PCMTWT_d","Total Wall Thickness (in)",value=TRUE)
-  })
+  setOriginalMCBVector <- function(vector){
+    #this sets the values for the original min and max input values
+    assign("originalmcbvector", vector, env = e2)
+  } #end setOriginalMCBVector
   
+  getOriginalMCBVector <- function(vector){
+    #this gets the values for the original min and max input values
+    
+    if(exists("originalmcbvector", e2)){
+      return(get("originalmcbvector", e2))
+    }
+    else{
+      return(NA)
+    }
+    
+  } #end getOriginalMCBVector
   
-  output$PCMOR_s<-renderUI({
-    checkboxInput("PCMOR_d","Out of Roundness (in)",value=F)
-  })
+  setMIVector <- function(vector){
+    #this sets the values for the multi input vector
+    assign("mivector", vector, env = e2)
+  } #end setMIVector
   
+  getMIVector <- function(){
+    #returns mivector
+    
+    if(exists("mivector", e2)){
+      return(get("mivector", e2))
+    }
+    else{
+      return(NA)
+    }
+    
+  } #end getMIVector
   
+  setMIStack <- function(stack){
+    #this sets the stack for the multi inputs
+    assign("mistack", stack, env = e2)
+  } #end setMIStack
   
-  output$PCMCCT_s<-renderUI({
-    checkboxInput("PCMCCT_d","Concentricity",value=F)
-  })
-  output$PCMLength_s<-renderUI({
-    checkboxInput("PCMLength_d","Length (in)",value=F)
-  })
-  output$PCMToLength_s<-renderUI({
-    checkboxInput("PCMToLength_d","Total Length (in)",value=T)
-  })
+  getMIStack <- function(){
+    #returns mivector
+    if(exists("mistack", e2)){
+      return(get("mistack", e2))
+    }
+    else{
+      return(NA)
+    }
+    
+  } #end getMIStack
   
-  output$PCMPPD_s<-renderUI({
-    checkboxInput("PCMPPD_d","Perpendicularity (in)",value=F)
-  })
+  getMIStack.length <- function(){
+    #returns the length of the SIStack
+    
+    if(exists("mistack", e2)){
+      #if it exists, return the length
+      return(length(getMIStack()))
+    }
+    else{
+      #else return NA
+      return(NA)
+    }
+    
+  }#end getMIStack.length
   
+  addMIStack <- function(name){
+    #this function adds a new parameter to the stack
+    #it will only add to the stack if it is a unique name
+    
+    stack <- get("mistack", e2)
+    
+    
+    #edit name
+    rep_name <- gsub("\\(", "\\\\(", name)
+    rep_name <- gsub("\\)", "\\\\)", rep_name)
+    
+    if (length(grep(rep_name, stack)) == 0){
+      #the name is not currently in the stack
+      stack <- c(stack, name) #add the name to the top of the stack (the right most)
+      setMIStack(stack) #set the stack
+    }
+    else{
+      #do nothing because the name is already present
+    }
+    
+  } #end  addMIStack
   
-  output$PCMNEXIV_s<-renderUI({
-    checkboxInput("PCMNEXIV_d","NEXIV",value=F)
-  })
-  output$PCMAnnealed_s<-renderUI({
-    checkboxInput("PCMAnnealed_d","Annealed",value=F)
-  })
-  output$PCMCaliper_s<-renderUI({
-    checkboxInput("PCMCaliper_d","Caliper",value=F)
-  })
-  output$PCMOS_s<-renderUI({
-    checkboxInput("PCMOS_d","OD Sort",value=F)
-  })
-  output$PCMMP_s<-renderUI({
-    checkboxInput("PCMMP_d","Melt Pump",value=F)
-  })
-  output$PCMHT_s<-renderUI({
-    checkboxInput("PCMHT_d","Hypo Tip",value=F)
-  })
-  output$PCMSPD_s<-renderUI({
-    checkboxInput("PCMSPD_d","Sparker Die",value=F)
-  })
-  output$PCMSLD_s<-renderUI({
-    checkboxInput("PCMSLD_d","Slicking Die",value=F)
-  })
-  output$PCMDLN_s<-renderUI({
-    checkboxInput("PCMDLN_d","Delamination",value=F)
-  })
-  output$PCMULT_s<-renderUI({
-    checkboxInput("PCMULT_d","Ultrasonic",value=F)
-  })
-  output$PCMVC_s<-renderUI({
-    checkboxInput("PCMVC_d","Vacuum Calibration",value=F)
-  })
-  output$PCMIRD_s<-renderUI({
-    checkboxInput("PCMIRD_d","Irradiated",value=F)
-  })
+  removeMIStack <- function(name){
+    #this function removes the inputs associated with the checkbox name from the stack
+    
+    print("removeMIStack: We are in the removeMIStack")
+    
+    stack <- get("mistack", e2)
+    
+    
+    #edit name
+    rep_name <- gsub("\\(", "\\\\(", name)
+    rep_name <- gsub("\\)", "\\\\)", rep_name)
+    
+    if (length(grep(rep_name, stack)) != 0){
+      #the name is not currently in the stack
+      indices <- grep(rep_name, stack)
+      
+      if (length(indices) == length(stack)){
+        #if the length of the indices are equal to the stack
+        print("removeMIStack: The length of the indices are equal to the stack")
+        stack <- c()
+      }
+      else if (length(indices) == 1){
+        print("removeMIStack: There was only one match in the stack")
+        #if there is only one match
+        if (indices == 1){
+          #if the first matches is 1 or the only match is one
+          stack <- stack[c(2:length(stack))] # removes the first element
+        }
+        else if (indices == length(stack)){
+          stack <- stack[c(1:(indices - 1))]
+        }
+        else{
+          #removes the index from the stack
+          stack <- stack[c(1:(indices-1), (indices + 1):length(stack))]
+        }#end if-else for the vallue of indices
+      }
+      else if (length(indices) == 2){
+        print("removeMIStack: There were multiple matches to the stack")
+        #if there are multiple indices
+        if (indices[1] == 1){
+          #if the first matches is 1 or the only match is one
+          
+          if (indices[2] == 2){
+            stack <- stack[c(3:length(stack))] # removes the first and second element
+          }
+          else if (indices[2] == length(stack)){
+            stack <- stack[c(2:(indices[2] - 1))]
+          }
+          else{
+            stack <- stack[c(2:(indices[2] - 1), (indices[2] + 1):length(stack))] # the indices
+          }#end if-else for the value of the second index
+          
+        }
+        else if(indices[1] == (length(stack) - 1)){
+          #if the first index is length(stack)-1, then the second index is the length of the stack
+          stack <- stack[c(1:(indices[1] - 1))]
+        }
+        else if (indices[1] == (indices[2] + 1)){
+          #if the indices are right next to each other but are not at the ends of the stack
+          stack <- stack[c(1:(indices[1]-1), (indices[2] + 1):length(stack))]
+        }
+        else{
+          #removes the indices from the stack
+          stack <- stack[c(1:(indices[1]-1), (indices[1] + 1):(indices[2] - 1), (indices[2] + 1):length(stack))]
+        }#end if-else for the value of indices
+        
+      }#end if-else for the length of indices
+      else{
+        #if it was neither, there was an error and the app shoudl stop
+        print("The indices in the removeMIStack were more than 2")
+        print(paste0("The indices are: ", indices))
+        stop()
+      }
+      
+      
+      setMIStack(stack) #set the stack
+    }
+    else{
+      #do nothing because the name is not in the stack
+      print("removeMIStack: Nothing was done because the name was not in the stack")
+    }
+    
+  } #end  removeMIStack
   
+  setMDFList <- function(list){
+    #sets the DFList
+    assign("df_list", list, env = e2)
+  }#end setMDFList
   
+  getMDFList <- function(){
+    #returns the df_list
+    if(exists("df_list", e2)){
+      #if it exists, return the length
+      return((get("df_list", e2)))
+    }
+    else{
+      #else return NA
+      return(NA)
+    }
+    
+  }#end getMDFList
   
-  #Search Box
+  addMDFSeries <- function(index, index_name, value){
+    #this creates the series of successively more narrow data frames based on the number of parameters
+    #the user has searched by. 3 parameters means there is the original data frame and three ones
+    #that have been successively narrowed.
+    
+    if (exists("df_list", e2)){
+      #if the list already exists
+      
+      if(index == getMIStack.length() + 1){
+        #if the index is larger than the list length, we have a new parameter that will be added
+        df_list <- getMDFList() #gets latest df_list
+        latest_df <- df_list[[index-1]] #the index should only be 1 greater than the list
+        
+        new_df <- generateNewMDF(latest_df, index_name, value)
+        df_list[[index]] <- new_df #add the new data frame
+        setMDFList(df_list) #set the new list
+        
+        multi_df_output$data <- new_df #set the data table to this
+        
+      }
+      else if(index > getMIStack.length() + 1){
+        #if there was an error in the index and it was too large
+        print("The index for the stack was too large and greater than the allowable limit")
+        print(paste0("The stack index is: ", index, ". The stack length is: ", getMIStack.length(), "."))
+        stopApp()
+      }
+      else if(index < 1){
+        #error in the index
+        print("The index for the stack was zero or negative")
+        print(paste0("The stack index is: ", index, ". The stack length is: ", getMIStack.length(), "."))
+        stopApp()
+      }
+      else{
+        #the index is within the stack which means we means a previous parameter is being changed
+        stack <- getMIStack()
+        stack_length <- getMIStack.length()
+        
+        input_values <- getMIVector()
+        
+        df_list <- getMDFList() #gets latest df_list
+        
+        if (index == 1){
+          #if it is starting from the beginning
+          
+          new_df <- generateNewMDF(multi_pps_data, index_name, value) #starts from this initial one
+          df_list[[index]] <- new_df #add the new data frame
+          
+          count <- index + 1
+          
+          while (count < stack_length + 1){
+            
+            previous_df <- df_list[[count-1]]
+            current_parameter <- stack[count]
+            current_parameter_value <- input_values[current_parameter]
+            
+            new_df <- generateNewMDF(previous_df, current_parameter, current_parameter_value)
+            count <- count + 1
+            df_list[[count]] <- new_df #add the new data frame
+          }#end while creating new DFs
+          
+          setMDFList(df_list) #set the new list
+          multi_df_output$data <- new_df #set the data table to this
+          
+        }
+        else{
+          
+          count <- index
+          
+          while (count < stack_length + 1){
+            
+            previous_df <- df_list[[count-1]] #gets the previous df
+            current_parameter <- stack[count]
+            current_parameter_value <- input_values[current_parameter]
+            
+            new_df <- generateNewMDF(previous_df, current_parameter, current_parameter_value)
+            
+            df_list[[count]] <- new_df #add the new data frame
+            
+            count <- count + 1
+          }#end while creating new DFs
+          
+          setMDFList(df_list) #set the new list
+          multi_df_output$data <- new_df #set the data table to this
+          
+        }#end if-else for index value
+        
+      }#end if else for the index length
+      
+    }
+    else{
+      assign("df_list", list("hello", "hi"), env = e2) #if the list does not yet exist, it creates it
+      #creates two dummy variables otherwise the list does not initialize correctly
+      
+      new_df <- generateNewMDF(multi_pps_data, index_name, value) #starts from this initial one
+      df_list <- getMDFList() #gets latest df_list
+      df_list[[index]] <- new_df #add the new data frame
+      df_list[[2]] <- NULL #removes the previous dummy variable
+      
+      setMDFList(df_list) #set the new list
+      multi_df_output$data <- new_df #set the data table to this
+      
+    }#end if-else for the df_list existing
+    
+  } #end addMDFSeries
   
-  output$PCMPN_input<-renderUI({
-    selectizeInput("PCMPN",label = NULL,multiple=TRUE,
-                   c("All",unique(as.character(multi_pps_data$`Part Number`))),
-                   selected="All")
-  })
-  output$PCMPD_input<-renderUI({
-    selectInput("PCMPD",label = NULL,
-                c("All",unique(as.character(multi_pps_data$`Part Description`))))
-  })
-  output$PCMRN_input<-renderUI({
-    selectInput("PCMRN",label = NULL,
-                c("All",unique(as.character(multi_pps_data$`Resin Number`))))
-  })
-  output$PCMRD_input<-renderUI({
-    selectInput("PCMRD",label = NULL,
-                c("All",unique(as.character(multi_pps_data$`Resin Description`))))
-  })
-  output$PCMPPSN_input<-renderUI({
-    selectInput("PCMPPSN",label = NULL,
-                c("All",unique(as.character(multi_pps_data$`PPS Number`))))
-  })
+  removeMDFSeries <- function(){
+    #this removes the data frames that were in the df_list because of the parameters. It is called
+    #when a checkbox is unchecked and one of the parameters were present
+    
+    print("removeMDFSeries: We are in removeMDFSeries")
+    
+    if (exists("df_list", e2)){
+      #if the list already exists
+      
+      print("removeMDFSeries: df_list exists")
+      
+      stack <- getMIStack() #gets the stack
+      stack_length <- getMIStack.length()
+      
+      if(stack_length == 0){
+        #if when the input parameters were removed from the stack, all the parameters were removed
+        #because the removed ones were the only parameters present
+        setMDFList(NULL) #sets the list to NULL so it can be reinitialized
+        multi_df_output$data <- multi_pps_data
+        
+        print("removeMDFSeries: The stack_length was zero")
+        
+      }
+      else{
+        #if there is still a stack present
+        
+        print("removeMDFSeries: The stack_length was NOT zero")
+        
+        input_values <- getMIVector() #gets the input_values
+        df_list <- getMDFList() #gets latest df_list
+        
+        current_parameter <- stack[1] #gets the first parameter in the stack
+        current_parameter_value <- input_values[current_parameter] #gets the parameters value
+        
+        new_df <- generateNewMDF(multi_pps_data, current_parameter, current_parameter_value) #starts from this initial one
+        df_list[[1]] <- new_df #add the new data frame
+        
+        count <- 2
+        
+        while (count < stack_length + 1){
+          
+          previous_df <- df_list[[count-1]]
+          current_parameter <- stack[count]
+          current_parameter_value <- input_values[current_parameter]
+          
+          new_df <- generateNewMDF(previous_df, current_parameter, current_parameter_value)
+          count <- count + 1
+          df_list[[count]] <- new_df #add the new data frame
+        }#end while creating new DFs
+        
+        if (count < (length(df_list) + 1)){
+          #'because we recreate the df_list from the original df_list and th new df_list will not
+          #'have the dataframes from the removed parameters, this new df_list will be shorter than
+          #'the original before the parameters were removed. Thus we resize the df_list
+          
+          while ((length(df_list) + 1) > count){
+            #the df_list will continually be resized as the inputs are made null, thus the condition
+            #is met when all the element greater than an index of count are removed
+            
+            df_list[[count]] <- NULL
+            
+          } #end while for making the elements NULL
+          
+          
+        }#end if for the count compared to the df_list length
+        
+        
+        setMDFList(df_list) #set the new list
+        multi_df_output$data <- new_df #set the data table to this
+        
+      }#end if-else for the stack length
+      
+    }
+    else{
+      #there was an error and the list did not exist when it should have because it observed a
+      #unchecked checkbox and the stack length was not zero
+      print("The df_list does not exist but you attempted to remove something from it")
+      stopApp()
+    }#end if else for the list existing
+    
+    
+  } #end removeMDFSeries
   
-  #Tooling
-  output$PCMDS_min_input<-renderUI({
-    numericInput("PCMDS_min",label = NULL,value=PCMDSmin,step=0.001)
-  })
-  output$PCMDS_max_input<-renderUI({
-    numericInput("PCMDS_max",label = NULL,value=PCMDSmax,step=0.001)
-  })
-  output$PCMDLL_input<-renderUI({
-    DLL_min=-1
-    DLL_max=0.54
-    selectInput("PCMDLL",label = NULL,c("All",unique(as.character(multi_pps_data$`Die Land Length (in)`))))
-  })
-  output$PCMTS_min_input<-renderUI({
-    numericInput("PCMTS_min",label = NULL,value=PCMTSmin,step=0.001)
-  })
-  output$PCMTS_max_input<-renderUI({
-    numericInput("PCMTS_max",label = NULL,value=PCMTSmax,step=0.001)
-  })
-  output$PCMTLL_input<-renderUI({
-    TLL_min=-1
-    TLL_max=0.49
-    selectInput("PCMTLL",label = NULL,c("All",unique(as.character(multi_pps_data$`Tip Land Length (in)`))))
-  })
-  output$PCMSP_input<-renderUI({
-    selectInput("PCMSP",label = NULL,
-                c("All",unique(as.character(multi_pps_data$`Screw Print`))))
-  })
+  resetMI <- function(checkbox_name){
+    #this resets the inputs for a checkbox
+    
+    print("resetMI: Resetting the Input Values")
+    print(paste0("resetMI: checkbox_name is - ", checkbox_name))
+    
+    grepname <- gsub("\\(", "\\\\(", checkbox_name)
+    grepname <- gsub("\\)", "\\\\)", grepname)
+    
+    inputs <- names(isolate(multi_inputs()))
+    input_ids <- getMIIDVector()
+    original_inputs <- getOriginalMCBVector()
+    print(original_inputs)
+    
+    input_indices <- grep(grepname, inputs)
+    
+    print(paste0("resetMI: input_indices is: ", input_indices))
+    
+    count <- 1
+    
+    while (count < length(input_indices) + 1){
+      #goes through all the input_indices that matches
+      
+      print("resetMI: In the while loop.")
+      
+      index <- input_indices[count]
+      input_name <- inputs[index]
+      id <- input_ids[index]
+      value <- original_inputs[[index]]
+      
+      print(paste0("resetMI: index is: ", index))
+      print(paste0("resetMI: input_name is: ", input_name))
+      print(paste0("resetMI: id is: ", id))
+      print(paste0("resetMI: value is: ", value))
+      
+      if (length(grep(" min", input_name, ignore.case = TRUE)) > 0){
+        print("resetMI: In the min")
+        updateNumericInput(session,
+                           inputId = id,
+                           label = NULL,
+                           value = value
+        )
+      }
+      else if (length(grep(" max", input_name, ignore.case = TRUE)) > 0){
+        print("resetMI: In the max")
+        updateNumericInput(session,
+                           inputId = id,
+                           label = NULL,
+                           value = value
+        )
+      }
+      else{
+        print("resetMI: In the else")
+        updateSelectInput(session, 
+                          id,
+                          label = NULL,
+                          choices = c("All",unique(as.character(multi_pps_data[,checkbox_name]))),
+                          selected =  "All"
+        )
+      }#end if-else for grep the input_name
+      
+      count <- count + 1
+    }#end while for length of input_indices
+    
+    
+  }#end resetMI
   
-  #Attributes_1
-  output$PCMFT_min_input<-renderUI({
-    numericInput("PCMFT_min",label = NULL,value = PCMFTmin,step=1)
-  })
-  output$PCMFT_max_input<-renderUI({
-    numericInput("PCMFT_max",label = NULL,value=PCMFTmax,step=1)
-  })
-  output$PCMBZT1_min_input<-renderUI({
-    numericInput("PCMBZT1_min",label = NULL,value=PCMBZT1min,step=5)
-  })
-  output$PCMBZT1_max_input<-renderUI({
-    numericInput("PCMBZT1_max",label = NULL,value=PCMBZT1max,step=5)
-  })
-  output$PCMBZT2_min_input<-renderUI({
-    numericInput("PCMBZT2_min",label = NULL,value=PCMBZT2min,step=5)
-  })
-  output$PCMBZT2_max_input<-renderUI({
-    numericInput("PCMBZT2_max",label = NULL,value=PCMBZT2max,step=5)
-  })
-  output$PCMBZT3_min_input<-renderUI({
-    numericInput("PCMBZT3_min",label = NULL,value=PCMBZT3min,step=5)
-  })
-  output$PCMBZT3_max_input<-renderUI({
-    numericInput("PCMBZT3_max",label = NULL,value=PCMBZT3max,step=5)
-  })
+  multi_df_output <- reactiveValues(data = multi_pps_data) #end reactive for multi_df_output
   
-  #Temperatures
-  output$PCMCT_min_input<-renderUI({
-    numericInput("PCMCT_min",label = NULL,value=PCMCTmin,step=5)
-  })
-  output$PCMCT_max_input<-renderUI({
-    numericInput("PCMCT_max",label = NULL,value=PCMCTmax,step=5)
-  })
-  output$PCMAT_min_input<-renderUI({
-    numericInput("PCMAT_min",label = NULL,value=PCMATmin,step=5)
-  })
-  output$PCMAT_max_input<-renderUI({
-    numericInput("PCMAT_max",label = NULL,value=PCMATmax,step=5)
-  })
-  output$PCMDT1_min_input<-renderUI({
-    numericInput("PCMDT1_min",label = NULL,value=PCMDT1min,step=5)
-  })
-  output$PCMDT1_max_input<-renderUI({
-    numericInput("PCMDT1_max",label = NULL,value=PCMDT1max,step=5)
-  })
-  output$PCMDT2_min_input<-renderUI({
-    numericInput("PCMDT2_min",label = NULL,value=PCMDT2min,step=5)
-  })
-  output$PCMDT2_max_input<-renderUI({
-    numericInput("PCMDT2_max",label = NULL,value=PCMDT2max,step=5)
-  })
-  #Attributes
-  output$PCMIDI_min_input<-renderUI({
-    numericInput("PCMIDI_min",label = NULL,value=PCMIDImin,step=0.001)
-  })
-  output$PCMIDI_max_input<-renderUI({
-    numericInput("PCMIDI_max",label = NULL,value=PCMIDImax,step=0.001)
-  })
-  output$PCMODI_min_input<-renderUI({
-    numericInput("PCMODI_min",label = NULL,value=PCMODImin,step=0.001)
-  })
-  output$PCMODI_max_input<-renderUI({
-    numericInput("PCMODI_max",label = NULL,value=PCMODImax,step=0.001)
-  })
+  observeEvent(multi_inputs(),{
+    #'This will observe if any of the inputs of the parameters for multi extrusion have changed
+    #'It does not check to see if the input has been selected, but rather, if the user has changed
+    #'the search input.'
+    
+    print("Input Observed")
+    
+    if (exists("mivector", e2)){
+      #checks to see if the vector has been created yet. This is to prevent the initialization
+      #of the program
+      
+      old_mivector <- getMIVector() #get the old mivector before inputs were changed
+      current_mivector <- multi_inputs()
+      setMIVector(current_mivector) #updates the mivector with the new inputs
+      
+      #produces a vector fo TRUE and FALSE. There should be one element that is different and
+      #grep 'FALSE' will find that index.
+      index_differ <- grep("FALSE", (current_mivector == old_mivector))
+      
+      if (length(index_differ) == 0){
+        #Nothing will be analyzed
+        print("A parameter was changed but the value was changed to what the previous value was")
+      }
+      else{
+        
+        index_name <- names(current_mivector[index_differ])
+        value <- current_mivector[index_differ] #gets the value of the new parameter
+        
+        if (is.null(value) || is.na(value)){
+          #Nothing will be analyzed
+          print("The value is null or na")
+        }
+        else{
+          addMIStack(index_name) #adds the name to the stack
+          current_mistack <- getMIStack() #gets the newstack
+          
+          #This needs to be updated because of the parenthese
+          updated_index_name <- gsub("\\(", "\\\\(", index_name)
+          updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          
+          stack_index <- grep(updated_index_name, current_mistack) #gets the index in the stack
+          
+          if (length(stack_index) != 1){
+            print("The Stack Index has a length != 0")
+            print(paste0("The Stack Index is: ", stack_index))
+            stopApp() #terminate the program
+          }
+          else{
+            addMDFSeries(stack_index, index_name, value) #updates the df_list and sets the datatable output df
+          } #end if-else for the length of the stack index
+          
+        }#end if-else for the value being na or null
+        
+      } #end if-else for the length of index_differ
+      
+    }
+    else{
+      #if it has not been created, it sets the vector and stack
+      #this is mainly to initialize data. The df_list does not need to be initialize as that is done
+      #in the addMDFSeries()
+      
+      print("observeEvent(multi_inputs): The multi_input vector does not exist.")
+      
+      setMIVector(multi_inputs())
+      setMIStack(c()) #creates an empty stack since no parameters have been changed yet
+    }
+  })#end observeEvent for the user inputs
   
-  output$PCMIWT_min_input<-renderUI({
-    numericInput("PCMIWT_min",label = NULL,value=PCMIWTmin,step=0.001)
-  })
-  output$PCMIWT_max_input<-renderUI({
-    numericInput("PCMIWT_max",label = NULL,value=PCMIWTmax,step=0.001)
-  })
-  output$PCMMWT_min_input<-renderUI({
-    numericInput("PCMMWT_min",label = NULL,value=PCMMWTmin,step=0.001)
-  })
-  output$PCMMWT_max_input<-renderUI({
-    numericInput("PCMMWT_max",label = NULL,value=PCMMWTmax,step=0.001)
-  })
-  output$PCMOWT_min_input<-renderUI({
-    numericInput("PCMOWT_min",label = NULL,value=PCMOWTmin,step=0.001)
-  })
-  output$PCMOWT_max_input<-renderUI({
-    numericInput("PCMOWT_max",label = NULL,value=PCMOWTmax,step=0.001)
-  })
-  output$PCMTWT_min_input<-renderUI({
-    numericInput("PCMTWT_min",label = NULL,value=PCMTWTmin,step=0.001)
-  })
-  output$PCMTWT_max_input<-renderUI({
-    numericInput("PCMTWT_max",label = NULL,value=PCMTWTmax,step=0.001)
-  })
-  
-  output$PCMOR_min_input<-renderUI({
-    numericInput("PCMOR_min",label = NULL,value=PCMORmin,step=0.001)
-  })
-  output$PCMOR_max_input<-renderUI({
-    numericInput("PCMOR_max",label = NULL,value=PCMORmax,step=0.001)
-  })
-  output$PCMCCT_min_input<-renderUI({
-    numericInput("PCMCCT_min",label = NULL,value=PCMCCTmin,step=0.0001)
-  })
-  output$PCMCCT_max_input<-renderUI({
-    numericInput("PCMCCT_max",label = NULL,value=PCMCCTmax,step=0.0001)
-  })
-  output$PCMLength_min_input<-renderUI({
-    numericInput("PCMLength_min",label = NULL,value=PCMLengthmin,step=1)
-  })
-  output$PCMLength_max_input<-renderUI({
-    numericInput("PCMLength_max",label = NULL,value=PCMLengthmax,step=1)
-  })
-  output$PCMToLength_min_input<-renderUI({
-    numericInput("PCMToLength_min",label = NULL,value=PCMToLengthmin,step=1)
-  })
-  output$PCMToLength_max_input<-renderUI({
-    numericInput("PCMToLength_max",label = NULL,value=PCMToLengthmax,step=1)
-  })
-  output$PCMPPD_input<-renderUI({
-    selectInput("PCMPPD",label = NULL,
-                c("All",unique(as.character(multi_pps_data$`Perpendicularity (in)`))))
-  })
-  
-  #Special_1
-  output$PCMNEXIV_input<-renderUI({
-    selectInput("PCMNEXIV",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCMAnnealed_input<-renderUI({
-    selectInput("PCMAnnealed",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCMCaliper_input<-renderUI({
-    selectInput("PCMCaliper",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCMOS_input<-renderUI({
-    selectInput("PCMOS",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCMMP_input<-renderUI({
-    selectInput("PCMMP",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCMHT_input<-renderUI({
-    selectInput("PCMHT",label = NULL,choices=c("All","yes","NA"))
-  })
-  #Special_2
-  output$PCMSPD_input<-renderUI({
-    selectInput("PCMSPD",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCMSLD_input<-renderUI({
-    selectInput("PCMSLD",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCMDLN_input<-renderUI({
-    selectInput("PCMDLN",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCMULT_input<-renderUI({
-    selectInput("PCMULT",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCMVC_input<-renderUI({
-    selectInput("PCMVC",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCMIRD_input<-renderUI({
-    selectInput("PCMIRD",label = NULL,choices=c("All","yes","NA"))
-  })
+  observeEvent(show_vars2(),{
+    #' this function will observe when a user checks or unchecks an input. If the input is unchecked,
+    #' it removes any of the data cleaning it did in the stack and also resets the value of the
+    #' input to the initialized value from the start of the session
+    
+    print("observeEvent(show_vars2): Checkbox Observed")
+    
+    if (exists("mcbvector", e2)){
+      
+      print("observeEvent(show_vars2): The mcbvector Exists")
+      
+      old_mcbvector <- getMCBVector() #get the old scbvector before inputs were changed
+      current_mcbvector <- show_vars2()
+      setMCBVector(current_mcbvector) #updates the scbvector with the new inputs
+      
+      #produces a vector fo TRUE and FALSE. There should be one element that is different and
+      #grep 'FALSE' will find that index.
+      index_differ <- grep("FALSE", (current_mcbvector == old_mcbvector))
+      
+      if (length(index_differ) == 0){
+        #Nothing will be analyzed since the value was changed to TRUE
+      }
+      else{
+        
+        print("observeEvent(show_vars2): The Checkbox Index_Differ Worked")
+        
+        index_name <- names(current_mcbvector[index_differ])
+        value <- current_mcbvector[index_differ] #gets the value of the new parameter
+        
+        if (is.null(value) || is.na(value)){
+          #Nothing will be analyzed
+          print("observeEvent(show_vars2): The checkbox value is null or na")
+          stopApp()
+        }
+        else if (value == FALSE){
+          #this ensures that the checkbox was unchecked instead of checked
+          
+          print("observeEvent(show_vars2): The Value of the Checkbox was FALSE")
+          
+          current_mistack <- getMIStack() #gets the newstack
+          
+          #This needs to be updated because of the parenthese
+          updated_index_name <- gsub("\\(", "\\\\(", index_name)
+          updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          
+          stack_index <- grep(updated_index_name, current_mistack) #gets the index in the stack
+          
+          if (length(stack_index) == 0){
+            print("observeEvent(show_vars2): The Input was not in the Stack")
+            #the input that was unchecked is not in the stack, so do nothing
+          }
+          else if (length(stack_index) == 1 || length(stack_index) == 2){
+            #the parameter that was unchecked is in the stack
+            #it can be of length 1 or 2 depending of the input parameter had a min and max value
+            #if it is a selectize input, there will only be one match (length of 1)
+            
+            print("observeEvent(show_vars2): The Input was in the Stack")
+            print(paste0("observeEvent(show_vars2): The Checkboxname is: ", index_name))
+            
+            resetMI(index_name) #resets the values of the inputs of the checkbox
+            removeMIStack(index_name)
+            removeMDFSeries() #removes the inputs associated with the checkbox
+          }
+          else{
+            #none of the conditions were met, most likely multiple matches greater than 2
+            print("observeEvent(show_vars2): The Stack Index for the Checkboxes ObserveEvent has a length > 2 or negative")
+            stopApp()
+          } #end if-else for the length of the stack index
+          
+        }
+        else{
+          #if it is not false, do nothing
+          print("observeEvent(show_vars2): The Checkbox value was TRUE")
+        }#end if-else for the value being na or null
+        
+      } #end if-else for the length of index_differ
+      
+    }
+    else{
+      #if it has not been created, it sets the vector
+      #this is mainly to initialize data.
+      
+      setOriginalMCBVector(multi_inputs()) #initialize the original values
+      setMCBVector(show_vars2()) #initialize the input values that will be changing with the app
+      
+    } #end if-else for scbvector existing
+    
+    
+  })#end observeEvent for the checkboxes
   
 
   
-  #PCM
-  Col_PCM=c()
+  # obtain the output of checkbox from functions and make a list to store them
+  #this variable will store all the inputs of the multi-layer extrusions
   show_vars2<-reactive({
-    as.numeric(c(input$PCMPN_d,input$PCMPD_d,input$PCMRN_d,input$PCMRD_d,input$PCMPPSN_d,input$PCMDS_d,input$PCMDLL_d,input$PCMTS_d,input$PCMTLL_d,input$PCMSP_d,input$PCMFT_d,
-                 input$PCMBZT1_d,input$PCMBZT2_d,input$PCMBZT3_d,input$PCMCT_d,input$PCMAT_d,input$PCMDT1_d,input$PCMDT2_d,input$PCMIDI_d,input$PCMODI_d,input$PCMIWT_d,input$PCMMWT_d,
-                 input$PCMOWT_d,input$PCMTWT_d,input$PCMOR_d,input$PCMCCT_d,input$PCMLength_d,input$PCMToLength_d,input$PCMPPD_d,input$PCMNEXIV_d,input$PCMAnnealed_d,input$PCMCaliper_d,
-                 input$PCMOS_d,input$PCMMP_d,input$PCMHT_d,input$PCMSPD_d,input$PCMSLD_d,input$PCMDLN_d,input$PCMULT_d,input$PCMVC_d,input$PCMIRD_d))})
+    
+    checkboxes2 <- as.numeric(c(input$PCMPN_d,input$PCMPD_d,input$PCMRN_d,input$PCMRD_d,
+                               input$PCMPPSN_d, input$PCMET_d, input$PCMB_d,
+                               input$PCMDS_d,input$PCMDLL_d,input$PCMTS_d,
+                               input$PCMTLL_d,input$PCMSP_d,input$PCMFT_d,
+                               input$PCMBZT1_d,input$PCMBZT2_d,input$PCMBZT3_d,
+                               input$PCMCT_d,input$PCMAT_d,input$PCMDT1_d,input$PCMDT2_d, input$PCMTE_d,
+                               input$PCMIDI_d,input$PCMODI_d,input$PCMIWT_d,input$PCMMWT_d,
+                               input$PCMOWT_d,input$PCMTWT_d,input$PCMOR_d,input$PCMCCT_d,
+                               input$PCMLength_d,input$PCMToLength_d,input$PCMPPD_d,input$PCMNEXIV_d,
+                               input$PCMAnnealed_d,input$PCMCaliper_d,input$PCMOS_d,input$PCMMP_d,
+                               input$PCMHT_d,input$PCMSPD_d,input$PCMSLD_d,input$PCMDLN_d,
+                               input$PCMULT_d,input$PCMVC_d,input$PCMIRD_d))
+    
+    names(checkboxes2) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+                           "PPS Number", "Extrusion Type", "Barrel",
+                           "Die Size (in)", "Die Land Length (in)",
+                           "Tip Size (in)", "Tip Land Length (in)", "Screw Print",
+                           "Feedthroat Temperature  F",
+                           "Barrel Zone 1 Temperature  F", "Barrel Zone 2 Temperature  F",
+                           "Barrel Zone 3 Temperature  F","Clamp Temperature  F",
+                           "Adapter Temperature  F","Die 1 Temperature  F", "Die 2 Temperature  F",
+                           "Tapered End",
+                           "Inner Diameter (in)", "Outer Diameter (in)",
+                           "Inner Wall Thickness (in)", "Middle Wall Thickness (in)",
+                           "Outer Wall Thickness (in)", "Total Wall Thickness (in)",
+                           "Out of Roundness (in)",
+                           "Concentricity (in)", "Length (in)", "Total Length",
+                           "Perpendicularity (in)",
+                           "Nexiv", "Annealed", "Caliper", "OD Sort", "Melt Pump", "Hypo Tip",
+                           "Sparker Die", "Slicking Die", "Delamination", "Ultrasonic",
+                           "Vacuum Calibration", "Irradiated")
+    
+    return(checkboxes2)
+    
+    })
+  
+  #this variable will store all the inputs of the multi extrusions
+  multi_inputs <- reactive({
+    #this variable will store all the inputs of of the multi extrusions
+    inputs2 <- c(input$PCMPN, input$PCMPD, input$PCMRN, input$PCMRD, input$PCMPPSN, 
+                input$PCMDS_min, input$PCMDS_max, input$PCMDLL, input$PCMTS_min, input$PCMTS_max,
+                input$PCMTLL, input$PCMSP, 
+                input$PCMFT_min, input$PCMFT_max, input$PCMBZT1_min, input$PCMBZT1_max,
+                input$PCMBZT2_min, input$PCMBZT2_max, input$PCMBZT3_min, input$PCMBZT3_max,
+                input$PCMCT_min, input$PCMCT_max, input$PCMAT_min, input$PCMAT_max,
+                input$PCMDT1_min, input$PCMDT1_max, input$PCMDT2_min, input$PCMDT2_max,
+                input$PCMIDI_min, input$PCMIDI_max, input$PCMODI_min, input$PCMODI_max,
+                input$PCMIWT_min, input$PCMIWT_max, 
+                input$PCMMWT_min, input$PCMMWT_max,
+                input$PCMOWT_min, input$PCMOWT_max,
+                input$PCMTWT_min, input$PCMTWT_max,
+                input$PCMOR_min, input$PCMOR_max, 
+                input$PCMCCT_min, input$PCMCCT_max, input$PCMLength_min, input$PCMLength_max,
+                input$PCMPPD,
+                input$PCMNEXIV, input$PCMAnnealed, input$PCMCaliper, input$PCMOS,
+                input$PCMMP, input$PCMHT, input$PCMSPD, input$PCMSLD, input$PCMDLN, input$PCMULT,
+                input$PCMVC, input$PCMIRD)
+    
+    names(inputs2) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+                       "PPS Number",
+                       "Die Size (in) Min", "Die Size (in) Max", "Die Land (in) Length", 
+                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land (in) Length", "Screw Print",
+                       "Feedthroat Temperature  F Min", "Feedthroat Temperature  F Max",
+                       "Barrel Zone 1 Temperature  F Min", "Barrel Zone 1 Temperature  F Max",
+                       "Barrel Zone 2 Temperature  F Min", "Barrel Zone 2 Temperature  F Max",
+                       "Barrel Zone 3 Temperature  F Min", "Barrel Zone 3 Temperature  F Max",
+                       "Clamp Temperature  F Min", "Clamp Temperature  F Max",
+                       "Adapter Temperature  F Min", "Adapter Temperature  F Max",
+                       "Die 1 Temperature  F Min", "Die 1 Temperature  F Max",
+                       "Die 2 Temperature  F Min", "Die 2 Temperature  F Max",
+                       "Inner Diameter (in) Min", "Inner Diameter (in) Max", "Outer Diameter (in) Min",
+                       "Outer Diameter (in) Max", 
+                       "Inner Wall Thickness (in) Min", "Inner Wall Thickness (in) Max",
+                       "Middle Wall Thickness (in) Min", "Middle Wall Thickness (in) Max",
+                       "Outer Wall Thickness (in) Min", "Outer Wall Thickness (in) Max",
+                       "Total Wall Thickness (in) Min", "Total Wall Thickness (in) Max",
+                       "Out of Roudness (in) Min", "Out of Roundness (in) Max", 
+                       "Concentricity (in) Min", "Concentricity (in) Max",
+                       "Length (in) Min", "Length (in) Max", "Perpendicularity (in", 
+                       "Nexiv", "Annealed", "Caliper", "OD Sort", "Melt Pump", "Hypo Tip",
+                       "Sparker Die", "Slicking Die", "Delamination", "Ultrasonic",
+                       "Vacuum Calibration", "Irradiated")
+    return(inputs2)
+  })
   
   output$mytable2 <- DT::renderDataTable({
     DT::datatable({
-      
+      Col_PCM=c()
       col_var2=show_vars2()
       for (i in 1:length(col_var2)){
         if (col_var2[i]!=0){
@@ -1220,11 +1682,10 @@ server<-function(input,output,session){
         }
       } 
   
-      data_PCM<-multi_pps_data[,Col_PCM]
+      data_PCM <- multi_df_output$data #the data frame is set
+      data_PCM<-data_PCM[,Col_PCM]
       
-      
-      
-      data_PCM
+      return(data_PCM)
     },
     options = list(orderClasses = TRUE, 
                    columnDefs = list(list(className = 'dt-center', 
@@ -1241,398 +1702,7 @@ server<-function(input,output,session){
   
   #### Tapered PPS ####
   
-  #Checkbox
-  output$PCTPN_s<-renderUI({
-    checkboxInput("PCTPN_d","Part Number",value=TRUE)
-  })
-  output$PCTPD_s<-renderUI({
-    checkboxInput("PCTPD_d","Part Description",value=TRUE)
-  })
-  output$PCTRN_s<-renderUI({
-    checkboxInput("PCTRN_d","Resin Number",value=TRUE)
-  })
-  output$PCTRD_s<-renderUI({
-    checkboxInput("PCTRD_d","Resin Description",value=TRUE)
-  })
-  output$PCTPPSN_s<-renderUI({
-    checkboxInput("PCTPPSN_d","PPS Number",value=F)
-  })
-  #Tooling
-  output$PCTDS_s<-renderUI({
-    checkboxInput("PCTDS_d","Die Size (in)",value=F)
-  })
-  output$PCTDLL_s<-renderUI({
-    checkboxInput("PCTDLL_d","Die Land Length (in)",value=F)
-  })
-  output$PCTTS_s<-renderUI({
-    checkboxInput("PCTTS_d","Tip Size (in)",value=F)
-  })
-  output$PCTTLL_s<-renderUI({
-    checkboxInput("PCTTLL_d","Tip Land Length (in)",value=F)
-  })
-  output$PCTSP_s<-renderUI({
-    checkboxInput("PCTSP_d","Screw Print",value=F)
-  })
   
-  
-  output$PCTFT_s<-renderUI({
-    checkboxInput("PCTFT_d","Feedthroat Temperature F",value=F)
-  })
-  output$PCTBZT1_s<-renderUI({
-    checkboxInput("PCTBZT1_d","Barrel Zone 1 Temperature F",value=F)
-  })
-  output$PCTBZT2_s<-renderUI({
-    checkboxInput("PCTBZT2_d","Barrel Zone 2 Temperature F",value=F)
-  })
-  output$PCTBZT3_s<-renderUI({
-    checkboxInput("PCTBZT3_d","Barrel Zone 3 Temperature F",value=F)
-  })
-  
-  
-  output$PCTCT_s<-renderUI({
-    checkboxInput("PCTCT_d","Clamp Temperature F",value=F)
-  })
-  output$PCTAT_s<-renderUI({
-    checkboxInput("PCTAT_d","Adapter Temperature F",value=F)
-  })
-  output$PCTDT1_s<-renderUI({
-    checkboxInput("PCTDT1_d","Die 1 Temperature F",value=F)
-  })
-  output$PCTDT2_s<-renderUI({
-    checkboxInput("PCTDT2_d","Die 2 Temperature F",value=F)
-  })
-  
-  output$PCTPIDI_s<-renderUI({
-    checkboxInput("PCTPIDI_d","Proximal Inner Diameter (in)",value=TRUE)
-  })
-  output$PCTPODI_s<-renderUI({
-    checkboxInput("PCTPODI_d","Proximal Outer Diameter (in)",value=TRUE)
-  })
-  output$PCTPWT_s<-renderUI({
-    checkboxInput("PCTPWT_d","Proximal Wall Thickness (in)",value=TRUE)
-  })
-  output$PCTPOR_s<-renderUI({
-    checkboxInput("PCTPOR_d","Proximal Out of Roundness (in)",value=F)
-  })
-  output$PCTPCCT_s<-renderUI({
-    checkboxInput("PCTPCCT_d","Proximal Concentricity",value=F)
-  })
-  
-  
-  output$PCTDIDI_s<-renderUI({
-    checkboxInput("PCTDIDI_d","Distal Inner Diameter (in)",value=TRUE)
-  })
-  output$PCTDODI_s<-renderUI({
-    checkboxInput("PCTDODI_d","Distal Outer Diameter (in)",value=TRUE)
-  })
-  output$PCTDWT_s<-renderUI({
-    checkboxInput("PCTDWT_d","Distal Wall Thickness (in)",value=TRUE)
-  })
-  output$PCTDOR_s<-renderUI({
-    checkboxInput("PCTDOR_d","Distal Out of Roundness (in)",value=F)
-  })
-  output$PCTDCCT_s<-renderUI({
-    checkboxInput("PCTDCCT_d","Distal Concentricity",value=F)
-  })
-  
-  
-  output$PCTPLength_s<-renderUI({
-    checkboxInput("PCTPLength_d","Proximal Length (in)",value=F)
-  })
-  output$PCTTLength_s<-renderUI({
-    checkboxInput("PCTTLength_d","Transition Length (in)",value=F)
-  })
-  output$PCTDLength_s<-renderUI({
-    checkboxInput("PCTDLength_d","Distal Length (in)",value=F)
-  })
-  output$PCTToLength_s<-renderUI({
-    checkboxInput("PCTToLength_d","Total Length (in)",value=F)
-  })
-  output$PCTPPD_s<-renderUI({
-    checkboxInput("PCTPPD_d","Perpendicularity (in)",value=F)
-  })
-  
-  
-  output$PCTNEXIV_s<-renderUI({
-    checkboxInput("PCTNEXIV_d","NEXIV",value=F)
-  })
-  output$PCTAnnealed_s<-renderUI({
-    checkboxInput("PCTAnnealed_d","Annealed",value=F)
-  })
-  output$PCTCaliper_s<-renderUI({
-    checkboxInput("PCTCaliper_d","Caliper",value=F)
-  })
-  output$PCTOS_s<-renderUI({
-    checkboxInput("PCTOS_d","OD Sort",value=F)
-  })
-  output$PCTMP_s<-renderUI({
-    checkboxInput("PCTMP_d","Melt Pump",value=F)
-  })
-  output$PCTHT_s<-renderUI({
-    checkboxInput("PCTHT_d","Hypo Tip",value=F)
-  })
-  output$PCTSPD_s<-renderUI({
-    checkboxInput("PCTSPD_d","Sparker Die",value=F)
-  })
-  output$PCTSLD_s<-renderUI({
-    checkboxInput("PCTSLD_d","Slicking Die",value=F)
-  })
-  output$PCTDLN_s<-renderUI({
-    checkboxInput("PCTDLN_d","Delamination",value=F)
-  })
-  output$PCTULT_s<-renderUI({
-    checkboxInput("PCTULT_d","Ultrasonic",value=F)
-  })
-  output$PCTVC_s<-renderUI({
-    checkboxInput("PCTVC_d","Vacuum Calibration",value=F)
-  })
-  output$PCTIRD_s<-renderUI({
-    checkboxInput("PCTIRD_d","Irradiated",value=F)
-  })
-  
-  
-  
-  #Search Box
-  
-  #Part Resin
-  output$PCTPN_input<-renderUI({
-    selectizeInput("PCTPN",label = NULL,multiple=TRUE,
-                   c("All",unique(as.character(single_pps_data$`Part Number`))),
-                   selected="All")
-  })
-  output$PCTPD_input<-renderUI({
-    selectInput("PCTPD",label = NULL,
-                c("All",unique(as.character(single_pps_data$`Part Description`))))
-  })
-  output$PCTRN_input<-renderUI({
-    selectInput("PCTRN",label = NULL,
-                c("All",unique(as.character(single_pps_data$`Resin Number`))))
-  })
-  output$PCTRD_input<-renderUI({
-    selectInput("PCTRD",label = NULL,
-                c("All",unique(as.character(single_pps_data$`Resin Description`))))
-  })
-  output$PCTPPSN_input<-renderUI({
-    selectInput("PCTPPSN",label = NULL,
-                c("All",unique(as.character(single_pps_data$`PPS Number`))))
-  })
-  
-  #Tooling
-  output$PCTDS_min_input<-renderUI({
-    numericInput("PCTDS_min",label = NULL,value=PCTDSmin,step=0.001)
-  })
-  output$PCTDS_max_input<-renderUI({
-    numericInput("PCTDS_max",label = NULL,value=PCTDSmax,step=0.001)
-  })
-  output$PCTDLL_input<-renderUI({
-    DLL_min=-1
-    DLL_max=0.54
-    selectInput("PCTDLL",label = NULL,c("All",unique(as.character(single_pps_data$`Die Land Length (in)`))))
-  })
-  output$PCTTS_min_input<-renderUI({
-    numericInput("PCTTS_min",label = NULL,value=PCTTSmin,step=0.001)
-  })
-  output$PCTTS_max_input<-renderUI({
-    numericInput("PCTTS_max",label = NULL,value=PCTTSmax,step=0.001)
-  })
-  output$PCTTLL_input<-renderUI({
-    TLL_min=-1
-    TLL_max=0.49
-    selectInput("PCTTLL",label = NULL,c("All",unique(as.character(single_pps_data$`Tip Land Length (in)`))))
-  })
-  output$PCTSP_input<-renderUI({
-    selectInput("PCTSP",label = NULL,
-                c("All",unique(as.character(single_pps_data$`Screw Print`))))
-  })
-  #Attributes_1
-  output$PCTFT_min_input<-renderUI({
-    numericInput("PCTFT_min",label = NULL,value = PCTFTmin,step=1)
-  })
-  output$PCTFT_max_input<-renderUI({
-    numericInput("PCTFT_max",label = NULL,value=PCTFTmax,step=1)
-  })
-  output$PCTBZT1_min_input<-renderUI({
-    numericInput("PCTBZT1_min",label = NULL,value=PCTBZT1min,step=5)
-  })
-  output$PCTBZT1_max_input<-renderUI({
-    numericInput("PCTBZT1_max",label = NULL,value=PCTBZT1max,step=5)
-  })
-  output$PCTBZT2_min_input<-renderUI({
-    numericInput("PCTBZT2_min",label = NULL,value=PCTBZT2min,step=5)
-  })
-  output$PCTBZT2_max_input<-renderUI({
-    numericInput("PCTBZT2_max",label = NULL,value=PCTBZT2max,step=5)
-  })
-  output$PCTBZT3_min_input<-renderUI({
-    numericInput("PCTBZT3_min",label = NULL,value=PCTBZT3min,step=5)
-  })
-  output$PCTBZT3_max_input<-renderUI({
-    numericInput("PCTBZT3_max",label = NULL,value=PCTBZT3max,step=5)
-  })
-  
-  #Attrobites_2
-  output$PCTCT_min_input<-renderUI({
-    numericInput("PCTCT_min",label = NULL,value=PCTCTmin,step=5)
-  })
-  output$PCTCT_max_input<-renderUI({
-    numericInput("PCTCT_max",label = NULL,value=PCTCTmax,step=5)
-  })
-  output$PCTAT_min_input<-renderUI({
-    numericInput("PCTAT_min",label = NULL,value=PCTATmin,step=5)
-  })
-  output$PCTAT_max_input<-renderUI({
-    numericInput("PCTAT_max",label = NULL,value=PCTATmax,step=5)
-  })
-  output$PCTDT1_min_input<-renderUI({
-    numericInput("PCTDT1_min",label = NULL,value=PCTDT1min,step=5)
-  })
-  output$PCTDT1_max_input<-renderUI({
-    numericInput("PCTDT1_max",label = NULL,value=PCTDT1max,step=5)
-  })
-  output$PCTDT2_min_input<-renderUI({
-    numericInput("PCTDT2_min",label = NULL,value=PCTDT2min,step=5)
-  })
-  output$PCTDT2_max_input<-renderUI({
-    numericInput("PCTDT2_max",label = NULL,value=PCTDT2max,step=5)
-  })
-  
-  
-  
-  
-  
-  #Temps
-  output$PCTPIDI_min_input<-renderUI({
-    numericInput("PCTPIDI_min",label = NULL,value=PCTPIDImin,step=0.001)
-  })
-  output$PCTPIDI_max_input<-renderUI({
-    numericInput("PCTPIDI_max",label = NULL,value=PCTPIDImax,step=0.001)
-  })
-  output$PCTPODI_min_input<-renderUI({
-    numericInput("PCTPODI_min",label = NULL,value=PCTPODImin,step=0.001)
-  })
-  output$PCTPODI_max_input<-renderUI({
-    numericInput("PCTPODI_max",label = NULL,value=PCTPODImax,step=0.001)
-  })
-  output$PCTPWT_min_input<-renderUI({
-    numericInput("PCTPWT_min",label = NULL,value=PCTPWTmin,step=0.001)
-  })
-  output$PCTPWT_max_input<-renderUI({
-    numericInput("PCTPWT_max",label = NULL,value=PCTPWTmax,step=0.001)
-  })
-  output$PCTPOR_min_input<-renderUI({
-    numericInput("PCTPOR_min",label = NULL,value=PCTPORmin,step=0.001)
-  })
-  output$PCTPOR_max_input<-renderUI({
-    numericInput("PCTPOR_max",label = NULL,value=PCTPORmax,step=0.001)
-  })
-  output$PCTPCCT_min_input<-renderUI({
-    numericInput("PCTPCCT_min",label = NULL,value=PCTPCCTmin,step=0.0001)
-  })
-  output$PCTPCCT_max_input<-renderUI({
-    numericInput("PCTPCCT_max",label = NULL,value=PCTPCCTmax,step=0.0001)
-  })
-  
-  output$PCTDIDI_min_input<-renderUI({
-    numericInput("PCTDIDI_min",label = NULL,value=PCTDIDImin,step=0.001)
-  })
-  output$PCTDIDI_max_input<-renderUI({
-    numericInput("PCTDIDI_max",label = NULL,value=PCTDIDImax,step=0.001)
-  })
-  output$PCTDODI_min_input<-renderUI({
-    numericInput("PCTDODI_min",label = NULL,value=PCTDODImin,step=0.001)
-  })
-  output$PCTDODI_max_input<-renderUI({
-    numericInput("PCTDODI_max",label = NULL,value=PCTDODImax,step=0.001)
-  })
-  output$PCTDWT_min_input<-renderUI({
-    numericInput("PCTDWT_min",label = NULL,value=PCTDWTmin,step=0.001)
-  })
-  output$PCTDWT_max_input<-renderUI({
-    numericInput("PCTDWT_max",label = NULL,value=PCTDWTmax,step=0.001)
-  })
-  output$PCTDOR_min_input<-renderUI({
-    numericInput("PCTDOR_min",label = NULL,value=PCTDORmin,step=0.001)
-  })
-  output$PCTDOR_max_input<-renderUI({
-    numericInput("PCTDOR_max",label = NULL,value=PCTDORmax,step=0.001)
-  })
-  output$PCTDCCT_min_input<-renderUI({
-    numericInput("PCTDCCT_min",label = NULL,value=PCTDCCTmin,step=0.0001)
-  })
-  output$PCTDCCT_max_input<-renderUI({
-    numericInput("PCTDCCT_max",label = NULL,value=PCTDCCTmax,step=0.0001)
-  })
-  
-  
-  output$PCTPLength_min_input<-renderUI({
-    numericInput("PCTPLength_min",label = NULL,value=PCTPLengthmin,step=1)
-  })
-  output$PCTPLength_max_input<-renderUI({
-    numericInput("PCTPLength_max",label = NULL,value=PCTPLengthmax,step=1)
-  })
-  output$PCTTLength_min_input<-renderUI({
-    numericInput("PCTTLength_min",label = NULL,value=PCTTLengthmin,step=1)
-  })
-  output$PCTTLength_max_input<-renderUI({
-    numericInput("PCTTLength_max",label = NULL,value=PCTTLengthmax,step=1)
-  })
-  output$PCTDLength_min_input<-renderUI({
-    numericInput("PCTDLength_min",label = NULL,value=PCTDLengthmin,step=1)
-  })
-  output$PCTLength_max_input<-renderUI({
-    numericInput("PCTDLength_max",label = NULL,value=PCTDLengthmax,step=1)
-  })
-  output$PCTToLength_min_input<-renderUI({
-    numericInput("PCTToLength_min",label = NULL,value=PCTToLengthmin,step=1)
-  })
-  output$PCTToLength_max_input<-renderUI({
-    numericInput("PCTToLength_max",label = NULL,value=PCTToLengthmax,step=1)
-  })
-  output$PCTPPD_input<-renderUI({
-    selectInput("PCTPPD",label = NULL,
-                c("All",unique(as.character(single_pps_data$`Perpendicularity (in)`))))
-  })
-  
-  #Special_1
-  output$PCTNEXIV_input<-renderUI({
-    selectInput("PCTNEXIV",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCTAnnealed_input<-renderUI({
-    selectInput("PCTAnnealed",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCTCaliper_input<-renderUI({
-    selectInput("PCTCaliper",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCTOS_input<-renderUI({
-    selectInput("PCTOS",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCTMP_input<-renderUI({
-    selectInput("PCTMP",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCTHT_input<-renderUI({
-    selectInput("PCTHT",label = NULL,choices=c("All","yes","NA"))
-  })
-  #Special_2
-  output$PCTSPD_input<-renderUI({
-    selectInput("PCTSPD",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCTSLD_input<-renderUI({
-    selectInput("PCTSLD",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCTDLN_input<-renderUI({
-    selectInput("PCTDLN",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCTULT_input<-renderUI({
-    selectInput("PCTULT",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCTVC_input<-renderUI({
-    selectInput("PCTVC",label = NULL,choices=c("All","yes","NA"))
-  })
-  output$PCTIRD_input<-renderUI({
-    selectInput("PCTIRD",label = NULL,choices=c("All","yes","NA"))
-  })
-  
-  Col_PCT=c()
   show_vars3<-reactive({
     as.numeric(c(input$PCTPN_d,input$PCTPD_d,input$PCTRN_d,input$PCTRD_d,input$PCTPPSN_d,input$PCTDS_d,input$PCTDLL_d,input$PCTTS_d,input$PCTTLL_d,input$PCTSP_d,input$PCTFT_d,
                  input$PCTBZT1_d,input$PCTBZT2_d,input$PCTBZT3_d,input$PCTCT_d,input$PCTAT_d,input$PCTDT1_d,input$PCTDT2_d,
@@ -1645,6 +1715,7 @@ server<-function(input,output,session){
   
   output$mytable3 <- DT::renderDataTable({
     DT::datatable({
+      Col_PCT=c()
       col_var3=show_vars3()
       for (i in 1:length(col_var3)){
         if (col_var3[i]!=0){
@@ -1777,8 +1848,7 @@ server<-function(input,output,session){
     colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
     shoppingcart$data <- rbind(shoppingcart$data, new_data, stringsAsFactors = FALSE)
     colnames(shoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
-  }
-  )
+  })
   
   
   observeEvent(input$delete_part_button,{
