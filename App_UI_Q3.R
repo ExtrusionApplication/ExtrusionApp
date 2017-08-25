@@ -407,9 +407,8 @@ ui<-navbarPage("Extrusion Application",
                                             fluidRow(
                                               conditionalPanel(
                                                 condition="input.PCMPN_d",
-                                                selectizeInput("PCMPN",label = NULL,multiple=TRUE,
-                                                               c("All",unique(as.character(multi_pps_data$`Part Number`))),
-                                                               selected="All")
+                                                selectInput("PCMPN",label = NULL,
+                                                               c("All",unique(as.character(multi_pps_data$`Part Number`))))
                                               ))),
                                      # Part Description
                                      column(2,
@@ -903,9 +902,8 @@ ui<-navbarPage("Extrusion Application",
                                             fluidRow(
                                               conditionalPanel(
                                                 condition="input.PCTPN_d",
-                                                selectizeInput("PCTPN",label = NULL,multiple=TRUE,
-                                                               c("All",unique(as.character(single_pps_data$`Part Number`))),
-                                                               selected="All")
+                                                selectInput("PCTPN",label = NULL,
+                                                               c("All",unique(as.character(tapered_pps_data$`Part Number`))))
                                               ))),
                                      # Part Description
                                      column(2,
@@ -1456,6 +1454,9 @@ ui<-navbarPage("Extrusion Application",
                                    
                                    fluidRow(
                                      DT::dataTableOutput("mytable3")
+                                   ),
+                                   fluidRow(
+                                     downloadButton('downloadTPPSData','Download Tapered PPS Data')
                                    )
                           )#end Tapered Extrusion PPS Data
                ),
