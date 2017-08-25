@@ -51,10 +51,10 @@ multi_pps_pathfile <- paste(path, multi_pps_file, sep = "/")
 tapered_pps_pathfile <- paste(path, tapered_pps_file, sep = "/")
 resin_pathfile <- paste(path, resin_file, sep = "/")
 screw_pathfile <- paste(path, screw_file, sep = "/")
-parameter_filepath <- paste(path, parameter_file, sep = "/")
-time_filepath <- paste(path, time_file, sep = "/")
-submitter_filepath <- paste(path, submitter_file, sep = "/")
-total_filepath <- paste(path, total_file, sep = "/")
+single_parameter_filepath <- paste(path, parameter_file, sep = "/")
+single_time_filepath <- paste(path, time_file, sep = "/")
+single_submitter_filepath <- paste(path, submitter_file, sep = "/")
+single_total_filepath <- paste(path, total_file, sep = "/")
 scrapcode_filepath <- paste(path, scrapcode_file, sep = "/")
 
 single_pps_data <- read.csv(single_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
@@ -70,13 +70,13 @@ resin_data <- read.csv(resin_pathfile, header = TRUE, stringsAsFactors = FALSE,
                        check.names = FALSE)
 screw_data <- read.csv(screw_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
-tari_parameter_data <- read.csv(parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
+single_tari_parameter_data <- read.csv(single_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
-tari_time_data <- read.csv(time_filepath, header = TRUE, stringsAsFactors = FALSE, 
+single_tari_time_data <- read.csv(single_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
-tari_submitter_data <- read.csv(submitter_filepath, header = TRUE, stringsAsFactors = FALSE, 
+single_tari_submitter_data <- read.csv(single_submitter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
-tari_total_data <- read.csv(total_filepath, header = TRUE, stringsAsFactors = FALSE, 
+single_tari_total_data <- read.csv(single_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
 scrapcodes_data <- read.csv(scrapcode_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)

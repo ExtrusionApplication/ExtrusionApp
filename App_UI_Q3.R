@@ -391,6 +391,9 @@ ui<-navbarPage("Extrusion Application",
                                    # Show Table
                                    fluidRow(
                                      DT::dataTableOutput("mytable1")
+                                   ),
+                                   fluidRow(
+                                     downloadButton('downloadSPPSData','Download Single PPS Data')
                                    )
                           ),#end Single Extrusion PPS Data
                           #Multi Extrusion PPS Data---UI
@@ -879,13 +882,14 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCMIRD",label = NULL,choices=c("All","yes","NA"))
                                               )))
                                    ), #end Special Operation
-                                   fluidRow(
-                                     downloadButton('downloadData','download')
-                                   ),
                                    
                                    fluidRow(
                                      DT::dataTableOutput("mytable2")
+                                   ),
+                                   fluidRow(
+                                     downloadButton('downloadMPPSData','Download Multi-Layer PPS Data')
                                    )
+                                   
                           ),#end multi Extrusion PPS Data
                           
                           #Tepered Extrusion PPS Data--UI
@@ -1500,7 +1504,7 @@ ui<-navbarPage("Extrusion Application",
                                      DT::dataTableOutput("laserlinc")
                                    )
                           )
-               ),
+               ), #end the NavbarMenu
                
                
                #Shopping Cart
@@ -1509,9 +1513,32 @@ ui<-navbarPage("Extrusion Application",
                absolutePanel("Shopping Cart",
                              bottom = 100, right = 20, width = 600,
                              draggable = TRUE,
-                             wellPanel(
-                               dataTableOutput("shoppingcart")
+                             tabsetPanel(
+                               tabPanel("Single Extrusion Cart",
+                                          #Single Extrusion Pparts
+                                          wellPanel(
+                                            dataTableOutput("singleshoppingcart")
+                                          )
+                               ),
+                               tabPanel("Multi-Layer Extrusion Cart",
+                                          #Single Extrusion Pparts
+                                          wellPanel(
+                                          )
+                               ),
+                               tabPanel("Tapered Extrusion Cart",
+                                          #Single Extrusion Pparts
+                                          wellPanel(
+                                          )
+                               ),
+                               tabPanel("Total Extrusion Cart",
+                                          #Single Extrusion Pparts
+                                          wellPanel(
+                                          )
+                               )
                              ),
                              style = "opacity: 0.92"
                ) #end absolutePanel#end Part Catalog
+               
+               
+               
 )#end ui
