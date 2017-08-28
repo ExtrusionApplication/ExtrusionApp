@@ -83,7 +83,66 @@ scrapcodes_data <- read.csv(scrapcode_filepath, header = TRUE, stringsAsFactors 
 
 
 
-#DATA CLEANING For all Data Tables
+#### Button vectors for PPS documents ####
+
+#getting the single buttons
+count <- 1
+single_buttons_vector <- c(rep(0,nrow(single_pps_data)))
+while (count < nrow(single_pps_data) + 1){
+  #runs through the single PPS and creates a vector of html entries for action buttons for the
+  #single PPS data table.
+  single_buttons_vector[count] <- as.character(
+    actionButton(inputId = paste0("button_", single_pps_data[count,1]),
+                 label = "Add Part",
+                 onclick = 'Shiny.onInputChange(\"singleadd_button\",  this.id)')
+  )
+  
+  count <- count + 1
+}#end single_pps_data buttons
+
+#this then adds the html to the table
+single_pps_data$"" <- single_buttons_vector
+single_pps_data <- single_pps_data[,c(ncol(single_pps_data), 1:(ncol(single_pps_data)-1))]
+
+
+
+
+#getting the multi-layer buttons
+count <- 1
+multi_buttons_vector <- c(rep(0,nrow(multi_pps_data)))
+while (count < nrow(multi_pps_data) + 1){
+  #runs through the multi-layer PPS and creates a vector of html entries for action buttons for the
+  #multi-layer PPS data table.
+  multi_buttons_vector[count] <- as.character(
+    actionButton(inputId = paste0("button_", multi_pps_data[count,1]),
+                 label = "Add Part",
+                 onclick = 'Shiny.onInputChange(\"multiadd_button\",  this.id)')
+  )
+  
+  count <- count + 1
+}#end multi_pps_data buttons
+
+
+
+
+#getting the tapered buttons
+count <- 1
+tapered_buttons_vector <- c(rep(0,nrow(tapered_pps_data)))
+while (count < nrow(tapered_pps_data) + 1){
+  #runs through the single PPS and creates a vector of html entries for action buttons for the
+  #single PPS data table.
+  tapered_buttons_vector[count] <- as.character(
+    actionButton(inputId = paste0("button_", tapered_pps_data[count,1]),
+                 label = "Add Part",
+                 onclick = 'Shiny.onInputChange(\"taperedadd_button\",  this.id)')
+  )
+  
+  count <- count + 1
+}#end tapered_pps_data buttons
+
+
+
+##### DATA CLEANING For all Data Tables ####
 
 #Convert all char to numeric
 for (i in 6:9){

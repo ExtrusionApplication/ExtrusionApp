@@ -814,6 +814,7 @@ server<-function(input,output,session){
       Col_PCS=c() #initialized the variable
       
       col_var1=show_vars1()
+      col_var1 = c(1,col_var1) #because the first column is the buttons, this makes sure it is true
       for (i in 1:length(col_var1)){
         #this will go through col_var1 and determine which parameters have been checked
         #only the parameters that have been checked will be displayed on the table
@@ -822,29 +823,11 @@ server<-function(input,output,session){
         }
       }
       
-      data_PCS <- single_df_output$data #the data frame is set
+      data_PCS <- isolate(single_df_output$data) #the data frame is set
       data_PCS <- data_PCS[,Col_PCS] #only get the columns that have been checked
       
       clean_single_pps_data$data <- data_PCS #assign the clean table to the data that is available
       #for downloading
-      
-      rows <- nrow(data_PCS)
-      vectorofbuttons <- c(rep(0, rows))
-      row_count <- 1
-      
-      while(row_count < rows + 1){
-        #this creates a vector of html action buttons to add to the table
-        vectorofbuttons[row_count] <- as.character(
-          actionButton(inputId = paste0("button_", data_PCS[row_count,1]),
-                       label = "Add Part",
-                       onclick = 'Shiny.onInputChange(\"singleadd_button\",  this.id)')
-        )
-        row_count <- row_count + 1
-      } #end while adding the html stuff
-      
-      data_PCS$"" <- vectorofbuttons
-      data_PCS <- data_PCS[,c(ncol(data_PCS), 1:(ncol(data_PCS)-1))]
-      
       
       return(data_PCS)
     }
@@ -882,6 +865,14 @@ server<-function(input,output,session){
                       stringsAsFactors = FALSE,
                       check.names = FALSE)
   ) #end singleshoppingcart
+  
+  singleshoppingcartparts <- reactiveValues(
+    #'this will hold only a list of parts, this way it is easier for users to look at all the parts
+    #'when there are two many batches in the shopping cart.
+    data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
+                      stringsAsFactors = FALSE,
+                      check.names = FALSE)
+  )
   
   observeEvent(input$singleadd_button,{
     #this observes whether the user clicked a button to add a part to the shopping cart
@@ -922,12 +913,30 @@ server<-function(input,output,session){
     colnames(singleshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
   })
   
+  observeEvent(input$singleadd_button,{
+    #this observes whether the user clicked a button to add a part to the part only shopping cart
+    part <- strsplit(input$singleadd_button, "_")[[1]][2]
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"singledelete_part_button\",  this.id)'))
+    
+    new_data <- cbind(part, deletepart)
+    
+    colnames(new_data) <- c("Part", "Delete Part")
+    singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+    colnames(singleshoppingcartparts$data) <- c("Part", "Delete Part")
+  })
+  
   
   observeEvent(input$singledelete_part_button,{
     #'this observes whether a person deleted a part from the shopping cart. If the button is clicked
     #'all batches associated to the part are removed
     part <- strsplit(input$singledelete_part_button, "_")[[1]][2]
     singleshoppingcart$data <- singleshoppingcart$data[singleshoppingcart$data$'Part' != part,]
+    singleshoppingcartparts$data <- singleshoppingcartparts$data[singleshoppingcartparts$data$'Part' != part,]
   })
   
   observeEvent(input$singledelete_batch_button,{
@@ -938,20 +947,58 @@ server<-function(input,output,session){
   })
   
   
-  output$singleshoppingcart <- renderDataTable(
+  output$singleshoppingcart <- renderDataTable({
     #'this shopping cart allows a user to select parts and batches they want to examine. Once added
     #'to the cart, they can view all the MES, SAP, and AppStats data
-    singleshoppingcart$data,
+    return(singleshoppingcart$data)
+    },
     filter = "top",
     rownames = FALSE,
     escape = FALSE,
-    server = FALSE) #for the shoppingcart
+    server = FALSE
+  ) #for the shoppingcart
   
-  output$downloadSPPSData <- downloadHandler(
+  
+  output$singleshoppingcartparts <- renderDataTable({
+    #'this is a table that only lists the parts for quick viewing
+    return(singleshoppingcartparts$data)
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE
+  ) #for the shoppingcart
+  
+  
+  output$singledownloadSPPSData <- downloadHandler(
     #downlaod the data
     filename = function() { paste("Single PPS Data", '.csv', sep='') },
     content = function(file) {
       write.csv(clean_single_pps_data$data, file)
+    }
+  )
+  
+  output$singleshoppingcartpps <- renderDataTable({
+    #this is to render a datatable that has all the PPS information of parts that have been saved
+    #to the shopping cart
+    
+    data <- single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcart$data$'Part'),]
+    return(data)
+    
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE
+  )
+  
+  
+  
+  output$singlecartdownloadpps <- downloadHandler(
+    #downlaod the single PPS data from the shopping cart
+    filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
+    content = function(file) {
+      write.csv(single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcart$data$'Part'),], file)
     }
   )
      
@@ -1911,10 +1958,11 @@ server<-function(input,output,session){
   })
   
   
-  output$multishoppingcart <- renderDataTable(
+  output$multishoppingcart <- renderDataTable({
     #'this shopping cart allows a user to select parts and batches they want to examine. Once added
     #'to the cart, they can view all the MES, SAP, and AppStats data
-    multishoppingcart$data,
+    return(multishoppingcart$data)
+    },
     filter = "top",
     rownames = FALSE,
     escape = FALSE,
@@ -2841,10 +2889,11 @@ server<-function(input,output,session){
   })
   
   
-  output$taperedshoppingcart <- renderDataTable(
+  output$taperedshoppingcart <- renderDataTable({
     #'this shopping cart allows a user to select parts and batches they want to examine. Once added
     #'to the cart, they can view all the MES, SAP, and AppStats data
-    taperedshoppingcart$data,
+    return(taperedshoppingcart$data)
+    },
     filter = "top",
     rownames = FALSE,
     escape = FALSE,
@@ -2864,7 +2913,7 @@ server<-function(input,output,session){
   #### EXTRA ####
   
 
-  output$MESparameters <- renderDataTable({
+  output$singleMESparameters <- renderDataTable({
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
     data <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
@@ -2872,7 +2921,7 @@ server<-function(input,output,session){
   },
   filter = "top")
   
-  output$MEStime <- renderDataTable({
+  output$singleMEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
     #shopping cart
     data <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
@@ -2880,7 +2929,7 @@ server<-function(input,output,session){
   },
   filter = "top")
   
-  output$MESsubmitter <- renderDataTable({
+  output$singleMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
     #shopping cart
     data <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
@@ -2888,7 +2937,7 @@ server<-function(input,output,session){
   },
   filter = "top")
   
-  output$MEStotal <- renderDataTable({
+  output$singleMEStotal <- renderDataTable({
     #This returns the table of all MES inputs based on the SAP batch numbers in the
     #shopping cart
     data <- single_tari_total_data[single_tari_total_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
@@ -2896,7 +2945,7 @@ server<-function(input,output,session){
   },
   filter = "top")
   
-  output$scrapcodes <- renderDataTable({
+  output$singlescrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
     #shopping cart
     data <- scrapcodes_data[scrapcodes_data$Order %in% singleshoppingcart$data$'SAP Batch',]
@@ -2905,21 +2954,21 @@ server<-function(input,output,session){
   filter = "top")
   
   #Testing the appstats data
-  output$nexiv <- renderDataTable({
-    #This returns the table of the Applied Stats Nexiv Data based on the SAP batch numbers in the
-    #shopping cart
-    data <- nexiv[nexiv$`Batch #` %in% singleshoppingcart$data$'SAP Batch',]
-    return(data)
-  },
-  filter = "top")
+  # output$nexiv <- renderDataTable({
+  #   #This returns the table of the Applied Stats Nexiv Data based on the SAP batch numbers in the
+  #   #shopping cart
+  #   data <- nexiv[nexiv$`Batch #` %in% singleshoppingcart$data$'SAP Batch',]
+  #   return(data)
+  # },
+  # filter = "top")
   
-  output$laserlinc <- renderDataTable({
-    #This returns the table of the Applied Stats laserlinc data based on the SAP batch numbers in the
-    #shopping cart
-    data <- ll[ll$`Lot Number` %in% singleshoppingcart$data$'SAP Batch',]
-    return(data)
-  },
-  filter = "top")
+  # output$laserlinc <- renderDataTable({
+  #   #This returns the table of the Applied Stats laserlinc data based on the SAP batch numbers in the
+  #   #shopping cart
+  #   data <- ll[ll$`Lot Number` %in% singleshoppingcart$data$'SAP Batch',]
+  #   return(data)
+  # },
+  # filter = "top")
   # end Single Extrusion PPS Data Server part and Shopping cart
   
   

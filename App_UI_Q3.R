@@ -7,6 +7,7 @@ library(stringr)
 library(gsubfn)
 library(proto)
 library(sqldf)
+library(shinyjs)
 
 
 #_s:name of the checkbox
@@ -393,7 +394,7 @@ ui<-navbarPage("Extrusion Application",
                                      DT::dataTableOutput("mytable1")
                                    ),
                                    fluidRow(
-                                     downloadButton('downloadSPPSData','Download Single PPS Data')
+                                     downloadButton('singledownloadSPPSData','Download Single PPS Data')
                                    )
                           ),#end Single Extrusion PPS Data
                           #Multi Extrusion PPS Data---UI
@@ -1460,66 +1461,141 @@ ui<-navbarPage("Extrusion Application",
                                    )
                           )#end Tapered Extrusion PPS Data
                ),
-               #MES Data table rendering
-               navbarMenu("MES Data",
-                          #Single Extrusion PPS Data
+               
+               
+               #Single Extrusion MES Data table rendering
+               navbarMenu("Single Extrusion MES Data",
                           tabPanel("MES Parameters and Yield",
                                    fluidRow(
-                                     DT::dataTableOutput("MESparameters")
+                                     DT::dataTableOutput("singleMESparameters")
                                    )
                           ),
                           tabPanel("MES Time Stamps",
                                    fluidRow(
-                                     DT::dataTableOutput("MEStime")
+                                     DT::dataTableOutput("singleMEStime")
                                    )
                           ),
                           tabPanel("MES Submitters",
                                    fluidRow(
-                                     DT::dataTableOutput("MESsubmitter")
+                                     DT::dataTableOutput("singleMESsubmitter")
                                    )
                           ),
                           tabPanel("MES Total",
                                    fluidRow(
-                                     DT::dataTableOutput("MEStotal")
+                                     DT::dataTableOutput("singleMEStotal")
                                    )
                           )
                ),
                
-               #Scrap Codes table rendering
-               tabPanel("Scrap Codes",
-                        fluidRow(
-                          DT::dataTableOutput("scrapcodes")
-                        )
+               #Multi-Layer Extrusion MES Data table rendering
+               navbarMenu("Multi-Layer Extrusion MES Data",
+                          tabPanel("MES Parameters and Yield",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("MES Time Stamps",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("MES Submitters",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("MES Total",
+                                   fluidRow(
+                                   )
+                          )
+               ),
+               
+               #Tapered Extrusion MES Data table rendering
+               navbarMenu("Single Extrusion MES Data",
+                          tabPanel("MES Parameters and Yield",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("MES Time Stamps",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("MES Submitters",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("MES Total",
+                                   fluidRow(
+                                   )
+                          )
+               ),
+               
+               
+               #Scrap Codes Data table rendering
+               navbarMenu("Scrap Codes",
+                          #Single Extrusion PPS Data
+                          tabPanel("Single Extrusion",
+                                   fluidRow(
+                                     DT::dataTableOutput("singlescrapcodes")
+                                   )
+                          ),
+                          tabPanel("Multi-Layer Extrusion",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("Tapered Extrusion",
+                                   fluidRow(
+                                   )
+                          )
                ),
                
                
                #Applied Stats Data table rendering
-               navbarMenu("AppStats Data",
+               # navbarMenu("AppStats Data",
+               #            #Single Extrusion PPS Data
+               #            tabPanel("Nexiv",
+               #                     fluidRow(
+               #                       DT::dataTableOutput("nexiv")
+               #                     )
+               #            ),
+               #            tabPanel("Laserlinc",
+               #                     fluidRow(
+               #                       DT::dataTableOutput("laserlinc")
+               #                     )
+               #            )
+               # ), #end the NavbarMenu
+               
+               
+               #Shopping Cart PPS Data table rendering
+               navbarMenu("Shopping Cart PPS Data",
                           #Single Extrusion PPS Data
-                          tabPanel("Nexiv",
+                          tabPanel("Single Extrusion",
                                    fluidRow(
-                                     DT::dataTableOutput("nexiv")
+                                     DT::dataTableOutput("singleshoppingcartpps"),
+                                     fluidRow(
+                                       downloadButton('singlecartdownloadpps',
+                                                      'Download Single Shopping Cart PPS Data')
+                                     )
                                    )
                           ),
-                          tabPanel("Laserlinc",
+                          tabPanel("Multi-Layer Extrusion",
                                    fluidRow(
-                                     DT::dataTableOutput("laserlinc")
+                                   )
+                          ),
+                          tabPanel("Tapered Extrusion",
+                                   fluidRow(
                                    )
                           )
-               ), #end the NavbarMenu
-               
+               ),
                
                #Shopping Cart
                #'This renders the shopping cart in an absolute panels that is always visible and
                #'allows for a user to select the output data with associated batches
                #'
-               absolutePanel(
-                             bottom = 100, right = 20, width = 500, height = 500,
-                             draggable = TRUE,
+               absolutePanel(class = "draggable",
+                             bottom = 100, right = 20, width = 500, height = 600,
                              tabsetPanel(
                                tabPanel("Single Extrusion Cart",
                                           #Single Extrusion Parts
-                                          dataTableOutput("singleshoppingcart")
+                                        DT::dataTableOutput("singleshoppingcartparts"),
+                                        dataTableOutput("singleshoppingcart")
                                ),
                                tabPanel("Multi-Layer Extrusion Cart"
                                           #Multi-layer Extrusion Parts
@@ -1531,8 +1607,16 @@ ui<-navbarPage("Extrusion Application",
                                           #Total Extrusion Parts
                                )
                              ),
-                             style = "opacity: 1; z-index: 1000; background: #C0C0C0; font-size: 15px"
-               ) #end absolutePanel#end Part Catalog
+                             style = "opacity: 1; z-index: 1000; background: #C0C0C0; font-size: 15px;cursor: move;"
+                             
+               ), #end absolutePanel#end Part Catalog
+               
+              
+               #### Extra HTML ####
+               
+               
+               #Draggable and Resizeable absolutepanel
+               HTML("<script>$(\".draggable\").draggable();</script>")
                
                
                
