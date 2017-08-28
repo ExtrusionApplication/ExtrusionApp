@@ -2867,7 +2867,7 @@ server<-function(input,output,session){
   output$MESparameters <- renderDataTable({
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
-    data <- tari_parameter_data[tari_parameter_data$`SAP Batch Number` %in% shoppingcart$data$'SAP Batch',]
+    data <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
   filter = "top")
@@ -2875,7 +2875,7 @@ server<-function(input,output,session){
   output$MEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
     #shopping cart
-    data <- tari_time_data[tari_time_data$`SAP Batch Number` %in% shoppingcart$data$'SAP Batch',]
+    data <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
   filter = "top")
@@ -2883,7 +2883,7 @@ server<-function(input,output,session){
   output$MESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
     #shopping cart
-    data <- tari_submitter_data[tari_submitter_data$`SAP Batch Number` %in% shoppingcart$data$'SAP Batch',]
+    data <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
   filter = "top")
@@ -2891,7 +2891,7 @@ server<-function(input,output,session){
   output$MEStotal <- renderDataTable({
     #This returns the table of all MES inputs based on the SAP batch numbers in the
     #shopping cart
-    data <- tari_total_data[tari_total_data$`SAP Batch Number` %in% shoppingcart$data$'SAP Batch',]
+    data <- single_tari_total_data[single_tari_total_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
   filter = "top")
@@ -2899,7 +2899,7 @@ server<-function(input,output,session){
   output$scrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
     #shopping cart
-    data <- scrapcodes_data[scrapcodes_data$Order %in% shoppingcart$data$'SAP Batch',]
+    data <- scrapcodes_data[scrapcodes_data$Order %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
   filter = "top")
@@ -2908,7 +2908,7 @@ server<-function(input,output,session){
   output$nexiv <- renderDataTable({
     #This returns the table of the Applied Stats Nexiv Data based on the SAP batch numbers in the
     #shopping cart
-    data <- nexiv[nexiv$`Batch #` %in% shoppingcart$data$'SAP Batch',]
+    data <- nexiv[nexiv$`Batch #` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
   filter = "top")
@@ -2916,7 +2916,7 @@ server<-function(input,output,session){
   output$laserlinc <- renderDataTable({
     #This returns the table of the Applied Stats laserlinc data based on the SAP batch numbers in the
     #shopping cart
-    data <- ll[ll$`Lot Number` %in% shoppingcart$data$'SAP Batch',]
+    data <- ll[ll$`Lot Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
   filter = "top")

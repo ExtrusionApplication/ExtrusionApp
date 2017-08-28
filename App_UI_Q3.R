@@ -1492,6 +1492,7 @@ ui<-navbarPage("Extrusion Application",
                         )
                ),
                
+               
                #Applied Stats Data table rendering
                navbarMenu("AppStats Data",
                           #Single Extrusion PPS Data
@@ -1511,33 +1512,26 @@ ui<-navbarPage("Extrusion Application",
                #Shopping Cart
                #'This renders the shopping cart in an absolute panels that is always visible and
                #'allows for a user to select the output data with associated batches
-               absolutePanel("Shopping Cart",
-                             bottom = 100, right = 20, width = 600,
+               #'
+               absolutePanel(
+                             bottom = 100, right = 20, width = 500, height = 500,
                              draggable = TRUE,
                              tabsetPanel(
                                tabPanel("Single Extrusion Cart",
-                                          #Single Extrusion Pparts
-                                          wellPanel(
-                                            dataTableOutput("singleshoppingcart")
-                                          )
+                                          #Single Extrusion Parts
+                                          dataTableOutput("singleshoppingcart")
                                ),
-                               tabPanel("Multi-Layer Extrusion Cart",
-                                          #Single Extrusion Pparts
-                                          wellPanel(
-                                          )
+                               tabPanel("Multi-Layer Extrusion Cart"
+                                          #Multi-layer Extrusion Parts
                                ),
-                               tabPanel("Tapered Extrusion Cart",
-                                          #Single Extrusion Pparts
-                                          wellPanel(
-                                          )
+                               tabPanel("Tapered Extrusion Cart"
+                                          #Tapered Extrusion Parts
                                ),
-                               tabPanel("Total Extrusion Cart",
-                                          #Single Extrusion Pparts
-                                          wellPanel(
-                                          )
+                               tabPanel("Total Extrusion Cart"
+                                          #Total Extrusion Parts
                                )
                              ),
-                             style = "opacity: 0.92"
+                             style = "opacity: 1; z-index: 1000; background: #C0C0C0; font-size: 15px"
                ) #end absolutePanel#end Part Catalog
                
                
