@@ -7,6 +7,7 @@ library(stringr)
 library(gsubfn)
 library(proto)
 library(sqldf)
+library(shinyjs)
 
 
 #_s:name of the checkbox
@@ -26,53 +27,52 @@ ui<-navbarPage("Extrusion Application",
                                      tags$h1(strong("Part Resin"),style="font-size:25px;",align="left"), #Use tag to add a hearder 
                                      #Part Number
                                      column(2,
-                                             fluidRow(checkboxInput("PCSPN_d", "Part Number", value = TRUE)),  #Show the checkbox for Part number. it will return a True/False value
-                                             fluidRow(
-                                               conditionalPanel(
-                                                 condition="input.PCSPN_d",   #If it were Ture, then there will have a search box for Part Number under checkbox
-                                                 selectizeInput("PCSPN",label = NULL,multiple=TRUE,
-                                                                c("All",unique(as.character(single_pps_data$`Part Number`))),
-                                                                selected="All"
-                                                                )
 
-                                                 ))),
+                                            fluidRow(checkboxInput("PCSPN_d", "Part Number", value = TRUE)),  #Show the checkbox for Part number. it will return a True/False value
+                                            fluidRow(
+                                              conditionalPanel(
+                                                condition="input.PCSPN_d",   #If it were Ture, then there will have a search box for Part Number under checkbox
+                                                selectInput("PCSPN",label = NULL,
+                                                               c("All",unique(as.character(single_pps_data$`Part Number`))))
+                                                
+                                              ))),
                                      # Part Description
                                      column(2,
-                                             fluidRow(checkboxInput("PCSPD_d", "Part Description", value = TRUE)),
-                                             fluidRow(
-                                               conditionalPanel(
-                                                 condition = "input.PCSPD_d",
-                                                 selectInput("PCSPD",label = NULL,
-                                                             c("All",unique(as.character(single_pps_data$`Part Description`))))
-                                                 ))), 
-                                      # Resin Number
-                                      column(2,
-                                             fluidRow(checkboxInput("PCSRN_d","Resin Number",value=TRUE)),
-                                             fluidRow(
-                                               conditionalPanel(
-                                                 condition = "input.PCSRN_d",
-                                                 selectInput("PCSRN",label = NULL,
-                                                             c("All",unique(as.character(single_pps_data$`Resin Number`))))
-                                               ))),
-                                      #Resin Description
-                                      column(2,
-                                             fluidRow(checkboxInput("PCSRD_d","Resin Description",value=TRUE)),
-                                             fluidRow(
-                                               conditionalPanel(
-                                                 condition = "input.PCSRD_d",
-                                                 selectInput("PCSRD",label = NULL,
-                                                             c("All",unique(as.character(single_pps_data$`Resin Description`))))
-                                               ))),
-                                      #PPS Number
-                                      column(2,
-                                             fluidRow(checkboxInput("PCSPPSN_d","PPS Number",value=F)),
-                                             fluidRow(
-                                               conditionalPanel(
-                                                 condition = "input.PCSPPSN_d",
-                                                 selectInput("PCSPPSN",label = NULL,
-                                                             c("All",unique(as.character(single_pps_data$`PPS Number`))))
-                                               )))
-                                     ),
+                                            fluidRow(checkboxInput("PCSPD_d", "Part Description", value = TRUE)),
+                                            fluidRow(
+                                              conditionalPanel(
+                                                condition = "input.PCSPD_d",
+                                                selectInput("PCSPD",label = NULL,
+                                                            c("All",unique(as.character(single_pps_data$`Part Description`))))
+                                              ))), 
+                                     # Resin Number
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRN_d","Resin Number",value=TRUE)),
+                                            fluidRow(
+                                              conditionalPanel(
+                                                condition = "input.PCSRN_d",
+                                                selectInput("PCSRN",label = NULL,
+                                                            c("All",unique(as.character(single_pps_data$`Resin Number`))))
+                                              ))),
+                                     #Resin Description
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRD_d","Resin Description",value=TRUE)),
+                                            fluidRow(
+                                              conditionalPanel(
+                                                condition = "input.PCSRD_d",
+                                                selectInput("PCSRD",label = NULL,
+                                                            c("All",unique(as.character(single_pps_data$`Resin Description`))))
+                                              ))),
+                                     #PPS Number
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSPPSN_d","PPS Number",value=F)),
+                                            fluidRow(
+                                              conditionalPanel(
+                                                condition = "input.PCSPPSN_d",
+                                                selectInput("PCSPPSN",label = NULL,
+                                                            c("All",unique(as.character(single_pps_data$`PPS Number`))))
+                                              )))
+                                   ),
                                    #Tooling
                                    fluidRow(
                                      tags$h1(strong("Tooling"),style="font-size:25px;",align="left"),
@@ -84,9 +84,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSDS_d",
                                                 column(6,numericInput("PCSDS_min",label = NULL,value=PCSDSmin,step=0.001)),
                                                 column(6,numericInput("PCSDS_max",label = NULL,value=PCSDSmax,step=0.001))
-                                                )
                                               )
-                                            ), #end column
+                                            )
+                                     ), #end column
                                      #Die Land Length
                                      column(2,
                                             fluidRow(checkboxInput("PCSDLL_d","Die Land Length (in)",value=F)),
@@ -103,9 +103,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSTS_d",
                                                 column(6,numericInput("PCSTS_min",label = NULL,value=PCMTSmin,step=0.001)),
                                                 column(6,numericInput("PCSTS_max",label = NULL,value=PCMTSmax,step=0.001))
-                                                )
                                               )
-                                            ), #end column
+                                            )
+                                     ), #end column
                                      #Tip Land Length
                                      column(2,
                                             fluidRow(checkboxInput("PCSTLL_d","Tip Land Length (in)",value=F)),
@@ -136,9 +136,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSFT_d",
                                                 column(6,numericInput("PCSFT_min",label = NULL,value = PCMFTmin,step=1)),
                                                 column(6,numericInput("PCSFT_max",label = NULL,value = PCMFTmax,step=1))
-                                                )
                                               )
-                                            ),
+                                            )
+                                     ),
                                      #Barrel Zone 1
                                      column(3,
                                             fluidRow(checkboxInput("PCSBZT1_d","Barrel Zone 1 Temperature F",value=F)),
@@ -147,9 +147,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSBZT1_d",
                                                 column(6,numericInput("PCSBZT1_min",label = NULL,value=PCMBZT1min,step=5)),
                                                 column(6,numericInput("PCSBZT1_max",label = NULL,value=PCMBZT1max,step=5))
-                                                )
                                               )
-                                            ),
+                                            )
+                                     ),
                                      #Barrel ZOne2
                                      column(3,
                                             fluidRow(checkboxInput("PCSBZT2_d","Barrel Zone 2 Temperature F",value=F)),
@@ -158,9 +158,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSBZT2_d",
                                                 column(6,numericInput("PCSBZT2_min",label = NULL,value=PCMBZT2min,step=5)),
                                                 column(6,numericInput("PCSBZT2_max",label = NULL,value=PCMBZT2max,step=5))
-                                                )
                                               )
-                                            ),
+                                            )
+                                     ),
                                      #Barrel Zone3
                                      column(3,
                                             fluidRow(checkboxInput("PCSBZT3_d","Barrel Zone 3 Temperature F",value=F)),
@@ -169,9 +169,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSBZT3_d",
                                                 column(6,numericInput("PCSBZT3_min",label = NULL,value=PCMBZT3min,step=5)),
                                                 column(6,numericInput("PCSBZT3_max",label = NULL,value=PCMBZT3max,step=5))
-                                                )
                                               )
                                             )
+                                     )
                                    ),#end Processing Attribute 1
                                    fluidRow(
                                      #Clamp Temperature F
@@ -182,9 +182,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSCT_d",
                                                 column(6,numericInput("PCSCT_min",label = NULL,value=PCMCTmin,step=5)),
                                                 column(6,numericInput("PCSCT_max",label = NULL,value=PCMCTmax,step=5))
-                                                )
                                               )
-                                            ),
+                                            )
+                                     ),
                                      #Adapter Temperature F
                                      column(3,
                                             fluidRow(checkboxInput("PCSAT_d","Adapter Temperature F",value=F)),
@@ -193,9 +193,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSAT_d",
                                                 column(6,numericInput("PCSAT_min",label = NULL,value=PCMATmin,step=5)),
                                                 column(6,numericInput("PCSAT_max",label = NULL,value=PCMATmax,step=5))
-                                                )
                                               )
-                                            ),
+                                            )
+                                     ),
                                      #Die 1 Temperature F
                                      column(3,
                                             fluidRow(checkboxInput("PCSDT1_d","Die 1 Temperature F",value=F)),
@@ -204,9 +204,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSDT1_d",
                                                 column(6,numericInput("PCSDT1_min",label = NULL,value=PCMDT1min,step=5)),
                                                 column(6,numericInput("PCSDT1_max",label = NULL,value=PCMDT1max,step=5))
-                                                )
                                               )
-                                            ),
+                                            )
+                                     ),
                                      #Die 2 Temperature F
                                      column(3,
                                             fluidRow(checkboxInput("PCSDT2_d","Die 2 Temperature F",value=F)),
@@ -215,10 +215,10 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSDT2_d",
                                                 column(6,numericInput("PCSDT2_min",label = NULL,value=PCMDT2min,step=5)),
                                                 column(6,numericInput("PCSDT2_max",label = NULL,value=PCMDT2max,step=5))
-                                                )
                                               )
                                             )
-                                     ), #end Processing Attribute 
+                                     )
+                                   ), #end Processing Attribute 
                                    
                                    #Dimentional Attribute
                                    fluidRow(
@@ -231,9 +231,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSIDI_d",
                                                 column(6,numericInput("PCSIDI_min",label = NULL,value=PCSIDImin,step=0.001)),
                                                 column(6,numericInput("PCSIDI_max",label = NULL,value=PCSIDImax,step=0.001))
-                                                )
                                               )
-                                            ),
+                                            )
+                                     ),
                                      #Outer Diameter
                                      column(3,
                                             fluidRow(checkboxInput("PCSODI_d","Outer Diameter (in)",value=TRUE)),
@@ -242,9 +242,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSODI_d",
                                                 column(6,numericInput("PCSODI_min",label = NULL,value=PCSODImin,step=0.001)),
                                                 column(6,numericInput("PCSODI_max",label = NULL,value=PCSODImax,step=0.001))
-                                                )
                                               )
-                                            ),
+                                            )
+                                     ),
                                      #Wall Thickness
                                      column(3,
                                             fluidRow(checkboxInput("PCSWT_d","Wall Thickness (in)",value=TRUE)),
@@ -253,9 +253,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSWT_d",
                                                 column(6,numericInput("PCSWT_min",label = NULL,value=PCSODImin,step=0.001)),
                                                 column(6,numericInput("PCSWT_max",label = NULL,value=PCSODImax,step=0.001))
-                                                )
                                               )
-                                            ),
+                                            )
+                                     ),
                                      #Out of Roundness (in)
                                      column(3,
                                             fluidRow(checkboxInput("PCSOR_d","Out of Roundness (in)",value=F)),
@@ -264,9 +264,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSOR_d",
                                                 column(6,numericInput("PCSOR_min",label = NULL,value=PCSODImin,step=0.001)),
                                                 column(6,numericInput("PCSOR_max",label = NULL,value=PCSODImax,step=0.001))
-                                                )
                                               )
                                             )
+                                     )
                                    ),
                                    fluidRow(
                                      #Concentricity
@@ -277,9 +277,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSCCT_d",
                                                 column(6,numericInput("PCSCCT_min",label = NULL,value=PCSCCTmin,step=0.0001)),
                                                 column(6,numericInput("PCSCCT_max",label = NULL,value=PCSCCTmin,step=0.0001))
-                                                )
                                               )
-                                            ),
+                                            )
+                                     ),
                                      #Length
                                      column(3,
                                             fluidRow(checkboxInput("PCSLength_d","Length (in)",value=F)),
@@ -288,9 +288,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSLength_d",
                                                 column(6,numericInput("PCSLength_min",label = NULL,value=PCSLengthmin,step=1)),
                                                 column(6,numericInput("PCSLength_max",label = NULL,value=PCSLengthmin,step=1))
-                                                )
                                               )
-                                            ),
+                                            )
+                                     ),
                                      #Perpendicularity
                                      column(3,
                                             fluidRow(checkboxInput("PCSPPD_d","Perpendicularity (in)",value=F)),
@@ -393,8 +393,11 @@ ui<-navbarPage("Extrusion Application",
                                    # Show Table
                                    fluidRow(
                                      DT::dataTableOutput("mytable1")
-                                     )
-                                   ),#end Single Extrusion PPS Data
+                                   ),
+                                   fluidRow(
+                                     downloadButton('singledownloadSPPSData','Download Single PPS Data')
+                                   )
+                          ),#end Single Extrusion PPS Data
                           #Multi Extrusion PPS Data---UI
                           tabPanel("Multi Extrusion PPS Data",
                                    #Part Resin
@@ -406,9 +409,10 @@ ui<-navbarPage("Extrusion Application",
                                             fluidRow(
                                               conditionalPanel(
                                                 condition="input.PCMPN_d",
-                                                selectizeInput("PCMPN",label = NULL,multiple=TRUE,
-                                                               c("All",unique(as.character(multi_pps_data$`Part Number`))),
-                                                               selected="All")
+
+                                                selectInput("PCMPN",label = NULL,
+                                                               c("All",unique(as.character(multi_pps_data$`Part Number`))))
+
                                               ))),
                                      # Part Description
                                      column(2,
@@ -435,7 +439,9 @@ ui<-navbarPage("Extrusion Application",
                                               conditionalPanel(
                                                 condition = "input.PCMRD_d",
                                                 selectInput("PCMRD",label = NULL,
-                                                           c("All",unique(as.character(multi_pps_data$`Resin Description`))))
+
+                                                            c("All",unique(as.character(multi_pps_data$`Resin Description`))))
+
                                               ))),
                                      #PPS Number
                                      column(2,
@@ -445,11 +451,21 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCMPPSN_d",
                                                 selectInput("PCMPPSN",label = NULL,
                                                             c("All",unique(as.character(multi_pps_data$`PPS Number`))))
-                                              )))
+
+                                              ))),
+                                     #Extrusion Type
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMET_d","Extrusion Type",value=F))
+                                            )
+
                                    ),
                                    #Tooling
                                    fluidRow(
                                      tags$h1(strong("Tooling"),style="font-size:25px;",align="left"),
+                                     #Barrel
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMB_d","Barrel",value=F))
+                                            ),
                                      #Die Size
                                      column(2,
                                             fluidRow(checkboxInput("PCMDS_d","Die Size (in)",value=T)),
@@ -641,6 +657,11 @@ ui<-navbarPage("Extrusion Application",
                                    fluidRow(
                                      tags$h1(strong("Dimentional Attribute"),style="font-size:25px;",align="left"),
                                      column(2,
+
+                                            fluidRow(checkboxInput("PCMTE_d","Tapered End",value=FALSE))
+                                            ),
+                                     column(2,
+
                                             fluidRow(checkboxInput("PCMIDI_d","Inner Diameter (in)",value=TRUE)),
                                             fluidRow(
                                               column(6,
@@ -870,16 +891,19 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCMIRD",label = NULL,choices=c("All","yes","NA"))
                                               )))
                                    ), #end Special Operation
-                                   fluidRow(
-                                     downloadButton('downloadData','download')
-                                   ),
+
+                                   
 
                                    fluidRow(
                                      DT::dataTableOutput("mytable2")
+                                   ),
+                                   fluidRow(
+                                     downloadButton('downloadMPPSData','Download Multi-Layer PPS Data')
                                    )
+                                   
                           ),#end multi Extrusion PPS Data
                           
-                          #Tepered Extrusion PPS Data--UI
+                          #Tapered Extrusion PPS Data--UI
                           tabPanel("Tapered Extrusion PPS Data",
                                    #Part Resin
                                    fluidRow(
@@ -890,9 +914,10 @@ ui<-navbarPage("Extrusion Application",
                                             fluidRow(
                                               conditionalPanel(
                                                 condition="input.PCTPN_d",
-                                                selectizeInput("PCTPN",label = NULL,multiple=TRUE,
-                                                               c("All",unique(as.character(single_pps_data$`Part Number`))),
-                                                               selected="All")
+
+                                                selectInput("PCTPN",label = NULL,
+                                                               c("All",unique(as.character(tapered_pps_data$`Part Number`))))
+
                                               ))),
                                      # Part Description
                                      column(2,
@@ -1440,55 +1465,135 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCTIRD",label = NULL,choices=c("All","yes","NA"))
                                               )))
                                    ), #end Special Operation
-          
+                                   
                                    fluidRow(
                                      DT::dataTableOutput("mytable3")
-                                     )
-                                   )#end Tapered Extrusion PPS Data
-                          ),
-               #MES Data table rendering
-               navbarMenu("MES Data",
-                          #Single Extrusion PPS Data
+                                   ),
+                                   fluidRow(
+                                     downloadButton('downloadTPPSData','Download Tapered PPS Data')
+                                   )
+                          )#end Tapered Extrusion PPS Data
+               ),
+               
+               
+               #Single Extrusion MES Data table rendering
+               navbarMenu("Single Extrusion MES Data",
                           tabPanel("MES Parameters and Yield",
                                    fluidRow(
-                                     DT::dataTableOutput("MESparameters")
+                                     DT::dataTableOutput("singleMESparameters")
                                    )
                           ),
                           tabPanel("MES Time Stamps",
                                    fluidRow(
-                                     DT::dataTableOutput("MEStime")
+                                     DT::dataTableOutput("singleMEStime")
                                    )
                           ),
                           tabPanel("MES Submitters",
                                    fluidRow(
-                                     DT::dataTableOutput("MESsubmitter")
+                                     DT::dataTableOutput("singleMESsubmitter")
                                    )
                           ),
                           tabPanel("MES Total",
                                    fluidRow(
-                                     DT::dataTableOutput("MEStotal")
+                                     DT::dataTableOutput("singleMEStotal")
                                    )
                           )
                ),
                
-               #Scrap Codes table rendering
-               tabPanel("Scrap Codes",
-                        fluidRow(
-                          DT::dataTableOutput("scrapcodes")
-                        )
-               ),
-               
-               #Applied Stats Data table rendering
-               navbarMenu("AppStats Data",
-                          #Single Extrusion PPS Data
-                          tabPanel("Nexiv",
+               #Multi-Layer Extrusion MES Data table rendering
+               navbarMenu("Multi-Layer Extrusion MES Data",
+                          tabPanel("MES Parameters and Yield",
                                    fluidRow(
-                                     DT::dataTableOutput("nexiv")
                                    )
                           ),
-                          tabPanel("Laserlinc",
+                          tabPanel("MES Time Stamps",
                                    fluidRow(
-                                     DT::dataTableOutput("laserlinc")
+                                   )
+                          ),
+                          tabPanel("MES Submitters",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("MES Total",
+                                   fluidRow(
+                                   )
+                          )
+               ),
+               
+               #Tapered Extrusion MES Data table rendering
+               navbarMenu("Single Extrusion MES Data",
+                          tabPanel("MES Parameters and Yield",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("MES Time Stamps",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("MES Submitters",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("MES Total",
+                                   fluidRow(
+                                   )
+                          )
+               ),
+               
+               
+               #Scrap Codes Data table rendering
+               navbarMenu("Scrap Codes",
+                          #Single Extrusion PPS Data
+                          tabPanel("Single Extrusion",
+                                   fluidRow(
+                                     DT::dataTableOutput("singlescrapcodes")
+                                   )
+                          ),
+                          tabPanel("Multi-Layer Extrusion",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("Tapered Extrusion",
+                                   fluidRow(
+                                   )
+                          )
+               ),
+               
+               
+               #Applied Stats Data table rendering
+               # navbarMenu("AppStats Data",
+               #            #Single Extrusion PPS Data
+               #            tabPanel("Nexiv",
+               #                     fluidRow(
+               #                       DT::dataTableOutput("nexiv")
+               #                     )
+               #            ),
+               #            tabPanel("Laserlinc",
+               #                     fluidRow(
+               #                       DT::dataTableOutput("laserlinc")
+               #                     )
+               #            )
+               # ), #end the NavbarMenu
+               
+               
+               #Shopping Cart PPS Data table rendering
+               navbarMenu("Shopping Cart PPS Data",
+                          #Single Extrusion PPS Data
+                          tabPanel("Single Extrusion",
+                                   fluidRow(
+                                     DT::dataTableOutput("singleshoppingcartpps"),
+                                     fluidRow(
+                                       downloadButton('singlecartdownloadpps',
+                                                      'Download Single Shopping Cart PPS Data')
+                                     )
+                                   )
+                          ),
+                          tabPanel("Multi-Layer Extrusion",
+                                   fluidRow(
+                                   )
+                          ),
+                          tabPanel("Tapered Extrusion",
+                                   fluidRow(
                                    )
                           )
                ),
@@ -1497,14 +1602,36 @@ ui<-navbarPage("Extrusion Application",
                #Shopping Cart
                #'This renders the shopping cart in an absolute panels that is always visible and
                #'allows for a user to select the output data with associated batches
-               absolutePanel("Shopping Cart",
-                 bottom = 100, right = 20, width = 600,
-                 draggable = TRUE,
-                 wellPanel(
-                   dataTableOutput("shoppingcart")
-                 ),
-                 style = "opacity: 0.92"
-               ) #end absolutePanel#end Part Catalog
+               #'
+               absolutePanel(class = "draggable",
+                             bottom = 100, right = 20, width = 500, height = 600,
+                             tabsetPanel(
+                               tabPanel("Single Extrusion Cart",
+                                          #Single Extrusion Parts
+                                        DT::dataTableOutput("singleshoppingcartparts"),
+                                        dataTableOutput("singleshoppingcart")
+                               ),
+                               tabPanel("Multi-Layer Extrusion Cart"
+                                          #Multi-layer Extrusion Parts
+                               ),
+                               tabPanel("Tapered Extrusion Cart"
+                                          #Tapered Extrusion Parts
+                               ),
+                               tabPanel("Total Extrusion Cart"
+                                          #Total Extrusion Parts
+                               )
+                             ),
+                             style = "opacity: 1; z-index: 1000; background: #C0C0C0; font-size: 15px;cursor: move;"
+                             
+               ), #end absolutePanel#end Part Catalog
+               
+              
+               #### Extra HTML ####
+               
+               
+               #Draggable and Resizeable absolutepanel
+               HTML("<script>$(\".draggable\").draggable();</script>")
+               
+               
+               
 )#end ui
-
-
