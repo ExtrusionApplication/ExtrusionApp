@@ -957,7 +957,8 @@ server<-function(input,output,session){
     filter = "top",
     rownames = FALSE,
     escape = FALSE,
-    server = FALSE
+    server = FALSE,
+    options=list(pageLength=5)   # make the shopping cart page shorter
   ) #for the shoppingcart
   
   
@@ -2993,7 +2994,21 @@ server<-function(input,output,session){
   # end Single Extrusion PPS Data Server part and Shopping cart
   
   
+  # Error Message---Manually add part number to shopping cart, if there is no such part number in the datadase, then return a error message
+  observeEvent(input$AddPN,{
+    showModal(modalDialog(
+      title = "Add Part Number",
+      "Success",
+      easyClose = T
+    ))
+  })
+  
+  
+  
+  
+  
 }
+  
 
 
 
