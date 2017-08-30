@@ -1,3 +1,4 @@
+
 #_d:id of the output of checkbox
 #_input: the name of the searchbox
 #PCS:Part Catalog--Single Extrusion PPS
@@ -847,6 +848,7 @@ server<-function(input,output,session){
   server = FALSE) #end Single Extrusion PPS Data
   
   
+
   
   
   ###
@@ -1748,6 +1750,7 @@ server<-function(input,output,session){
   
   # obtain the output of checkbox from functions and make a list to store them
   #this variable will store all the inputs of the multi-layer extrusions
+
   show_vars2<-reactive({
     
     checkboxes2 <- as.numeric(c(input$PCMPN_d,input$PCMPD_d,input$PCMRN_d,input$PCMRD_d,
@@ -1835,8 +1838,22 @@ server<-function(input,output,session){
     return(inputs2)
   })
   
+  
+  
+  #All Table Filter works are done below, and output a modified talbe. This table will be used by the renderdatatable, and download button
+  datasetInput<-reactive({
+    col_var2=show_vars2()
+    for (i in 1:length(col_var2)){
+      if (col_var2[i]!=0){
+        Col_PCM=c(Col_PCM,i) # obtain the selected columns' number
+      }
+    } 
+    data_PCM<-multi_pps_data[,Col_PCM]
+    data_PCM
+  })
   output$mytable2 <- DT::renderDataTable({
     DT::datatable({
+
       Col_PCM=c()
       col_var2=show_vars2()
       for (i in 1:length(col_var2)){
@@ -1869,6 +1886,7 @@ server<-function(input,output,session){
       data_PCM <- data_PCM[,c(ncol(data_PCM), 1:(ncol(data_PCM)-1))]
       
       return(data_PCM)
+
     },
     options = list(orderClasses = TRUE, 
                    columnDefs = list(list(className = 'dt-center', 
@@ -1886,6 +1904,7 @@ server<-function(input,output,session){
   
   
   
+
   ###
   
   ### The multi-layer shopping cart section ###
@@ -2649,6 +2668,7 @@ server<-function(input,output,session){
     
   })#end observeEvent for the checkboxes
   
+
   
   
   # obtain the output of checkbox from functions and make a list to store them----multi Extrusion PPS Data
@@ -2899,6 +2919,7 @@ server<-function(input,output,session){
     escape = FALSE,
     server = FALSE) #for the shoppingcart
   
+
   output$downloadTPPSData <- downloadHandler(
     #downlaod the data
     filename = function() { paste0("Tapered PPS Data", ".csv") },
@@ -2972,7 +2993,6 @@ server<-function(input,output,session){
   # end Single Extrusion PPS Data Server part and Shopping cart
   
   
-
 }
 
 

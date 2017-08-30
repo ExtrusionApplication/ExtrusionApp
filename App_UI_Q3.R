@@ -27,6 +27,7 @@ ui<-navbarPage("Extrusion Application",
                                      tags$h1(strong("Part Resin"),style="font-size:25px;",align="left"), #Use tag to add a hearder 
                                      #Part Number
                                      column(2,
+
                                             fluidRow(checkboxInput("PCSPN_d", "Part Number", value = TRUE)),  #Show the checkbox for Part number. it will return a True/False value
                                             fluidRow(
                                               conditionalPanel(
@@ -408,8 +409,10 @@ ui<-navbarPage("Extrusion Application",
                                             fluidRow(
                                               conditionalPanel(
                                                 condition="input.PCMPN_d",
+
                                                 selectInput("PCMPN",label = NULL,
                                                                c("All",unique(as.character(multi_pps_data$`Part Number`))))
+
                                               ))),
                                      # Part Description
                                      column(2,
@@ -436,7 +439,9 @@ ui<-navbarPage("Extrusion Application",
                                               conditionalPanel(
                                                 condition = "input.PCMRD_d",
                                                 selectInput("PCMRD",label = NULL,
+
                                                             c("All",unique(as.character(multi_pps_data$`Resin Description`))))
+
                                               ))),
                                      #PPS Number
                                      column(2,
@@ -446,11 +451,13 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCMPPSN_d",
                                                 selectInput("PCMPPSN",label = NULL,
                                                             c("All",unique(as.character(multi_pps_data$`PPS Number`))))
+
                                               ))),
                                      #Extrusion Type
                                      column(2,
                                             fluidRow(checkboxInput("PCMET_d","Extrusion Type",value=F))
                                             )
+
                                    ),
                                    #Tooling
                                    fluidRow(
@@ -650,9 +657,11 @@ ui<-navbarPage("Extrusion Application",
                                    fluidRow(
                                      tags$h1(strong("Dimentional Attribute"),style="font-size:25px;",align="left"),
                                      column(2,
+
                                             fluidRow(checkboxInput("PCMTE_d","Tapered End",value=FALSE))
                                             ),
                                      column(2,
+
                                             fluidRow(checkboxInput("PCMIDI_d","Inner Diameter (in)",value=TRUE)),
                                             fluidRow(
                                               column(6,
@@ -882,7 +891,9 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCMIRD",label = NULL,choices=c("All","yes","NA"))
                                               )))
                                    ), #end Special Operation
+
                                    
+
                                    fluidRow(
                                      DT::dataTableOutput("mytable2")
                                    ),
@@ -903,8 +914,10 @@ ui<-navbarPage("Extrusion Application",
                                             fluidRow(
                                               conditionalPanel(
                                                 condition="input.PCTPN_d",
+
                                                 selectInput("PCTPN",label = NULL,
                                                                c("All",unique(as.character(tapered_pps_data$`Part Number`))))
+
                                               ))),
                                      # Part Description
                                      column(2,
@@ -1584,6 +1597,7 @@ ui<-navbarPage("Extrusion Application",
                                    )
                           )
                ),
+               
                
                #Shopping Cart
                #'This renders the shopping cart in an absolute panels that is always visible and
