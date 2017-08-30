@@ -892,7 +892,7 @@ ui<-navbarPage("Extrusion Application",
                                    
                           ),#end multi Extrusion PPS Data
                           
-                          #Tepered Extrusion PPS Data--UI
+                          #Tapered Extrusion PPS Data--UI
                           tabPanel("Tapered Extrusion PPS Data",
                                    #Part Resin
                                    fluidRow(
