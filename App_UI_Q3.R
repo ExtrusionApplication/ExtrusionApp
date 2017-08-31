@@ -1600,11 +1600,13 @@ ui<-navbarPage("Extrusion Application",
                #create a pop up window for the shopping cart
                absolutePanel(
                  actionButton("ShoppingCart","",icon=icon("shopping-cart","fa-2x"),width = 80 ),
+                 #verbatimTextOutput("ShoppingCart_Count"),     # Try to add the number of part-number in shopping cart behind the cart icon
+                 
                  bsModal("modalExample", "Shopping Cart", "ShoppingCart", size = "default",
                          tabsetPanel(
                            tabPanel("Single-Extrusion Cart",
-                                    textInput("SECPN_input","Part Number"),
-                                    actionButton("AddPN","Add"),
+                                    textInput("SinglePartNum_input","Part Number"),
+                                    actionButton("singleMadd_button","Add"),
                                     DT::dataTableOutput("singleshoppingcartparts"),
                                     dataTableOutput("singleshoppingcart")
                            ),

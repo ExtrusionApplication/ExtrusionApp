@@ -969,7 +969,8 @@ server<-function(input,output,session){
   filter = "top",
   rownames = FALSE,
   escape = FALSE,
-  server = FALSE
+  server = FALSE,
+  options=list(pageLength=5)   # make the shopping cart page shorter
   ) #for the shoppingcart
   
   
@@ -2995,17 +2996,92 @@ server<-function(input,output,session){
   
   
   # Error Message---Manually add part number to shopping cart, if there is no such part number in the datadase, then return a error message
-  observeEvent(input$AddPN,{
-    showModal(modalDialog(
-      title = "Add Part Number",
-      "Success",
-      easyClose = T
-    ))
+  # observeEvent(input$singleMadd_button,{
+  #   showModal(modalDialog(
+  #     title = "Add Part Number",
+  #     "Success",
+  #     easyClose = T
+  #   ))
+  # })
+  
+  
+# Test--SHow The numbe of part number that have been added to shopping cart
+  #output$ShoppingCart_Count<-renderText({
+   # Count<-count(singleshoppingcartparts$data)
+    #Count
+  #})
+  
+  
+  
+  
+  
+  
+# Add Manually part number input button
+  
+  observeEvent(input$singleMadd_button,{
+    #used by single Mnanually add button in the shopping cart
+    #get the part from the text input box
+    part <- input$SinglePartNum_input
+    
+      showModal(modalDialog(
+        title = "Add Part Number",
+        "Success",
+        easyClose = T
+      ))
+      
+      
+    print(part)
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"singledelete_part_button\",  this.id)'))
+    
+    #Get the SAP batches
+    SAP_batches <- single_tari_parameter_data$`SAP Batch Number`[single_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    #Action button to delete batch
+    batch_count <- 1
+    vectorofbuttons <- c(rep(0, length(SAP_batches)))
+    
+    while(batch_count < length(SAP_batches) + 1){
+      vectorofbuttons[batch_count] <- as.character(
+        actionButton(inputId = paste0("button_", SAP_batches[batch_count]),
+                     label = "Delete Batch",
+                     onclick = 'Shiny.onInputChange(\"singledelete_batch_button\",  this.id)'))
+      batch_count <- batch_count + 1
+    }
+    
+    #Vectors of parts and buttons
+    partvector <- rep(part, numberofbatches)
+    deletepartvector <- rep(deletepart, numberofbatches)
+    
+    new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
+    
+    colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    singleshoppingcart$data <- rbind(singleshoppingcart$data, new_data, stringsAsFactors = FALSE)
+    colnames(singleshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
   })
   
-  
-  
-  
+  observeEvent(input$singleMadd_button,{
+    #this observes whether the user manually add a part to shopping cart
+    part <- input$SinglePartNum_input
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"singledelete_part_button\",  this.id)'))
+    
+    new_data <- cbind(part, deletepart)
+    
+    colnames(new_data) <- c("Part", "Delete Part")
+    singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+    colnames(singleshoppingcartparts$data) <- c("Part", "Delete Part")
+    updateTextInput(session,"SinglePartNum_input",value = "") #update input box, reset it to be blank
+  })
   
 }
   
