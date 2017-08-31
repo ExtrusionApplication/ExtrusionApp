@@ -3083,6 +3083,7 @@ server<-function(input,output,session){
     updateTextInput(session,"SinglePartNum_input",value = "") #update input box, reset it to be blank
   })
   
+
 }
   
 
