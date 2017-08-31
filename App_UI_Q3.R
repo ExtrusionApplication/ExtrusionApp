@@ -8,6 +8,7 @@ library(gsubfn)
 library(proto)
 library(sqldf)
 library(shinyjs)
+library(shinyBS)
 
 
 #_s:name of the checkbox
@@ -18,7 +19,6 @@ library(shinyjs)
 #PCT: Part Catalog--Tapered Extrusion PPS
 
 ui<-navbarPage("Extrusion Application",
-               
                navbarMenu("Part Catalog",   #Create a dropdown list named as Part Catalog containing of Single, Multi,and Tapered
                           #Single Extrusion PPS Data
                           tabPanel("Single Extrusion PPS Data",
@@ -1597,40 +1597,52 @@ ui<-navbarPage("Extrusion Application",
                                    )
                           )
                ),
+               #create a pop up window for the shopping cart
+               absolutePanel(
+                 actionButton("ShoppingCart","",icon=icon("shopping-cart","fa-2x"),width = 80 ),
+                 #verbatimTextOutput("ShoppingCart_Count"),     # Try to add the number of part-number in shopping cart behind the cart icon
+                 
+                 bsModal("modalExample", "Shopping Cart", "ShoppingCart", size = "default",
+                         tabsetPanel(
+                           tabPanel("Single-Extrusion Cart",
+                                    textInput("SinglePartNum_input","Part Number"),
+                                    actionButton("singleMadd_button","Add"),
+                                    DT::dataTableOutput("singleshoppingcartparts"),
+                                    dataTableOutput("singleshoppingcart")
+                           ),
+                           tabPanel("Multi-Layer Extrusion Cart"
+                                    #Multi-layer Extrusion Parts
+                           ),
+                           tabPanel("Tapered Extrusion Cart"
+                                    #Tapered Extrusion Parts
+                           ),
+                           tabPanel("Total Extrusion Cart"
+                                    #Total Extrusion Parts
+                           )
+                         )
+                         
+                         
+                         
+                 ),
+                 draggable = F,right = 20,top = 100,fixed = T
+                 
+               )
+
+               
+               
                
                
                #Shopping Cart
                #'This renders the shopping cart in an absolute panels that is always visible and
                #'allows for a user to select the output data with associated batches
                #'
-               absolutePanel(class = "draggable",
-                             bottom = 100, right = 20, width = 500, height = 600,
-                             tabsetPanel(
-                               tabPanel("Single Extrusion Cart",
-                                          #Single Extrusion Parts
-                                        DT::dataTableOutput("singleshoppingcartparts"),
-                                        dataTableOutput("singleshoppingcart")
-                               ),
-                               tabPanel("Multi-Layer Extrusion Cart"
-                                          #Multi-layer Extrusion Parts
-                               ),
-                               tabPanel("Tapered Extrusion Cart"
-                                          #Tapered Extrusion Parts
-                               ),
-                               tabPanel("Total Extrusion Cart"
-                                          #Total Extrusion Parts
-                               )
-                             ),
-                             style = "opacity: 1; z-index: 1000; background: #C0C0C0; font-size: 15px;cursor: move;"
-                             
-               ), #end absolutePanel#end Part Catalog
-               
+              
               
                #### Extra HTML ####
                
                
                #Draggable and Resizeable absolutepanel
-               HTML("<script>$(\".draggable\").draggable();</script>")
+              # HTML("<script>$(\".draggable\").draggable();</script>")
                
                
                
