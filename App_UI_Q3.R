@@ -7,11 +7,6 @@ library(stringr)
 library(gsubfn)
 library(proto)
 library(sqldf)
-<<<<<<< HEAD
-=======
-library(shinyjs)
-library(shinyBS)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
 
 
 #_s:name of the checkbox
@@ -22,10 +17,7 @@ library(shinyBS)
 #PCT: Part Catalog--Tapered Extrusion PPS
 
 ui<-navbarPage("Extrusion Application",
-<<<<<<< HEAD
                
-=======
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                navbarMenu("Part Catalog",   #Create a dropdown list named as Part Catalog containing of Single, Multi,and Tapered
                           #Single Extrusion PPS Data
                           tabPanel("Single Extrusion PPS Data",
@@ -34,7 +26,6 @@ ui<-navbarPage("Extrusion Application",
                                      tags$h1(strong("Part Resin"),style="font-size:25px;",align="left"), #Use tag to add a hearder 
                                      #Part Number
                                      column(2,
-<<<<<<< HEAD
                                              fluidRow(checkboxInput("PCSPN_d", "Part Number", value = TRUE)),  #Show the checkbox for Part number. it will return a True/False value
                                              fluidRow(
                                                conditionalPanel(
@@ -81,54 +72,6 @@ ui<-navbarPage("Extrusion Application",
                                                              c("All",unique(as.character(single_pps_data$`PPS Number`))))
                                                )))
                                      ),
-=======
-
-                                            fluidRow(checkboxInput("PCSPN_d", "Part Number", value = TRUE)),  #Show the checkbox for Part number. it will return a True/False value
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition="input.PCSPN_d",   #If it were Ture, then there will have a search box for Part Number under checkbox
-                                                selectInput("PCSPN",label = NULL,
-                                                               c("All",unique(as.character(single_pps_data$`Part Number`))))
-                                                
-                                              ))),
-                                     # Part Description
-                                     column(2,
-                                            fluidRow(checkboxInput("PCSPD_d", "Part Description", value = TRUE)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCSPD_d",
-                                                selectInput("PCSPD",label = NULL,
-                                                            c("All",unique(as.character(single_pps_data$`Part Description`))))
-                                              ))), 
-                                     # Resin Number
-                                     column(2,
-                                            fluidRow(checkboxInput("PCSRN_d","Resin Number",value=TRUE)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCSRN_d",
-                                                selectInput("PCSRN",label = NULL,
-                                                            c("All",unique(as.character(single_pps_data$`Resin Number`))))
-                                              ))),
-                                     #Resin Description
-                                     column(2,
-                                            fluidRow(checkboxInput("PCSRD_d","Resin Description",value=TRUE)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCSRD_d",
-                                                selectInput("PCSRD",label = NULL,
-                                                            c("All",unique(as.character(single_pps_data$`Resin Description`))))
-                                              ))),
-                                     #PPS Number
-                                     column(2,
-                                            fluidRow(checkboxInput("PCSPPSN_d","PPS Number",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCSPPSN_d",
-                                                selectInput("PCSPPSN",label = NULL,
-                                                            c("All",unique(as.character(single_pps_data$`PPS Number`))))
-                                              )))
-                                   ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                    #Tooling
                                    fluidRow(
                                      tags$h1(strong("Tooling"),style="font-size:25px;",align="left"),
@@ -140,15 +83,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSDS_d",
                                                 column(6,numericInput("PCSDS_min",label = NULL,value=PCSDSmin,step=0.001)),
                                                 column(6,numericInput("PCSDS_max",label = NULL,value=PCSDSmax,step=0.001))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ), #end column
-=======
-                                              )
-                                            )
-                                     ), #end column
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Die Land Length
                                      column(2,
                                             fluidRow(checkboxInput("PCSDLL_d","Die Land Length (in)",value=F)),
@@ -165,15 +102,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSTS_d",
                                                 column(6,numericInput("PCSTS_min",label = NULL,value=PCMTSmin,step=0.001)),
                                                 column(6,numericInput("PCSTS_max",label = NULL,value=PCMTSmax,step=0.001))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ), #end column
-=======
-                                              )
-                                            )
-                                     ), #end column
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Tip Land Length
                                      column(2,
                                             fluidRow(checkboxInput("PCSTLL_d","Tip Land Length (in)",value=F)),
@@ -204,15 +135,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSFT_d",
                                                 column(6,numericInput("PCSFT_min",label = NULL,value = PCMFTmin,step=1)),
                                                 column(6,numericInput("PCSFT_max",label = NULL,value = PCMFTmax,step=1))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ),
-=======
-                                              )
-                                            )
-                                     ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Barrel Zone 1
                                      column(3,
                                             fluidRow(checkboxInput("PCSBZT1_d","Barrel Zone 1 Temperature F",value=F)),
@@ -221,15 +146,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSBZT1_d",
                                                 column(6,numericInput("PCSBZT1_min",label = NULL,value=PCMBZT1min,step=5)),
                                                 column(6,numericInput("PCSBZT1_max",label = NULL,value=PCMBZT1max,step=5))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ),
-=======
-                                              )
-                                            )
-                                     ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Barrel ZOne2
                                      column(3,
                                             fluidRow(checkboxInput("PCSBZT2_d","Barrel Zone 2 Temperature F",value=F)),
@@ -238,15 +157,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSBZT2_d",
                                                 column(6,numericInput("PCSBZT2_min",label = NULL,value=PCMBZT2min,step=5)),
                                                 column(6,numericInput("PCSBZT2_max",label = NULL,value=PCMBZT2max,step=5))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ),
-=======
-                                              )
-                                            )
-                                     ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Barrel Zone3
                                      column(3,
                                             fluidRow(checkboxInput("PCSBZT3_d","Barrel Zone 3 Temperature F",value=F)),
@@ -255,15 +168,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSBZT3_d",
                                                 column(6,numericInput("PCSBZT3_min",label = NULL,value=PCMBZT3min,step=5)),
                                                 column(6,numericInput("PCSBZT3_max",label = NULL,value=PCMBZT3max,step=5))
-<<<<<<< HEAD
                                                 )
                                               )
                                             )
-=======
-                                              )
-                                            )
-                                     )
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                    ),#end Processing Attribute 1
                                    fluidRow(
                                      #Clamp Temperature F
@@ -274,15 +181,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSCT_d",
                                                 column(6,numericInput("PCSCT_min",label = NULL,value=PCMCTmin,step=5)),
                                                 column(6,numericInput("PCSCT_max",label = NULL,value=PCMCTmax,step=5))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ),
-=======
-                                              )
-                                            )
-                                     ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Adapter Temperature F
                                      column(3,
                                             fluidRow(checkboxInput("PCSAT_d","Adapter Temperature F",value=F)),
@@ -291,15 +192,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSAT_d",
                                                 column(6,numericInput("PCSAT_min",label = NULL,value=PCMATmin,step=5)),
                                                 column(6,numericInput("PCSAT_max",label = NULL,value=PCMATmax,step=5))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ),
-=======
-                                              )
-                                            )
-                                     ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Die 1 Temperature F
                                      column(3,
                                             fluidRow(checkboxInput("PCSDT1_d","Die 1 Temperature F",value=F)),
@@ -308,15 +203,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSDT1_d",
                                                 column(6,numericInput("PCSDT1_min",label = NULL,value=PCMDT1min,step=5)),
                                                 column(6,numericInput("PCSDT1_max",label = NULL,value=PCMDT1max,step=5))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ),
-=======
-                                              )
-                                            )
-                                     ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Die 2 Temperature F
                                      column(3,
                                             fluidRow(checkboxInput("PCSDT2_d","Die 2 Temperature F",value=F)),
@@ -325,17 +214,10 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSDT2_d",
                                                 column(6,numericInput("PCSDT2_min",label = NULL,value=PCMDT2min,step=5)),
                                                 column(6,numericInput("PCSDT2_max",label = NULL,value=PCMDT2max,step=5))
-<<<<<<< HEAD
                                                 )
                                               )
                                             )
                                      ), #end Processing Attribute 
-=======
-                                              )
-                                            )
-                                     )
-                                   ), #end Processing Attribute 
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                    
                                    #Dimentional Attribute
                                    fluidRow(
@@ -348,15 +230,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSIDI_d",
                                                 column(6,numericInput("PCSIDI_min",label = NULL,value=PCSIDImin,step=0.001)),
                                                 column(6,numericInput("PCSIDI_max",label = NULL,value=PCSIDImax,step=0.001))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ),
-=======
-                                              )
-                                            )
-                                     ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Outer Diameter
                                      column(3,
                                             fluidRow(checkboxInput("PCSODI_d","Outer Diameter (in)",value=TRUE)),
@@ -365,15 +241,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSODI_d",
                                                 column(6,numericInput("PCSODI_min",label = NULL,value=PCSODImin,step=0.001)),
                                                 column(6,numericInput("PCSODI_max",label = NULL,value=PCSODImax,step=0.001))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ),
-=======
-                                              )
-                                            )
-                                     ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Wall Thickness
                                      column(3,
                                             fluidRow(checkboxInput("PCSWT_d","Wall Thickness (in)",value=TRUE)),
@@ -382,15 +252,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSWT_d",
                                                 column(6,numericInput("PCSWT_min",label = NULL,value=PCSODImin,step=0.001)),
                                                 column(6,numericInput("PCSWT_max",label = NULL,value=PCSODImax,step=0.001))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ),
-=======
-                                              )
-                                            )
-                                     ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Out of Roundness (in)
                                      column(3,
                                             fluidRow(checkboxInput("PCSOR_d","Out of Roundness (in)",value=F)),
@@ -399,15 +263,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSOR_d",
                                                 column(6,numericInput("PCSOR_min",label = NULL,value=PCSODImin,step=0.001)),
                                                 column(6,numericInput("PCSOR_max",label = NULL,value=PCSODImax,step=0.001))
-<<<<<<< HEAD
                                                 )
                                               )
                                             )
-=======
-                                              )
-                                            )
-                                     )
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                    ),
                                    fluidRow(
                                      #Concentricity
@@ -418,15 +276,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSCCT_d",
                                                 column(6,numericInput("PCSCCT_min",label = NULL,value=PCSCCTmin,step=0.0001)),
                                                 column(6,numericInput("PCSCCT_max",label = NULL,value=PCSCCTmin,step=0.0001))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ),
-=======
-                                              )
-                                            )
-                                     ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Length
                                      column(3,
                                             fluidRow(checkboxInput("PCSLength_d","Length (in)",value=F)),
@@ -435,15 +287,9 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCSLength_d",
                                                 column(6,numericInput("PCSLength_min",label = NULL,value=PCSLengthmin,step=1)),
                                                 column(6,numericInput("PCSLength_max",label = NULL,value=PCSLengthmin,step=1))
-<<<<<<< HEAD
                                                 )
                                               )
                                             ),
-=======
-                                              )
-                                            )
-                                     ),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                      #Perpendicularity
                                      column(3,
                                             fluidRow(checkboxInput("PCSPPD_d","Perpendicularity (in)",value=F)),
@@ -546,16 +392,8 @@ ui<-navbarPage("Extrusion Application",
                                    # Show Table
                                    fluidRow(
                                      DT::dataTableOutput("mytable1")
-<<<<<<< HEAD
                                      )
                                    ),#end Single Extrusion PPS Data
-=======
-                                   ),
-                                   fluidRow(
-                                     downloadButton('singledownloadSPPSData','Download Single PPS Data')
-                                   )
-                          ),#end Single Extrusion PPS Data
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                           #Multi Extrusion PPS Data---UI
                           tabPanel("Multi Extrusion PPS Data",
                                    #Part Resin
@@ -563,7 +401,6 @@ ui<-navbarPage("Extrusion Application",
                                      tags$h1(strong("Part Resin"),style="font-size:25px;",align="left"),
                                      #Part Number
                                      column(2,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCMPN_s")),
                                             fluidRow(
                                               conditionalPanel(
@@ -602,93 +439,23 @@ ui<-navbarPage("Extrusion Application",
                                                 condition = "input.PCMPPSN_d",
                                                 uiOutput("PCMPPSN_input")
                                               )))
-=======
-                                            fluidRow(checkboxInput("PCMPN_d","Part Number",value=TRUE)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition="input.PCMPN_d",
-
-                                                selectInput("PCMPN",label = NULL,
-                                                               c("All",unique(as.character(multi_pps_data$`Part Number`))))
-
-                                              ))),
-                                     # Part Description
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMPD_d","Part Description",value=TRUE)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMPD_d",
-                                                selectInput("PCMPD",label = NULL,
-                                                            c("All",unique(as.character(multi_pps_data$`Part Description`))))
-                                              ))), 
-                                     # Resin Number
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMRN_d","Resin Number",value=TRUE)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMRN_d",
-                                                selectInput("PCMRN",label = NULL,
-                                                            c("All",unique(as.character(multi_pps_data$`Resin Number`))))
-                                              ))),
-                                     #Resin Description
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMRD_d","Resin Description",value=TRUE)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMRD_d",
-                                                selectInput("PCMRD",label = NULL,
-
-                                                            c("All",unique(as.character(multi_pps_data$`Resin Description`))))
-
-                                              ))),
-                                     #PPS Number
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMPPSN_d","PPS Number",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMPPSN_d",
-                                                selectInput("PCMPPSN",label = NULL,
-                                                            c("All",unique(as.character(multi_pps_data$`PPS Number`))))
-
-                                              ))),
-                                     #Extrusion Type
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMET_d","Extrusion Type",value=F))
-                                            )
-
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                    ),
                                    #Tooling
                                    fluidRow(
                                      tags$h1(strong("Tooling"),style="font-size:25px;",align="left"),
-<<<<<<< HEAD
                                      #Die Size
                                      column(2,
                                             fluidRow(uiOutput("PCMDS_s")),
-=======
-                                     #Barrel
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMB_d","Barrel",value=F))
-                                            ),
-                                     #Die Size
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMDS_d","Die Size (in)",value=T)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMDS_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMDS_min_input")
-=======
-                                                       numericInput("PCMDS_min",label = NULL,value=PCMDSmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMDS_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMDS_max_input")
                                                      )))),
                                      #Die Land Length
@@ -702,45 +469,21 @@ ui<-navbarPage("Extrusion Application",
                                      #Tip Size
                                      column(2,
                                             fluidRow(uiOutput("PCMTS_s")),
-=======
-                                                       numericInput("PCMDS_max",label = NULL,value=PCMDSmax,step=0.001)
-                                                     )))),
-                                     #Die Land Length
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMDLL_d","Die Land Length (in)",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMDLL_d",
-                                                selectInput("PCMDLL",label = NULL,c("All",unique(as.character(multi_pps_data$`Die Land Length (in)`))))
-                                              ))),
-                                     #Tip Size
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMTS_d","Tip Size (in)",value=T)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMTS_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMTS_min_input")
-=======
-                                                       numericInput("PCMTS_min",label = NULL,value=PCMTSmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMTS_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMTS_max_input")
-=======
-                                                       numericInput("PCMTS_max",label = NULL,value=PCMTSmax,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ))),
                                      #Tip Land Length
                                      column(2,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCMTLL_s")),
                                             fluidRow(
                                               conditionalPanel(
@@ -754,22 +497,6 @@ ui<-navbarPage("Extrusion Application",
                                               conditionalPanel(
                                                 condition = "input.PCMSP_d",
                                                 uiOutput("PCMSP_input")
-=======
-                                            fluidRow(checkboxInput("PCMTLL_d","Tip Land Length (in)",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMTLL_d",
-                                                selectInput("PCMTLL",label = NULL,c("All",unique(as.character(multi_pps_data$`Tip Land Length (in)`))))
-                                              ))),
-                                     #Screw Print
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMSP_d","Screw Print",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMSP_d",
-                                                selectInput("PCMSP",label = NULL,
-                                                            c("All",unique(as.character(multi_pps_data$`Screw Print`))))
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                               )))
                                    ),#end Tooling
                                    #Processing Attributes
@@ -778,473 +505,263 @@ ui<-navbarPage("Extrusion Application",
                                      
                                      #Feedthroat
                                      column(3,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCMFT_s")),
-=======
-                                            fluidRow(checkboxInput("PCMFT_d","Feedthroat Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMFT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMFT_min_input")
-=======
-                                                       numericInput("PCMFT_min",label = NULL,value = PCMFTmin,step=1)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMFT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMFT_max_input")
-=======
-                                                       numericInput("PCMFT_max",label = NULL,value=PCMFTmax,step=1)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ))),
                                      #Barrel Zone 1
                                      column(3,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCMBZT1_s")),
-=======
-                                            fluidRow(checkboxInput("PCMBZT1_d","Barrel Zone 1 Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMBZT1_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMBZT1_min_input")
-=======
-                                                       numericInput("PCMBZT1_min",label = NULL,value=PCMBZT1min,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMBZT1_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMBZT1_max_input")
-=======
-                                                       numericInput("PCMBZT1_max",label = NULL,value=PCMBZT1max,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ))),
                                      #Barrel ZOne2
                                      column(3,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCMBZT2_s")),
-=======
-                                            fluidRow(checkboxInput("PCMBZT2_d","Barrel Zone 2 Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMBZT2_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMBZT2_min_input")
-=======
-                                                       numericInput("PCMBZT2_min",label = NULL,value=PCMBZT2min,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMBZT2_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMBZT2_max_input")
-=======
-                                                       numericInput("PCMBZT2_max",label = NULL,value=PCMBZT2max,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ))),
                                      #Barrel Zone3
                                      column(3,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCMBZT3_s")),
-=======
-                                            fluidRow(checkboxInput("PCMBZT3_d","Barrel Zone 3 Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMBZT3_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMBZT3_min_input")
-=======
-                                                       numericInput("PCMBZT3_min",label = NULL,value=PCMBZT3min,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMBZT3_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMBZT3_max_input")
-=======
-                                                       numericInput("PCMBZT3_max",label = NULL,value=PCMBZT3max,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               )))
                                    ),#end Processing Attribute 1
                                    fluidRow(
                                      column(3,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCMCT_s")),
-=======
-                                            fluidRow(checkboxInput("PCMCT_d","Clamp Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMCT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMCT_min_input")
-=======
-                                                       numericInput("PCMCT_min",label = NULL,value=PCMCTmin,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMCT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMCT_max_input")
                                                      )
                                               ))),
                                      column(3,
                                             fluidRow(uiOutput("PCMAT_s")),
-=======
-                                                       numericInput("PCMCT_max",label = NULL,value=PCMCTmax,step=5)
-                                                     )
-                                              ))),
-                                     column(3,
-                                            fluidRow(checkboxInput("PCMAT_d","Adapter Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMAT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMAT_min_input")
-=======
-                                                       numericInput("PCMAT_min",label = NULL,value=PCMATmin,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMAT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMAT_max_input")
                                                      )
                                               ))),
                                      column(3,
                                             fluidRow(uiOutput("PCMDT1_s")),
-=======
-                                                       numericInput("PCMAT_max",label = NULL,value=PCMATmax,step=5)
-                                                     )
-                                              ))),
-                                     column(3,
-                                            fluidRow(checkboxInput("PCMDT1_d","Die 1 Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMDT1_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMDT1_min_input")
-=======
-                                                       numericInput("PCMDT1_min",label = NULL,value=PCMDT1min,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMDT1_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMDT1_max_input")
                                                      )
                                               ))),
                                      column(3,
                                             fluidRow(uiOutput("PCMDT2_s")),
-=======
-                                                       numericInput("PCMDT1_max",label = NULL,value=PCMDT1max,step=5)
-                                                     )
-                                              ))),
-                                     column(3,
-                                            fluidRow(checkboxInput("PCMDT2_d","Die 2 Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMDT2_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMDT2_min_input")
-=======
-                                                       numericInput("PCMDT2_min",label = NULL,value=PCMDT2min,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMDT2_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMDT2_max_input")
-=======
-                                                       numericInput("PCMDT2_max",label = NULL,value=PCMDT2max,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               )))), #end Processing Attribute 2
                                    #Dimentional Attribute
                                    fluidRow(
                                      tags$h1(strong("Dimentional Attribute"),style="font-size:25px;",align="left"),
                                      column(2,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCMIDI_s")),
-=======
-
-                                            fluidRow(checkboxInput("PCMTE_d","Tapered End",value=FALSE))
-                                            ),
-                                     column(2,
-
-                                            fluidRow(checkboxInput("PCMIDI_d","Inner Diameter (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMIDI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMIDI_min_input")
-=======
-                                                       numericInput("PCMIDI_min",label = NULL,value=PCMIDImin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMIDI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMIDI_max_input")
                                                      )))),
                                      column(2,
                                             fluidRow(uiOutput("PCMODI_s")),
-=======
-                                                       numericInput("PCMIDI_max",label = NULL,value=PCMIDImax,step=0.001)
-                                                     )))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMODI_d","Outer Diameter (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMODI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMODI_min_input")
-=======
-                                                       numericInput("PCMODI_min",label = NULL,value=PCMODImin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMODI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMODI_max_input")
                                                      )))),
                                      column(2,
                                             fluidRow(uiOutput("PCMIWT_s")),
-=======
-                                                       numericInput("PCMODI_max",label = NULL,value=PCMODImax,step=0.001)
-                                                     )))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMIWT_d","Inner Wall Thickness (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMIWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMIWT_min_input")
-=======
-                                                       numericInput("PCMIWT_min",label = NULL,value=PCMIWTmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMIWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMIWT_max_input")
                                                      )))),
                                      column(2,
                                             fluidRow(uiOutput("PCMMWT_s")),
-=======
-                                                       numericInput("PCMIWT_max",label = NULL,value=PCMIWTmax,step=0.001)
-                                                     )))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMMWT_d","Middle Wall Thickness (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMMWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMMWT_min_input")
-=======
-                                                       numericInput("PCMMWT_min",label = NULL,value=PCMMWTmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMMWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMMWT_max_input")
                                                      )))),
                                      column(2,
                                             fluidRow(uiOutput("PCMOWT_s")),
-=======
-                                                       numericInput("PCMMWT_max",label = NULL,value=PCMMWTmax,step=0.001)
-                                                     )))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMOWT_d","Outer Wall Thickness (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMOWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMOWT_min_input")
-=======
-                                                       numericInput("PCMOWT_min",label = NULL,value=PCMOWTmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMOWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMOWT_max_input")
                                                      )))),
                                      column(2,
                                             fluidRow(uiOutput("PCMTWT_s")),
-=======
-                                                       numericInput("PCMOWT_max",label = NULL,value=PCMOWTmax,step=0.001)
-                                                     )))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMTWT_d","Total Wall Thickness (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMTWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMTWT_min_input")
-=======
-                                                       numericInput("PCMTWT_min",label = NULL,value=PCMTWTmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMTWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMTWT_max_input")
-=======
-                                                       numericInput("PCMTWT_max",label = NULL,value=PCMTWTmax,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      ))))),
                                    
                                    fluidRow(
                                      column(2,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCMOR_s")),
-=======
-                                            fluidRow(checkboxInput("PCMOR_d","Out of Roundness (in)",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMOR_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMOR_min_input")
-=======
-                                                       numericInput("PCMOR_min",label = NULL,value=PCMORmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMOR_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMOR_max_input")
                                                      )))),
                                      column(2,
                                             fluidRow(uiOutput("PCMCCT_s")),
-=======
-                                                       numericInput("PCMOR_max",label = NULL,value=PCMORmax,step=0.001)
-                                                     )))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMCCT_d","Concentricity",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMCCT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMCCT_min_input")
-=======
-                                                       numericInput("PCMCCT_min",label = NULL,value=PCMCCTmin,step=0.0001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMCCT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMCCT_max_input")
                                                      )))),
                                      column(2,
                                             fluidRow(uiOutput("PCMLength_s")),
-=======
-                                                       numericInput("PCMCCT_max",label = NULL,value=PCMCCTmax,step=0.0001)
-                                                     )))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMLength_d","Length (in)",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMLength_min_input")
-=======
-                                                       numericInput("PCMLength_min",label = NULL,value=PCMLengthmin,step=1)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMLength_max_input")
                                                      )))),
                                      column(2,
                                             fluidRow(uiOutput("PCMToLength_s")),
-=======
-                                                       numericInput("PCMLength_max",label = NULL,value=PCMLengthmax,step=1)
-                                                     )))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMToLength_d","Total Length (in)",value=T)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMToLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMToLength_min_input")
-=======
-                                                       numericInput("PCMToLength_min",label = NULL,value=PCMToLengthmin,step=1)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCMToLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCMToLength_max_input")
                                                      )))),
                                      
@@ -1254,25 +771,12 @@ ui<-navbarPage("Extrusion Application",
                                               conditionalPanel(
                                                 condition = "input.PCMPPD_d",
                                                 uiOutput("PCMPPD_input")
-=======
-                                                       numericInput("PCMToLength_max",label = NULL,value=PCMToLengthmax,step=1)
-                                                     )))),
-                                     
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMPPD_d","Perpendicularity (in)",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMPPD_d",
-                                                selectInput("PCMPPD",label = NULL,
-                                                            c("All",unique(as.character(multi_pps_data$`Perpendicularity (in)`))))
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                               )))), #End Dimentional Attribute
                                    
                                    #Special Operation
                                    fluidRow(
                                      tags$h1(strong("Special Operation"),style="font-size:25px;",align="left"),
                                      column(1,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCMNEXIV_s")),
                                             fluidRow(
                                               conditionalPanel(
@@ -1364,112 +868,12 @@ ui<-navbarPage("Extrusion Application",
                           ),#end multi Extrusion PPS Data
                           
                           #Tepered Extrusion PPS Data--UI
-=======
-                                            fluidRow(checkboxInput("PCMNEXIV_d","NEXIV",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMNEXIV_d",
-                                                selectInput("PCMNEXIV",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCMAnnealed_d","Annealed",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMAnnealed_d",
-                                                selectInput("PCMAnnealed",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCMCaliper_d","Caliper",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMCaliper_d",
-                                                selectInput("PCMCaliper",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCMOS_d","OD Sort",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMOS_d",
-                                                selectInput("PCMOS",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCMMP_d","Melt Pump",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMMP_d",
-                                                selectInput("PCMMP",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCMHT_d","Hypo Tip",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMHT_d",
-                                                selectInput("PCMHT",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCMSPD_d","Sparker Die",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMSPD_d",
-                                                selectInput("PCMSPD",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCMSLD_d","Slicking Die",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMSLD_d",
-                                                selectInput("PCMSLD",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCMDLN_d","Delamination",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMDLN_d",
-                                                selectInput("PCMDLN",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCMULT_d","Ultrasonic",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMULT_d",
-                                                selectInput("PCMULT",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCMVC_d","Vacuum Calibration",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMVC_d",
-                                                selectInput("PCMVC",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCMIRD_d","Irradiated",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCMIRD_d",
-                                                selectInput("PCMIRD",label = NULL,choices=c("All","yes","NA"))
-                                              )))
-                                   ), #end Special Operation
-
-                                   
-
-                                   fluidRow(
-                                     DT::dataTableOutput("mytable2")
-                                   ),
-                                   fluidRow(
-                                     downloadButton('downloadMPPSData','Download Multi-Layer PPS Data')
-                                   )
-                                   
-                          ),#end multi Extrusion PPS Data
-                          
-                          #Tapered Extrusion PPS Data--UI
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                           tabPanel("Tapered Extrusion PPS Data",
                                    #Part Resin
                                    fluidRow(
                                      tags$h1(strong("Part Resin"),style="font-size:25px;",align="left"),
                                      #Part Number
                                      column(2,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTPN_s")),
                                             fluidRow(
                                               conditionalPanel(
@@ -1507,52 +911,6 @@ ui<-navbarPage("Extrusion Application",
                                               conditionalPanel(
                                                 condition = "input.PCTPPSN_d",
                                                 uiOutput("PCTPPSN_input")
-=======
-                                            fluidRow(checkboxInput("PCTPN_d","Part Number",value=TRUE)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition="input.PCTPN_d",
-
-                                                selectInput("PCTPN",label = NULL,
-                                                               c("All",unique(as.character(tapered_pps_data$`Part Number`))))
-
-                                              ))),
-                                     # Part Description
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTPD_d","Part Description",value=TRUE)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTPD_d",
-                                                selectInput("PCTPD",label = NULL,
-                                                            c("All",unique(as.character(single_pps_data$`Part Description`))))
-                                              ))), 
-                                     # Resin Number
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTRN_d","Resin Number",value=TRUE)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTRN_d",
-                                                selectInput("PCTRN",label = NULL,
-                                                            c("All",unique(as.character(single_pps_data$`Resin Number`))))
-                                              ))),
-                                     #Resin Description
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTRD_d","Resin Description",value=TRUE)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTRD_d",
-                                                selectInput("PCTRD",label = NULL,
-                                                            c("All",unique(as.character(single_pps_data$`Resin Description`))))
-                                              ))),
-                                     #PPS Number
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTPPSN_d","PPS Number",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTPPSN_d",
-                                                selectInput("PCTPPSN",label = NULL,
-                                                            c("All",unique(as.character(single_pps_data$`PPS Number`))))
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                               )))
                                    ),
                                    #Tooling
@@ -1560,26 +918,17 @@ ui<-navbarPage("Extrusion Application",
                                      tags$h1(strong("Tooling"),style="font-size:25px;",align="left"),
                                      #Die Size
                                      column(2,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTDS_s")),
-=======
-                                            fluidRow(checkboxInput("PCTDS_d","Die Size (in)",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDS_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDS_min_input")
-=======
-                                                       numericInput("PCTDS_min",label = NULL,value=PCTDSmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDS_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDS_max_input")
                                                      )))),
                                      #Die Land Length
@@ -1593,45 +942,21 @@ ui<-navbarPage("Extrusion Application",
                                      #Tip Size
                                      column(2,
                                             fluidRow(uiOutput("PCTTS_s")),
-=======
-                                                       numericInput("PCTDS_max",label = NULL,value=PCTDSmax,step=0.001)
-                                                     )))),
-                                     #Die Land Length
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTDLL_d","Die Land Length (in)",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTDLL_d",
-                                                selectInput("PCTDLL",label = NULL,c("All",unique(as.character(single_pps_data$`Die Land Length (in)`))))
-                                              ))),
-                                     #Tip Size
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTTS_d","Tip Size (in)",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTTS_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTTS_min_input")
-=======
-                                                       numericInput("PCTTS_min",label = NULL,value=PCTTSmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTTS_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTTS_max_input")
-=======
-                                                       numericInput("PCTTS_max",label = NULL,value=PCTTSmax,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ))),
                                      #Tip Land Length
                                      column(2,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTTLL_s")),
                                             fluidRow(
                                               conditionalPanel(
@@ -1645,22 +970,6 @@ ui<-navbarPage("Extrusion Application",
                                               conditionalPanel(
                                                 condition = "input.PCTSP_d",
                                                 uiOutput("PCTSP_input")
-=======
-                                            fluidRow(checkboxInput("PCTTLL_d","Tip Land Length (in)",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTTLL_d",
-                                                selectInput("PCTTLL",label = NULL,c("All",unique(as.character(single_pps_data$`Tip Land Length (in)`))))
-                                              ))),
-                                     #Screw Print
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTSP_d","Screw Print",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTSP_d",
-                                                selectInput("PCTSP",label = NULL,
-                                                            c("All",unique(as.character(single_pps_data$`Screw Print`))))
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                               )))
                                    ),#end Tooling
                                    #Processing Attributes
@@ -1669,500 +978,284 @@ ui<-navbarPage("Extrusion Application",
                                      
                                      #Feedthroat
                                      column(3,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTFT_s")),
-=======
-                                            fluidRow(checkboxInput("PCTFT_d","Feedthroat Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTFT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTFT_min_input")
-=======
-                                                       numericInput("PCTFT_min",label = NULL,value = PCTFTmin,step=1)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTFT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTFT_max_input")
-=======
-                                                       numericInput("PCTFT_max",label = NULL,value=PCTFTmax,step=1)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ))),
                                      #Barrel Zone 1
                                      column(3,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTBZT1_s")),
-=======
-                                            fluidRow(checkboxInput("PCTBZT1_d","Barrel Zone 1 Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTBZT1_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTBZT1_min_input")
-=======
-                                                       numericInput("PCTBZT1_min",label = NULL,value=PCTBZT1min,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTBZT1_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTBZT1_max_input")
-=======
-                                                       numericInput("PCTBZT1_max",label = NULL,value=PCTBZT1max,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ))),
                                      #Barrel ZOne2
                                      column(3,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTBZT2_s")),
-=======
-                                            fluidRow(checkboxInput("PCTBZT2_d","Barrel Zone 2 Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTBZT2_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTBZT2_min_input")
-=======
-                                                       numericInput("PCTBZT2_min",label = NULL,value=PCTBZT2min,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTBZT2_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTBZT2_max_input")
-=======
-                                                       numericInput("PCTBZT2_max",label = NULL,value=PCTBZT2max,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ))),
                                      #Barrel Zone3
                                      column(3,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTBZT3_s")),
-=======
-                                            fluidRow(checkboxInput("PCTBZT3_d","Barrel Zone 3 Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTBZT3_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTBZT3_min_input")
-=======
-                                                       numericInput("PCTBZT3_min",label = NULL,value=PCTBZT3min,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTBZT3_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTBZT3_max_input")
-=======
-                                                       numericInput("PCTBZT3_max",label = NULL,value=PCTBZT3max,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               )))
                                    ),#end Processing Attribute 1
                                    fluidRow(
                                      column(3,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTCT_s")),
-=======
-                                            fluidRow(checkboxInput("PCTCT_d","Clamp Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTCT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTCT_min_input")
-=======
-                                                       numericInput("PCTCT_min",label = NULL,value=PCTCTmin,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTCT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTCT_max_input")
                                                      )
                                               ))),
                                      column(3,
                                             fluidRow(uiOutput("PCTAT_s")),
-=======
-                                                       numericInput("PCTCT_max",label = NULL,value=PCTCTmax,step=5)
-                                                     )
-                                              ))),
-                                     column(3,
-                                            fluidRow(checkboxInput("PCTAT_d","Adapter Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTAT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTAT_min_input")
-=======
-                                                       numericInput("PCTAT_min",label = NULL,value=PCTATmin,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTAT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTAT_max_input")
                                                      )
                                               ))),
                                      column(3,
                                             fluidRow(uiOutput("PCTDT1_s")),
-=======
-                                                       numericInput("PCTAT_max",label = NULL,value=PCTATmax,step=5)
-                                                     )
-                                              ))),
-                                     column(3,
-                                            fluidRow(checkboxInput("PCTDT1_d","Die 1 Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDT1_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDT1_min_input")
-=======
-                                                       numericInput("PCTDT1_min",label = NULL,value=PCTDT1min,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDT1_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDT1_max_input")
                                                      )
                                               ))),
                                      column(3,
                                             fluidRow(uiOutput("PCTDT2_s")),
-=======
-                                                       numericInput("PCTDT1_max",label = NULL,value=PCTDT1max,step=5)
-                                                     )
-                                              ))),
-                                     column(3,
-                                            fluidRow(checkboxInput("PCTDT2_d","Die 2 Temperature F",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDT2_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDT2_min_input")
-=======
-                                                       numericInput("PCTDT2_min",label = NULL,value=PCTDT2min,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDT2_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDT2_max_input")
-=======
-                                                       numericInput("PCTDT2_max",label = NULL,value=PCTDT2max,step=5)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               )))), #end Processing Attribute 2
                                    #Dimentional Attribute
                                    fluidRow(
                                      tags$h1(strong("Dimentional Attribute"),style="font-size:25px;",align="left"),
                                      column(2,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTPIDI_s")),
-=======
-                                            fluidRow(checkboxInput("PCTPIDI_d","Proximal Inner Diameter (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPIDI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPIDI_min_input")
-=======
-                                                       numericInput("PCTPIDI_min",label = NULL,value=PCTPIDImin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPIDI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPIDI_max_input")
                                                      )
                                               ))),
                                      column(2,
                                             fluidRow(uiOutput("PCTPODI_s")),
-=======
-                                                       numericInput("PCTPIDI_max",label = NULL,value=PCTPIDImax,step=0.001)
-                                                     )
-                                              ))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTPODI_d","Proximal Outer Diameter (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPODI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPODI_min_input")
-=======
-                                                       numericInput("PCTPODI_min",label = NULL,value=PCTPODImin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPODI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPODI_max_input")
                                                      )
                                               ))),
                                      column(2,
                                             fluidRow(uiOutput("PCTPWT_s")),
-=======
-                                                       numericInput("PCTPODI_max",label = NULL,value=PCTPODImax,step=0.001)
-                                                     )
-                                              ))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTPWT_d","Proximal Wall Thickness (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPWT_min_input")
-=======
-                                                       numericInput("PCTPWT_min",label = NULL,value=PCTPWTmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPWT_max_input")
                                                      )
                                               ))),
                                      column(2,
                                             fluidRow(uiOutput("PCTPOR_s")),
-=======
-                                                       numericInput("PCTPWT_max",label = NULL,value=PCTPWTmax,step=0.001)
-                                                     )
-                                              ))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTPOR_d","Proximal Out of Roundness (in)",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPOR_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPOR_min_input")
-=======
-                                                       numericInput("PCTPOR_min",label = NULL,value=PCTPORmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPOR_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPOR_max_input")
                                                      )
                                               ))),
                                      column(2,
                                             fluidRow(uiOutput("PCTPCCT_s")),
-=======
-                                                       numericInput("PCTPOR_max",label = NULL,value=PCTPORmax,step=0.001)
-                                                     )
-                                              ))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTPCCT_d","Proximal Concentricity",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPCCT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPCCT_min_input")
-=======
-                                                       numericInput("PCTPCCT_min",label = NULL,value=PCTPCCTmin,step=0.0001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPCCT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPCCT_max_input")
-=======
-                                                       numericInput("PCTPCCT_max",label = NULL,value=PCTPCCTmax,step=0.0001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               )))
                                      
                                    ), #end Dimentional Attribute 1
                                    fluidRow(
                                      column(2,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTDIDI_s")),
-=======
-                                            fluidRow(checkboxInput("PCTDIDI_d","Distal Inner Diameter (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDIDI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDIDI_min_input")
-=======
-                                                       numericInput("PCTDIDI_min",label = NULL,value=PCTDIDImin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDIDI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDIDI_max_input")
                                                      )
                                               ))),
                                      column(2,
                                             fluidRow(uiOutput("PCTDODI_s")),
-=======
-                                                       numericInput("PCTDIDI_max",label = NULL,value=PCTDIDImax,step=0.001)
-                                                     )
-                                              ))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTDODI_d","Distal Outer Diameter (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDODI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDODI_min_input")
-=======
-                                                       numericInput("PCTDODI_min",label = NULL,value=PCTDODImin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDODI_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDODI_max_input")
                                                      )
                                               ))),
                                      column(2,
                                             fluidRow(uiOutput("PCTDWT_s")),
-=======
-                                                       numericInput("PCTDODI_max",label = NULL,value=PCTDODImax,step=0.001)
-                                                     )
-                                              ))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTDWT_d","Distal Wall Thickness (in)",value=TRUE)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDWT_min_input")
-=======
-                                                       numericInput("PCTDWT_min",label = NULL,value=PCTDWTmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDWT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDWT_max_input")
                                                      )
                                               ))),
                                      column(2,
                                             fluidRow(uiOutput("PCTDOR_s")),
-=======
-                                                       numericInput("PCTDWT_max",label = NULL,value=PCTDWTmax,step=0.001)
-                                                     )
-                                              ))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTDOR_d","Distal Out of Roundness (in)",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDOR_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDOR_min_input")
-=======
-                                                       numericInput("PCTDOR_min",label = NULL,value=PCTDORmin,step=0.001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDOR_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDOR_max_input")
                                                      )
                                               ))),
                                      column(2,
                                             fluidRow(uiOutput("PCTDCCT_s")),
-=======
-                                                       numericInput("PCTDOR_max",label = NULL,value=PCTDORmax,step=0.001)
-                                                     )
-                                              ))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTDCCT_d","Distal Concentricity",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDCCT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDCCT_min_input")
-=======
-                                                       numericInput("PCTDCCT_min",label = NULL,value=PCTDCCTmin,step=0.0001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDCCT_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDCCT_max_input")
-=======
-                                                       numericInput("PCTDCCT_max",label = NULL,value=PCTDCCTmax,step=0.0001)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               )))
                                      
@@ -2170,108 +1263,63 @@ ui<-navbarPage("Extrusion Application",
                                    fluidRow(
                                      
                                      column(2,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTPLength_s")),
-=======
-                                            fluidRow(checkboxInput("PCTPLength_d","Proximal Length (in)",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPLength_min_input")
-=======
-                                                       numericInput("PCTPLength_min",label = NULL,value=PCTPLengthmin,step=1)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTPLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTPLength_max_input")
                                                      )
                                               ))),
                                      column(2,
                                             fluidRow(uiOutput("PCTTLength_s")),
-=======
-                                                       numericInput("PCTPLength_max",label = NULL,value=PCTPLengthmax,step=1)
-                                                     )
-                                              ))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTTLength_d","Transition Length (in)",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTTLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTTLength_min_input")
-=======
-                                                       numericInput("PCTTLength_min",label = NULL,value=PCTTLengthmin,step=1)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTTLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTTLength_max_input")
-=======
-                                                       numericInput("PCTTLength_max",label = NULL,value=PCTTLengthmax,step=1)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ))),
                                      
                                      column(2,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTDLength_s")),
-=======
-                                            fluidRow(checkboxInput("PCTDLength_d","Distal Length (in)",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDLength_min_input")
-=======
-                                                       numericInput("PCTDLength_min",label = NULL,value=PCTDLengthmin,step=1)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTDLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTDLength_max_input")
                                                      )
                                               ))),
                                      column(2,
                                             fluidRow(uiOutput("PCTToLength_s")),
-=======
-                                                       numericInput("PCTDLength_max",label = NULL,value=PCTDLengthmax,step=1)
-                                                     )
-                                              ))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTToLength_d","Total Length (in)",value=F)),
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTToLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTToLength_min_input")
-=======
-                                                       numericInput("PCTToLength_min",label = NULL,value=PCTToLengthmin,step=1)
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                                      )
                                               ),
                                               column(6,
                                                      conditionalPanel(
                                                        condition = "input.PCTToLength_d",
-<<<<<<< HEAD
                                                        uiOutput("PCTToLength_max_input")
                                                      )
                                               ))),
@@ -2281,18 +1329,6 @@ ui<-navbarPage("Extrusion Application",
                                               conditionalPanel(
                                                 condition = "input.PCTPPD_d",
                                                 uiOutput("PCTPPD_input")
-=======
-                                                       numericInput("PCTToLength_max",label = NULL,value=PCTToLengthmax,step=1)
-                                                     )
-                                              ))),
-                                     column(2,
-                                            fluidRow(checkboxInput("PCTPPD_d","Perpendicularity (in)",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTPPD_d",
-                                                selectInput("PCTPPD",label = NULL,
-                                                            c("All",unique(as.character(single_pps_data$`Perpendicularity (in)`))))
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                               )))
                                      
                                    ),#end of attribute 3
@@ -2300,7 +1336,6 @@ ui<-navbarPage("Extrusion Application",
                                    fluidRow(
                                      tags$h1(strong("Special Operation"),style="font-size:25px;",align="left"),
                                      column(1,
-<<<<<<< HEAD
                                             fluidRow(uiOutput("PCTNEXIV_s")),
                                             fluidRow(
                                               conditionalPanel(
@@ -2397,160 +1432,25 @@ ui<-navbarPage("Extrusion Application",
                           tabPanel("MES Parameters and Yield",
                                    fluidRow(
                                      DT::dataTableOutput("MESparameters")
-=======
-                                            fluidRow(checkboxInput("PCTNEXIV_d","NEXIV",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTNEXIV_d",
-                                                selectInput("PCTNEXIV",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCTAnnealed_d","Annealed",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTAnnealed_d",
-                                                selectInput("PCTAnnealed",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCTCaliper_d","Caliper",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTCaliper_d",
-                                                selectInput("PCTCaliper",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCTOS_d","OD Sort",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTOS_d",
-                                                selectInput("PCTOS",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCTMP_d","Melt Pump",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTMP_d",
-                                                selectInput("PCTMP",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCTHT_d","Hypo Tip",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTHT_d",
-                                                selectInput("PCTHT",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCTSPD_d","Sparker Die",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTSPD_d",
-                                                selectInput("PCTSPD",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCTSLD_d","Slicking Die",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTSLD_d",
-                                                selectInput("PCTSLD",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCTDLN_d","Delamination",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTDLN_d",
-                                                selectInput("PCTDLN",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCTULT_d","Ultrasonic",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTULT_d",
-                                                selectInput("PCTULT",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCTVC_d","Vacuum Calibration",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTVC_d",
-                                                selectInput("PCTVC",label = NULL,choices=c("All","yes","NA"))
-                                              ))),
-                                     column(1,
-                                            fluidRow(checkboxInput("PCTIRD_d","Irradiated",value=F)),
-                                            fluidRow(
-                                              conditionalPanel(
-                                                condition = "input.PCTIRD_d",
-                                                selectInput("PCTIRD",label = NULL,choices=c("All","yes","NA"))
-                                              )))
-                                   ), #end Special Operation
-                                   
-                                   fluidRow(
-                                     DT::dataTableOutput("mytable3")
-                                   ),
-                                   fluidRow(
-                                     downloadButton('downloadTPPSData','Download Tapered PPS Data')
-                                   )
-                          )#end Tapered Extrusion PPS Data
-               ),
-               
-               
-               #Single Extrusion MES Data table rendering
-               navbarMenu("Single Extrusion MES Data",
-                          tabPanel("MES Parameters and Yield",
-                                   fluidRow(
-                                     DT::dataTableOutput("singleMESparameters")
                                    )
                           ),
                           tabPanel("MES Time Stamps",
                                    fluidRow(
-                                     DT::dataTableOutput("singleMEStime")
-                                   )
-                          ),
-                          tabPanel("MES Submitters",
-                                   fluidRow(
-                                     DT::dataTableOutput("singleMESsubmitter")
-                                   )
-                          ),
-                          tabPanel("MES Total",
-                                   fluidRow(
-                                     DT::dataTableOutput("singleMEStotal")
-                                   )
-                          )
-               ),
-               
-               #Multi-Layer Extrusion MES Data table rendering
-               navbarMenu("Multi-Layer Extrusion MES Data",
-                          tabPanel("MES Parameters and Yield",
-                                   fluidRow(
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
-                                   )
-                          ),
-                          tabPanel("MES Time Stamps",
-                                   fluidRow(
-<<<<<<< HEAD
                                      DT::dataTableOutput("MEStime")
-=======
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                    )
                           ),
                           tabPanel("MES Submitters",
                                    fluidRow(
-<<<<<<< HEAD
                                      DT::dataTableOutput("MESsubmitter")
-=======
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                    )
                           ),
                           tabPanel("MES Total",
                                    fluidRow(
-<<<<<<< HEAD
                                      DT::dataTableOutput("MEStotal")
-=======
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                                    )
                           )
                ),
                
-<<<<<<< HEAD
                #Scrap Codes table rendering
                tabPanel("Scrap Codes",
                         fluidRow(
@@ -2572,124 +1472,10 @@ ui<-navbarPage("Extrusion Application",
                                    )
                           )
                ),
-=======
-               #Tapered Extrusion MES Data table rendering
-               navbarMenu("Single Extrusion MES Data",
-                          tabPanel("MES Parameters and Yield",
-                                   fluidRow(
-                                   )
-                          ),
-                          tabPanel("MES Time Stamps",
-                                   fluidRow(
-                                   )
-                          ),
-                          tabPanel("MES Submitters",
-                                   fluidRow(
-                                   )
-                          ),
-                          tabPanel("MES Total",
-                                   fluidRow(
-                                   )
-                          )
-               ),
-               
-               
-               #Scrap Codes Data table rendering
-               navbarMenu("Scrap Codes",
-                          #Single Extrusion PPS Data
-                          tabPanel("Single Extrusion",
-                                   fluidRow(
-                                     DT::dataTableOutput("singlescrapcodes")
-                                   )
-                          ),
-                          tabPanel("Multi-Layer Extrusion",
-                                   fluidRow(
-                                   )
-                          ),
-                          tabPanel("Tapered Extrusion",
-                                   fluidRow(
-                                   )
-                          )
-               ),
-               
-               
-               #Applied Stats Data table rendering
-               # navbarMenu("AppStats Data",
-               #            #Single Extrusion PPS Data
-               #            tabPanel("Nexiv",
-               #                     fluidRow(
-               #                       DT::dataTableOutput("nexiv")
-               #                     )
-               #            ),
-               #            tabPanel("Laserlinc",
-               #                     fluidRow(
-               #                       DT::dataTableOutput("laserlinc")
-               #                     )
-               #            )
-               # ), #end the NavbarMenu
-               
-               
-               #Shopping Cart PPS Data table rendering
-               navbarMenu("Shopping Cart PPS Data",
-                          #Single Extrusion PPS Data
-                          tabPanel("Single Extrusion",
-                                   fluidRow(
-                                     DT::dataTableOutput("singleshoppingcartpps"),
-                                     fluidRow(
-                                       downloadButton('singlecartdownloadpps',
-                                                      'Download Single Shopping Cart PPS Data')
-                                     )
-                                   )
-                          ),
-                          tabPanel("Multi-Layer Extrusion",
-                                   fluidRow(
-                                   )
-                          ),
-                          tabPanel("Tapered Extrusion",
-                                   fluidRow(
-                                   )
-                          )
-               ),
-               #create a pop up window for the shopping cart
-               absolutePanel(
-                 actionButton("ShoppingCart","",icon=icon("shopping-cart","fa-2x"),width = 80 ),
-                 #verbatimTextOutput("ShoppingCart_Count"),     # Try to add the number of part-number in shopping cart behind the cart icon
-                 
-                 bsModal("modalExample", "Shopping Cart", "ShoppingCart", size = "default",
-                         tabsetPanel(
-                           tabPanel("Single-Extrusion Cart",
-                                    textInput("SinglePartNum_input","Part Number"),
-                                    actionButton("singleMadd_button","Add"),
-                                    DT::dataTableOutput("singleshoppingcartparts"),
-                                    dataTableOutput("singleshoppingcart")
-                           ),
-                           tabPanel("Multi-Layer Extrusion Cart"
-                                    #Multi-layer Extrusion Parts
-                           ),
-                           tabPanel("Tapered Extrusion Cart"
-                                    #Tapered Extrusion Parts
-                           ),
-                           tabPanel("Total Extrusion Cart"
-                                    #Total Extrusion Parts
-                           )
-                         )
-                         
-                         
-                         
-                 ),
-                 draggable = F,right = 20,top = 100,fixed = T
-                 
-               )
-
-               
-               
-               
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
                
                #Shopping Cart
                #'This renders the shopping cart in an absolute panels that is always visible and
                #'allows for a user to select the output data with associated batches
-<<<<<<< HEAD
                absolutePanel("Shopping Cart",
                  bottom = 100, right = 20, width = 600,
                  draggable = TRUE,
@@ -2701,17 +1487,3 @@ ui<-navbarPage("Extrusion Application",
 )#end ui
 
 
-=======
-               #'
-              
-              
-               #### Extra HTML ####
-               
-               
-               #Draggable and Resizeable absolutepanel
-              # HTML("<script>$(\".draggable\").draggable();</script>")
-               
-               
-               
-)#end ui
->>>>>>> 87a4b3cca1786e62fda1fbe306aa79c0ff42e388
