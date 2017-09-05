@@ -29,7 +29,7 @@ server<-function(input,output,session){
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
       
-      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      column_index <- grep(paste0("^",parameter_name), names(df), ignore.case = TRUE)
       
       new_df <- df[df[,column_index] >= value,]
       return(new_df)
@@ -43,7 +43,7 @@ server<-function(input,output,session){
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
       
       
-      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      column_index <- grep(paste0("^",parameter_name), names(df), ignore.case = TRUE)
       
       new_df <- df[df[,column_index] <= value,]
       return(new_df)
@@ -56,7 +56,7 @@ server<-function(input,output,session){
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
       
-      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      column_index <- grep(paste0("^",parameter_name), names(df), ignore.case = TRUE)
       
       if (value == "All"){
         #if 'All' is selected
@@ -83,7 +83,7 @@ server<-function(input,output,session){
   
   #the assign will initialize the siidvector
   assign("siidvector", 
-         c("PCSPN", "PCSPD", "PCSRN", "PCSRD", "PCSPPSN", 
+         c("Placeholder", "PCSPN", "PCSPD", "PCSRN", "PCSRD", "PCSPPSN", 
            "PCSDS_min", "PCSDS_max", "PCSDLL", "PCSTS_min", "PCSTS_max",
            "PCSTLL", "PCSSP", 
            "PCSFT_min", "PCSFT_max", "PCSBZT1_min", "PCSBZT1_max",
@@ -211,6 +211,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) == 0){
       #the name is not currently in the stack
@@ -234,6 +235,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) != 0){
       #the name is not currently in the stack
@@ -520,6 +522,7 @@ server<-function(input,output,session){
     
     grepname <- gsub("\\(", "\\\\(", checkbox_name)
     grepname <- gsub("\\)", "\\\\)", grepname)
+    grepname <- paste0("^", grepname) #must start with it to avoid mis matches
     
     inputs <- names(isolate(single_inputs()))
     input_ids <- getSIIDVector()
@@ -590,6 +593,7 @@ server<-function(input,output,session){
     
     print("observeEvent(single_inputs()): Input Observed")
     
+    
     if (exists("sivector", e1)){
       #checks to see if the vector has been created yet. This is to prevent the initialization
       #of the program
@@ -606,7 +610,12 @@ server<-function(input,output,session){
       
       if (length(index_differ) == 0){
         #Nothing will be analyzed
-        print("A parameter was changed but the value was changed to what the previous value was")
+        print("observeEvent(single_inputs()): A parameter was changed but the value was changed to what the previous value was")
+      }
+      if (length(index_differ) > 1){
+        #this means the values are being reset because a checkbox was unchecked for a max and min value
+        print("observeEvent(single_inputs()): The checkbox was unchecked")
+        #then do nothing because the values should not go in the stack
       }
       else{
         
@@ -624,6 +633,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name) #must start with it to avoid mis matches
           
           stack_index <- grep(updated_index_name, current_sistack) #gets the index in the stack
           
@@ -671,7 +681,10 @@ server<-function(input,output,session){
       index_differ <- grep("FALSE", (current_scbvector == old_scbvector))
 
       if (length(index_differ) == 0){
-        #Nothing will be analyzed since the value was changed to TRUE
+        #Nothing will be analyzed since the value was not changed
+      }
+      if (length(index_differ) > 1){
+        #multiple selected or deselected, so do nothing
       }
       else{
         
@@ -695,6 +708,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name)
 
           stack_index <- grep(updated_index_name, current_sistack) #gets the index in the stack
 
@@ -744,7 +758,7 @@ server<-function(input,output,session){
 
 
   # obtain the output of checkbox from functions and make a list to store them----Single Extrusion PPS Data
-  show_vars1<-reactive({
+  show_vars1 <- reactive({
     #'Placholder' is for the action buttons. It is fiven a value of true so it is always displayed
     checkboxes <- as.numeric(c(TRUE, input$PCSPN_d,input$PCSPD_d,input$PCSRN_d,input$PCSRD_d,input$PCSPPSN_d,input$PCSDS_d,input$PCSDLL_d,input$PCSTS_d,input$PCSTLL_d,input$PCSSP_d,input$PCSFT_d,
                  input$PCSBZT1_d,input$PCSBZT2_d,input$PCSBZT3_d,input$PCSCT_d,input$PCSAT_d,input$PCSDT1_d,input$PCSDT2_d,input$PCSIDI_d,input$PCSODI_d,input$PCSWT_d,
@@ -816,18 +830,8 @@ server<-function(input,output,session){
   
   
   output$mytable1 <- DT::renderDataTable({
-    DT::datatable({
       
-      Col_PCS=c() #initialized the variable
-      
-      col_var1=show_vars1()
-      for (i in 1:length(col_var1)){
-        #this will go through col_var1 and determine which parameters have been checked
-        #only the parameters that have been checked will be displayed on the table
-        if (col_var1[i]!=0){
-          Col_PCS=c(Col_PCS,i)
-        }
-      }
+      Col_PCS <- which (1 == show_vars1())
       
       data_PCS <- single_df_output$data #the data frame is set
       data_PCS <- data_PCS[,Col_PCS] #only get the columns that have been checked
@@ -836,8 +840,6 @@ server<-function(input,output,session){
       #for downloading
       
       return(data_PCS)
-    }
-    )
   },
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',
@@ -1051,6 +1053,96 @@ server<-function(input,output,session){
       write.csv(single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcart$data$'Part'),], file)
     }
   )
+  
+  
+  observeEvent(input$checksingledimensions,{
+    #this checks all the checkboxes associated with single dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCSIDI_d", label = "Inner Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSODI_d", label = "Outer Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSWT_d", label = "Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSOR_d", label = "Out of Roundness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSCCT_d", label = "Concentricity",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSLength_d", label = "Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSPPD_d", label = "Perpendicularity (in)",value = TRUE)
+    
+  }) #end obserEvent for input$checksingledimensions
+  
+  
+  observeEvent(input$unchecksingledimensions,{
+    #this unchecks all the checkboxes associated with single dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCSIDI_d", label = "Inner Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSODI_d", label = "Outer Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSWT_d", label = "Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSOR_d", label = "Out of Roundness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSCCT_d", label = "Concentricity",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSLength_d", label = "Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSPPD_d", label = "Perpendicularity (in)",value = FALSE)
+    
+  }) #end obserEvent for input$unchecksingledimensions
+  
+  observeEvent(input$checksinglespecial,{
+    #this checks all the checkboxes associated with single special operation inputs
+    updateCheckboxInput(session, inputId = "PCSNEXIV_d", label = "NEXIV",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSAnnealed_d", label = "Annealed",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSCaliper_d", label = "Caliper",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSOS_d", label = "OD Sort",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSMP_d", label = "Melt Pump",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSHT_d", label = "Hypo Tip",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSSPD_d", label = "Sparker Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSSLD_d", label = "Slicking Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSDLN_d", label = "Delamination",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSULT_d", label = "Ultrasonic",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSVC_d", label = "Vacuum Calibration",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSIRD_d", label = "Irradiated",value = TRUE)
+    
+  }) #end obserEvent for input$checksinglespecial
+  
+  
+  observeEvent(input$unchecksinglespecial,{
+    #this unchecks all the checkboxes associated with single special operation inputs
+    updateCheckboxInput(session, inputId = "PCSNEXIV_d", label = "NEXIV",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSAnnealed_d", label = "Annealed",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSCaliper_d", label = "Caliper",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSOS_d", label = "OD Sort",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSMP_d", label = "Melt Pump",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSHT_d", label = "Hypo Tip",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSSPD_d", label = "Sparker Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSSLD_d", label = "Slicking Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSDLN_d", label = "Delamination",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSULT_d", label = "Ultrasonic",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSVC_d", label = "Vacuum Calibration",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSIRD_d", label = "Irradiated",value = FALSE)
+    
+  }) #end obserEvent for input$unchecksinglespecial
+  
+  observeEvent(input$resetsingleinputs,{
+    #this will reset the single inputs when clicked
+    #It first removes all the dataframes that have been created, resets the input values,
+    #and then it resets the stack
+    setSDFList(NULL) #resetst the DF list
+    
+    current_inputs <- isolate(single_inputs())
+    original_inputs <- getOriginalSIVector()
+    
+    differ_indices <- which(current_inputs != original_inputs)
+    value_names <- names(current_inputs[differ_indices])
+    
+    print(paste0("observeEvent(input$resetsingleinputs): ",value_names))
+    
+    count <- 1
+    #this while loop iterates through all the values that differed
+    while (count < length(value_names) + 1){
+      current_name <- value_names[count]
+      resetSI(current_name)
+      count <- count + 1
+    }#end while
+    
+    setSIStack(c()) #creates an empty stack
+    
+    #sets the data table to the original data set
+    single_df_output$data <- single_pps_data
+    
+  }) #end obserEvent for input$resetsingleinputs
      
   
   

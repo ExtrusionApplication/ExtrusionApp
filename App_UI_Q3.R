@@ -276,7 +276,7 @@ ui<-navbarPage("Extrusion Application",
                                               conditionalPanel(
                                                 condition = "input.PCSCCT_d",
                                                 column(6,numericInput("PCSCCT_min",label = NULL,value=PCSCCTmin,step=0.0001)),
-                                                column(6,numericInput("PCSCCT_max",label = NULL,value=PCSCCTmin,step=0.0001))
+                                                column(6,numericInput("PCSCCT_max",label = NULL,value=PCSCCTmax,step=0.0001))
                                               )
                                             )
                                      ),
@@ -287,7 +287,7 @@ ui<-navbarPage("Extrusion Application",
                                               conditionalPanel(
                                                 condition = "input.PCSLength_d",
                                                 column(6,numericInput("PCSLength_min",label = NULL,value=PCSLengthmin,step=1)),
-                                                column(6,numericInput("PCSLength_max",label = NULL,value=PCSLengthmin,step=1))
+                                                column(6,numericInput("PCSLength_max",label = NULL,value=PCSLengthmax,step=1))
                                               )
                                             )
                                      ),
@@ -300,7 +300,11 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCSPPD",label = NULL,
                                                             c("All",unique(as.character(single_pps_data$`Perpendicularity (in)`))))
                                               )))), #End Dimentional Attribute
-                                   
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checksingledimensions", "Show All Dimensional Attributes"),
+                                     actionButton("unchecksingledimensions", "Hide All Dimensional Attributes")
+                                   ),
                                    #Special Operation
                                    fluidRow(
                                      tags$h1(strong("Special Operation"),style="font-size:25px;",align="left"),
@@ -389,6 +393,11 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCSIRD",label = NULL,choices=c("All","yes","NA"))
                                               )))
                                    ), #end Special Operation
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checksinglespecial", "Show All Special Operations"),
+                                     actionButton("unchecksinglespecial", "Hide All Special Operations")
+                                   ),
                                    
                                    # Show Table
                                    fluidRow(
@@ -396,7 +405,8 @@ ui<-navbarPage("Extrusion Application",
                                    ),
                                    fluidRow(
                                      downloadButton('singledownloadSPPSData','Download Single PPS Data'),
-                                     downloadButton('singledownloadSPPSDataAll','Download Single PPS Data with All Parameters')
+                                     downloadButton('singledownloadSPPSDataAll','Download Single PPS Data with All Parameters'),
+                                     actionButton('resetsingleinputs', "Reset Single Input Parameters")
                                    )
                           ),#end Single Extrusion PPS Data
                           #Multi Extrusion PPS Data---UI

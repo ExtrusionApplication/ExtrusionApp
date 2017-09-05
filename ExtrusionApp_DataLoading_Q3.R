@@ -32,11 +32,11 @@ n2 <- read.csv(test4, header = TRUE, stringsAsFactors = FALSE,
 
 #Creating variables across all sessions
 path <- "//Mgrovef1/shared/Operations/EXTRUSIO/Felipe Correa Netto/Extrusion Application/Data/UI Data"
-single_pps_file <- "Single PPS Data Filled GTE.csv"
+single_pps_file <- "Single PPS Data_UI_30 August 2017.csv"
 #single_tari_file <- "Single Tari Data.csv"
 single_tari_file <- "MES Data_Single Tari Data.csv"
-multi_pps_file <- "Multi-Layered PPS Data Filled GTE.csv"
-tapered_pps_file <- "Tapered PPS Data Filled GTE.csv"
+multi_pps_file <- "Multi-Layered PPS Data_UI_30 August 2017.csv"
+tapered_pps_file <- "Tapered PPS Data_UI_30 August 2017.csv"
 resin_file <- "Resin Information.csv"
 screw_file <- "Screw Properties.csv"
 parameter_file <- "Parameters and Yield.csv"
