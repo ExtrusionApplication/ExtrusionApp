@@ -395,7 +395,8 @@ ui<-navbarPage("Extrusion Application",
                                      DT::dataTableOutput("mytable1")
                                    ),
                                    fluidRow(
-                                     downloadButton('singledownloadSPPSData','Download Single PPS Data')
+                                     downloadButton('singledownloadSPPSData','Download Single PPS Data'),
+                                     downloadButton('singledownloadSPPSDataAll','Download Single PPS Data with All Parameters')
                                    )
                           ),#end Single Extrusion PPS Data
                           #Multi Extrusion PPS Data---UI

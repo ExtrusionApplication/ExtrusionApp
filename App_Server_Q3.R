@@ -13,6 +13,11 @@ server<-function(input,output,session){
   #' 4) The multi layered extrusion data set cleaning
   #' 5) The tapered extrusion data set cleaning
   
+  
+  
+  
+  #### Single PPS  ####
+  
   generateNewDF <- function(df, index_name, value){
     #this determines whether the index is max, min, or other. And then it cleans up the df based
     #on that and generates a new clean df
@@ -67,9 +72,6 @@ server<-function(input,output,session){
     }#end if-else on the types of parameters
     
   }#end generateNewDf
-  
-  
-  #### Single PPS  ####
   
   e1 <- new.env(
     #This environment will store variable of inputs and stack that are used for comparison
@@ -586,7 +588,7 @@ server<-function(input,output,session){
     #'It does not check to see if the input has been selected, but rather, if the user has changed
     #'the search input.'
     
-    print("Input Observed")
+    print("observeEvent(single_inputs()): Input Observed")
     
     if (exists("sivector", e1)){
       #checks to see if the vector has been created yet. This is to prevent the initialization
@@ -599,6 +601,8 @@ server<-function(input,output,session){
       #produces a vector fo TRUE and FALSE. There should be one element that is different and
       #grep 'FALSE' will find that index.
       index_differ <- grep("FALSE", (current_sivector == old_sivector))
+      
+      print(paste0("observeEvent(single_inputs()): The index differ is ", index_differ))
       
       if (length(index_differ) == 0){
         #Nothing will be analyzed
@@ -741,12 +745,13 @@ server<-function(input,output,session){
 
   # obtain the output of checkbox from functions and make a list to store them----Single Extrusion PPS Data
   show_vars1<-reactive({
-    checkboxes <- as.numeric(c(input$PCSPN_d,input$PCSPD_d,input$PCSRN_d,input$PCSRD_d,input$PCSPPSN_d,input$PCSDS_d,input$PCSDLL_d,input$PCSTS_d,input$PCSTLL_d,input$PCSSP_d,input$PCSFT_d,
+    #'Placholder' is for the action buttons. It is fiven a value of true so it is always displayed
+    checkboxes <- as.numeric(c(TRUE, input$PCSPN_d,input$PCSPD_d,input$PCSRN_d,input$PCSRD_d,input$PCSPPSN_d,input$PCSDS_d,input$PCSDLL_d,input$PCSTS_d,input$PCSTLL_d,input$PCSSP_d,input$PCSFT_d,
                  input$PCSBZT1_d,input$PCSBZT2_d,input$PCSBZT3_d,input$PCSCT_d,input$PCSAT_d,input$PCSDT1_d,input$PCSDT2_d,input$PCSIDI_d,input$PCSODI_d,input$PCSWT_d,
                  input$PCSOR_d,input$PCSCCT_d,input$PCSLength_d,input$PCSPPD_d,input$PCSNEXIV_d,input$PCSAnnealed_d,input$PCSCaliper_d,input$PCSOS_d,input$PCSMP_d,input$PCSHT_d,
                  input$PCSSPD_d,input$PCSSLD_d,input$PCSDLN_d,input$PCSULT_d,input$PCSVC_d,input$PCSIRD_d))
 
-    names(checkboxes) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(checkboxes) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
                            "PPS Number",
                            "Die Size (in)", "Die Land Length (in)",
                            "Tip Size (in)", "Tip Land Length (in)", "Screw Print",
@@ -768,7 +773,8 @@ server<-function(input,output,session){
   #this variable will store all the inputs of the single extrusions
   single_inputs <- reactive({
     #this variable will store all the inputs of of the single extrusions
-    inputs <- c(input$PCSPN, input$PCSPD, input$PCSRN, input$PCSRD, input$PCSPPSN, 
+    #'Placholder' is for the action buttons.
+    inputs <- c("Placeholder", input$PCSPN, input$PCSPD, input$PCSRN, input$PCSRD, input$PCSPPSN, 
                    input$PCSDS_min, input$PCSDS_max, input$PCSDLL, input$PCSTS_min, input$PCSTS_max,
                    input$PCSTLL, input$PCSSP, 
                    input$PCSFT_min, input$PCSFT_max, input$PCSBZT1_min, input$PCSBZT1_max,
@@ -783,7 +789,7 @@ server<-function(input,output,session){
                    input$PCSMP, input$PCSHT, input$PCSSPD, input$PCSSLD, input$PCSDLN, input$PCSULT,
                    input$PCSVC, input$PCSIRD
                    )
-    names(inputs) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(inputs) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
                        "PPS Number",
                        "Die Size (in) Min", "Die Size (in) Max", "Die Land (in) Length", 
                        "Tip Size (in) Min","Tip Size (in) Max", "Tip Land (in) Length", "Screw Print",
@@ -815,7 +821,6 @@ server<-function(input,output,session){
       Col_PCS=c() #initialized the variable
       
       col_var1=show_vars1()
-      col_var1 = c(1,col_var1) #because the first column is the buttons, this makes sure it is true
       for (i in 1:length(col_var1)){
         #this will go through col_var1 and determine which parameters have been checked
         #only the parameters that have been checked will be displayed on the table
@@ -871,7 +876,7 @@ server<-function(input,output,session){
   singleshoppingcartparts <- reactiveValues(
     #'this will hold only a list of parts, this way it is easier for users to look at all the parts
     #'when there are two many batches in the shopping cart.
-    data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
+    data = data.frame("Part" = numeric(0), "Batches?" = numeric(0), "Delete Part" = numeric(0),
                       stringsAsFactors = FALSE,
                       check.names = FALSE)
   )
@@ -893,6 +898,8 @@ server<-function(input,output,session){
     numberofbatches <- length(SAP_batches)
     
     #Action button to delete batch
+    #' if there are not batches the part will not be added to this shopping cart table but will
+    #' be added to the part
     batch_count <- 1
     vectorofbuttons <- c(rep(0, length(SAP_batches)))
     
@@ -925,11 +932,24 @@ server<-function(input,output,session){
                    label = "Delete Part",
                    onclick = 'Shiny.onInputChange(\"singledelete_part_button\",  this.id)'))
     
-    new_data <- cbind(part, deletepart)
     
-    colnames(new_data) <- c("Part", "Delete Part")
+    #This determines if there are batches for the part
+    SAP_batches <- single_tari_parameter_data$`SAP Batch Number`[single_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
     singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
-    colnames(singleshoppingcartparts$data) <- c("Part", "Delete Part")
+    colnames(singleshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
   })
   
   
@@ -978,7 +998,17 @@ server<-function(input,output,session){
     #downlaod the data
     filename = function() { paste("Single PPS Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(clean_single_pps_data$data, file)
+      #I remove the first column so the HTML is not outputed
+      write.csv(clean_single_pps_data$data[2:ncol(clean_single_pps_data$data)], file)
+    }
+  )
+  
+  output$singledownloadSPPSDataAll <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Single PPS Data", '.csv', sep='') },
+    content = function(file) {
+      #I remove the first column so the HTML is not outputed
+      write.csv(single_df_output$data[2:ncol(single_df_output$data)], file)
     }
   )
   
@@ -986,7 +1016,7 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcart$data$'Part'),]
+    data <- single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcartparts$data$'Part'),]
     return(data)
     
   },
