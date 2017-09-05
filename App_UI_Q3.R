@@ -1597,6 +1597,16 @@ ui<-navbarPage("Extrusion Application",
                                    )
                           )
                ),
+               
+               # A new tab for Analysis 
+               # some plots with choices for the plots
+               tabPanel("Analysis",
+                        sidebarLayout(
+                          sidebarPanel(),
+                          mainPanel()
+                        )),
+               
+        
                #create a pop up window for the shopping cart
                absolutePanel(
                  actionButton("ShoppingCart","",icon=icon("shopping-cart","fa-2x"),width = 80 ),
