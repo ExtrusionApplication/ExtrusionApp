@@ -1640,10 +1640,7 @@ ui<-navbarPage("Extrusion Application",
               
               
                #### Extra HTML ####
-               
-               
-               #Draggable and Resizeable absolutepanel
-              # HTML("<script>$(\".draggable\").draggable();</script>")
+
                
                
                

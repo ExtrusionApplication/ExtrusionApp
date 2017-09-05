@@ -829,7 +829,7 @@ server<-function(input,output,session){
         }
       }
       
-      data_PCS <- isolate(single_df_output$data) #the data frame is set
+      data_PCS <- single_df_output$data #the data frame is set
       data_PCS <- data_PCS[,Col_PCS] #only get the columns that have been checked
       
       clean_single_pps_data$data <- data_PCS #assign the clean table to the data that is available
@@ -885,7 +885,7 @@ server<-function(input,output,session){
     #this observes whether the user clicked a button to add a part to the shopping cart
     #get the part
     part <- strsplit(input$singleadd_button, "_")[[1]][2]
-    print(part)
+    print(paste0("observeEvent(input$singleadd_button): ", part))
     
     #Action button to delete part
     deletepart <- as.character(
@@ -918,8 +918,16 @@ server<-function(input,output,session){
     new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
     
     colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
-    singleshoppingcart$data <- rbind(singleshoppingcart$data, new_data, stringsAsFactors = FALSE)
-    colnames(singleshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    
+    if (length(grep(part, singleshoppingcart$data$"Part")) == 0){
+      singleshoppingcart$data <- rbind(singleshoppingcart$data, new_data, stringsAsFactors = FALSE)
+      colnames(singleshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    }
+    else{
+      #Do nothing if the part is already there
+    }
+    
+    
   })
   
   observeEvent(input$singleadd_button,{
@@ -948,8 +956,16 @@ server<-function(input,output,session){
     new_data <- cbind(part, batches, deletepart)
     
     colnames(new_data) <- c("Part", "Batches?", "Delete Part")
-    singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
-    colnames(singleshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+    
+    
+    if (length(grep(part, singleshoppingcartparts$data$"Part")) == 0){
+      singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+      colnames(singleshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+    }
+    else{
+      #Do nothing if the part is already there
+    }
+    
   })
   
   
