@@ -124,9 +124,14 @@ ui<-navbarPage("Extrusion Application",
                                                             c("All",unique(as.character(multi_pps_data$`Screw Print`))))
                                               )))
                                    ),#end Tooling
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checksingletooling", "Show All Tooling"),
+                                     actionButton("unchecksingletooling", "Hide All Tooling")
+                                   ),
                                    #Processing Attributes
                                    fluidRow(
-                                     tags$h1(strong("Processing Attribute"),style="font-size:25px;",align="left"),
+                                     tags$h1(strong("Processing Parameters"),style="font-size:25px;",align="left"),
                                      
                                      #Feedthroat
                                      column(3,
@@ -219,6 +224,11 @@ ui<-navbarPage("Extrusion Application",
                                             )
                                      )
                                    ), #end Processing Attribute 
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checksingleparameters", "Show All Processing Parameters"),
+                                     actionButton("unchecksingleparameters", "Hide All Processing Parameters")
+                                   ),
                                    
                                    #Dimentional Attribute
                                    fluidRow(

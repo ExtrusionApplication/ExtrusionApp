@@ -1054,6 +1054,54 @@ server<-function(input,output,session){
     }
   )
   
+  observeEvent(input$checksingletooling,{
+    #this checks all the checkboxes associated with single tooling inputs
+    updateCheckboxInput(session, inputId = "PCSDS_d", label = "Die Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSDLL_d", label = "Die Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSTS_d", label = "Tip Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSTLL_d", label = "Tip Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSSP_d", label = "Screw Print",value = TRUE)
+    
+  }) #end obserEvent for input$checksingletooling
+  
+  
+  observeEvent(input$unchecksingletooling,{
+    #this unchecks all the checkboxes associated with single tooling inputs
+    updateCheckboxInput(session, inputId = "PCSDS_d", label = "Die Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSDLL_d", label = "Die Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSTS_d", label = "Tip Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSTLL_d", label = "Tip Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSSP_d", label = "Screw Print",value = FALSE)
+    
+  }) #end obserEvent for input$unchecksingletooling
+  
+  
+  observeEvent(input$checksingleparameters,{
+    #this checks all the checkboxes associated with single processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCSFT_d", label = "Feedthroat Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSBZT1_d", label = "Barrel Zone 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSBZT2_d", label = "Barrel Zone 2 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSBZT3_d", label = "Barrel Zone 3 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSCT_d", label = "Clamp Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSAT_d", label = "Adapter Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSDT1_d", label = "Die 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSDT2_d", label = "Die 2 Temperature F",value = TRUE)
+    
+  }) #end obserEvent for input$checksingleparameters
+  
+  
+  observeEvent(input$unchecksingleparameters,{
+    #this unchecks all the checkboxes associated with single processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCSFT_d", label = "Feedthroat Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSBZT1_d", label = "Barrel Zone 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSBZT2_d", label = "Barrel Zone 2 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSBZT3_d", label = "Barrel Zone 3 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSCT_d", label = "Clamp Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSAT_d", label = "Adapter Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSDT1_d", label = "Die 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSDT2_d", label = "Die 2 Temperature F",value = FALSE)
+    
+  }) #end obserEvent for input$unchecksingleparameters
   
   observeEvent(input$checksingledimensions,{
     #this checks all the checkboxes associated with single dimensional attribute inputs
