@@ -2921,6 +2921,11 @@ server<-function(input,output,session){
     escape = FALSE,
     server = FALSE) #for the shoppingcart
   
+  
+  
+  
+
+  
 
   output$downloadTPPSData <- downloadHandler(
     #downlaod the data
@@ -2939,10 +2944,30 @@ server<-function(input,output,session){
   output$singleMESparameters <- renderDataTable({
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
+    #filter on Date Range
     data <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
+
     return(data)
   },
-  filter = "top")
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) #end Single Extrusion PPS Data
+  
+  
+  
+  
+  
+  
+
   
   output$singleMEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
@@ -2950,7 +2975,18 @@ server<-function(input,output,session){
     data <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) #end Single Extrusion PPS Data
   
   output$singleMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
@@ -2958,7 +2994,18 @@ server<-function(input,output,session){
     data <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) #end Single Extrusion PPS Data
   
   output$singleMEStotal <- renderDataTable({
     #This returns the table of all MES inputs based on the SAP batch numbers in the
@@ -2966,7 +3013,18 @@ server<-function(input,output,session){
     data <- single_tari_total_data[single_tari_total_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) #end Single Extrusion PPS Data
   
   output$singlescrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
@@ -2974,7 +3032,18 @@ server<-function(input,output,session){
     data <- scrapcodes_data[scrapcodes_data$Order %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) #end Single Extrusion PPS Data
   
   #Testing the appstats data
   # output$nexiv <- renderDataTable({
@@ -3082,6 +3151,12 @@ server<-function(input,output,session){
     colnames(singleshoppingcartparts$data) <- c("Part", "Delete Part")
     updateTextInput(session,"SinglePartNum_input",value = "") #update input box, reset it to be blank
   })
+  
+  
+  
+  
+  #***************Data Analysis Tab******************************
+  
   
 
 }
