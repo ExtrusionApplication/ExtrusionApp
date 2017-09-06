@@ -319,3 +319,7 @@ while (count < nrow(multi_pps_data) + 1){
   
   count <- count + 1
 }#end multi_pps_data buttons
+
+#this then adds the html to the table
+multi_pps_data$"" <- multi_buttons_vector
+multi_pps_data <- multi_pps_data[,c(ncol(multi_pps_data), 1:(ncol(multi_pps_data)-1))]

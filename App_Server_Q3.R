@@ -28,6 +28,7 @@ server<-function(input,output,session){
       parameter_name <- gsub(" Min", "", index_name)
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
       column_index <- grep(paste0("^",parameter_name), names(df), ignore.case = TRUE)
       
@@ -41,6 +42,7 @@ server<-function(input,output,session){
       parameter_name <- gsub(" Max", "", index_name)
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
       
       column_index <- grep(paste0("^",parameter_name), names(df), ignore.case = TRUE)
@@ -55,6 +57,7 @@ server<-function(input,output,session){
       parameter_name <- index_name
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
       column_index <- grep(paste0("^",parameter_name), names(df), ignore.case = TRUE)
       
@@ -612,10 +615,11 @@ server<-function(input,output,session){
         #Nothing will be analyzed
         print("observeEvent(single_inputs()): A parameter was changed but the value was changed to what the previous value was")
       }
-      if (length(index_differ) > 1){
+      else if (length(index_differ) > 1){
         #this means the values are being reset because a checkbox was unchecked for a max and min value
         print("observeEvent(single_inputs()): The checkbox was unchecked")
         #then do nothing because the values should not go in the stack
+        
       }
       else{
         
@@ -683,7 +687,7 @@ server<-function(input,output,session){
       if (length(index_differ) == 0){
         #Nothing will be analyzed since the value was not changed
       }
-      if (length(index_differ) > 1){
+      else if (length(index_differ) > 1){
         #multiple selected or deselected, so do nothing
       }
       else{
@@ -805,8 +809,8 @@ server<-function(input,output,session){
                    )
     names(inputs) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
                        "PPS Number",
-                       "Die Size (in) Min", "Die Size (in) Max", "Die Land (in) Length", 
-                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land (in) Length", "Screw Print",
+                       "Die Size (in) Min", "Die Size (in) Max", "Die Land Length (in)", 
+                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land Length (in)", "Screw Print",
                        "Feedthroat Temperature  F Min", "Feedthroat Temperature  F Max",
                        "Barrel Zone 1 Temperature  F Min", "Barrel Zone 1 Temperature  F Max",
                        "Barrel Zone 2 Temperature  F Min", "Barrel Zone 2 Temperature  F Max",
@@ -1207,6 +1211,7 @@ server<-function(input,output,session){
       parameter_name <- gsub(" Min", "", index_name)
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
       column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
       
@@ -1224,11 +1229,13 @@ server<-function(input,output,session){
       parameter_name <- gsub(" Max", "", index_name)
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
-      
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
       column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
       
-      middle_df <- df[df[,column_index] <= value,]
+      clean_df <- df[df[,column_index] != "", ] #this removes blanks
+      
+      middle_df <- clean_df[clean_df[,column_index] <= value,]
       
       part_numbers <- middle_df[,"Part Number"]#then it gets the unique part numbers
       new_df <- df[df[,"Part Number"] %in% part_numbers,]#then it cleans up the original df
@@ -1242,8 +1249,12 @@ server<-function(input,output,session){
       parameter_name <- index_name
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
       column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      
+      print(parameter_name)
+      print(column_index)
       
       if (value == "All"){
         #if 'All' is selected
@@ -1272,7 +1283,7 @@ server<-function(input,output,session){
   
   #the assign will initialize the miidvector
   assign("miidvector", 
-         c("PCMPN", "PCMPD", "PCMRN", "PCMRD", "PCMPPSN", 
+         c("Placeholder", "PCMPN", "PCMPD", "PCMRN", "PCMRD", "PCMPPSN", 
            "PCMDS_min", "PCMDS_max", "PCMDLL", "PCMTS_min", "PCMTS_max",
            "PCMTLL", "PCMSP", 
            "PCMFT_min", "PCMFT_max", "PCMBZT1_min", "PCMBZT1_max",
@@ -1329,22 +1340,22 @@ server<-function(input,output,session){
     
   } #end getMCBVector
   
-  setOriginalMCBVector <- function(vector){
+  setOriginalMIVector <- function(vector){
     #this sets the values for the original min and max input values
-    assign("originalmcbvector", vector, env = e2)
-  } #end setOriginalMCBVector
+    assign("originalmivector", vector, env = e2)
+  } #end setOriginalMIVector
   
-  getOriginalMCBVector <- function(vector){
+  getOriginalMIVector <- function(vector){
     #this gets the values for the original min and max input values
     
-    if(exists("originalmcbvector", e2)){
-      return(get("originalmcbvector", e2))
+    if(exists("originalmivector", e2)){
+      return(get("originalmivector", e2))
     }
     else{
       return(NA)
     }
     
-  } #end getOriginalMCBVector
+  } #end getOriginalMIVector
   
   setMIVector <- function(vector){
     #this sets the values for the multi input vector
@@ -1403,6 +1414,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) == 0){
       #the name is not currently in the stack
@@ -1426,6 +1438,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) != 0){
       #the name is not currently in the stack
@@ -1713,10 +1726,11 @@ server<-function(input,output,session){
     
     grepname <- gsub("\\(", "\\\\(", checkbox_name)
     grepname <- gsub("\\)", "\\\\)", grepname)
+    grepname <- paste0("^", grepname) #must start with it to avoid mis matches
     
     inputs <- names(isolate(multi_inputs()))
     input_ids <- getMIIDVector()
-    original_inputs <- getOriginalMCBVector()
+    original_inputs <- getOriginalMIVector()
     print(original_inputs)
     
     input_indices <- grep(grepname, inputs)
@@ -1781,7 +1795,7 @@ server<-function(input,output,session){
     #'It does not check to see if the input has been selected, but rather, if the user has changed
     #'the search input.'
     
-    print("Input Observed")
+    print("observeEvent(multi_inputs()): Input Observed")
     
     if (exists("mivector", e2)){
       #checks to see if the vector has been created yet. This is to prevent the initialization
@@ -1798,6 +1812,13 @@ server<-function(input,output,session){
       if (length(index_differ) == 0){
         #Nothing will be analyzed
         print("A parameter was changed but the value was changed to what the previous value was")
+        
+      }
+      else if (length(index_differ) > 1){
+        #this means the values are being reset because a checkbox was unchecked for a max and min value
+        print("observeEvent(multi_inputs()): The checkbox was unchecked")
+        #then do nothing because the values should not go in the stack
+        
       }
       else{
         
@@ -1815,6 +1836,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name) #must start with it to avoid mis matches
           
           stack_index <- grep(updated_index_name, current_mistack) #gets the index in the stack
           
@@ -1836,8 +1858,6 @@ server<-function(input,output,session){
       #if it has not been created, it sets the vector and stack
       #this is mainly to initialize data. The df_list does not need to be initialize as that is done
       #in the addMDFSeries()
-      
-      print("observeEvent(multi_inputs): The multi_input vector does not exist.")
       
       setMIVector(multi_inputs())
       setMIStack(c()) #creates an empty stack since no parameters have been changed yet
@@ -1866,6 +1886,9 @@ server<-function(input,output,session){
       if (length(index_differ) == 0){
         #Nothing will be analyzed since the value was changed to TRUE
       }
+      else if (length(index_differ) > 1){
+        #multiple selected or deselected, so do nothing
+      }
       else{
         
         print("observeEvent(show_vars2): The Checkbox Index_Differ Worked")
@@ -1888,6 +1911,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name) #must start with it to avoid mis matches
           
           stack_index <- grep(updated_index_name, current_mistack) #gets the index in the stack
           
@@ -1926,7 +1950,7 @@ server<-function(input,output,session){
       #if it has not been created, it sets the vector
       #this is mainly to initialize data.
       
-      setOriginalMCBVector(multi_inputs()) #initialize the original values
+      setOriginalMIVector(multi_inputs()) #initialize the original values
       setMCBVector(show_vars2()) #initialize the input values that will be changing with the app
       
     } #end if-else for scbvector existing
@@ -1941,7 +1965,7 @@ server<-function(input,output,session){
 
   show_vars2<-reactive({
     
-    checkboxes2 <- as.numeric(c(input$PCMPN_d,input$PCMPD_d,input$PCMRN_d,input$PCMRD_d,
+    checkboxes2 <- as.numeric(c(TRUE, input$PCMPN_d,input$PCMPD_d,input$PCMRN_d,input$PCMRD_d,
                                input$PCMPPSN_d, input$PCMET_d, input$PCMB_d,
                                input$PCMDS_d,input$PCMDLL_d,input$PCMTS_d,
                                input$PCMTLL_d,input$PCMSP_d,input$PCMFT_d,
@@ -1954,7 +1978,7 @@ server<-function(input,output,session){
                                input$PCMHT_d,input$PCMSPD_d,input$PCMSLD_d,input$PCMDLN_d,
                                input$PCMULT_d,input$PCMVC_d,input$PCMIRD_d))
     
-    names(checkboxes2) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(checkboxes2) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
                            "PPS Number", "Extrusion Type", "Barrel",
                            "Die Size (in)", "Die Land Length (in)",
                            "Tip Size (in)", "Tip Land Length (in)", "Screw Print",
@@ -1980,7 +2004,7 @@ server<-function(input,output,session){
   #this variable will store all the inputs of the multi extrusions
   multi_inputs <- reactive({
     #this variable will store all the inputs of of the multi extrusions
-    inputs2 <- c(input$PCMPN, input$PCMPD, input$PCMRN, input$PCMRD, input$PCMPPSN, 
+    inputs2 <- c("Placeholder", input$PCMPN, input$PCMPD, input$PCMRN, input$PCMRD, input$PCMPPSN, 
                 input$PCMDS_min, input$PCMDS_max, input$PCMDLL, input$PCMTS_min, input$PCMTS_max,
                 input$PCMTLL, input$PCMSP, 
                 input$PCMFT_min, input$PCMFT_max, input$PCMBZT1_min, input$PCMBZT1_max,
@@ -1999,10 +2023,10 @@ server<-function(input,output,session){
                 input$PCMMP, input$PCMHT, input$PCMSPD, input$PCMSLD, input$PCMDLN, input$PCMULT,
                 input$PCMVC, input$PCMIRD)
     
-    names(inputs2) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(inputs2) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
                        "PPS Number",
-                       "Die Size (in) Min", "Die Size (in) Max", "Die Land (in) Length", 
-                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land (in) Length", "Screw Print",
+                       "Die Size (in) Min", "Die Size (in) Max", "Die Land Length (in)", 
+                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land Length(in)", "Screw Print",
                        "Feedthroat Temperature  F Min", "Feedthroat Temperature  F Max",
                        "Barrel Zone 1 Temperature  F Min", "Barrel Zone 1 Temperature  F Max",
                        "Barrel Zone 2 Temperature  F Min", "Barrel Zone 2 Temperature  F Max",
@@ -2028,27 +2052,10 @@ server<-function(input,output,session){
   
   
   
-  #All Table Filter works are done below, and output a modified talbe. This table will be used by the renderdatatable, and download button
-  datasetInput<-reactive({
-    col_var2=show_vars2()
-    for (i in 1:length(col_var2)){
-      if (col_var2[i]!=0){
-        Col_PCM=c(Col_PCM,i) # obtain the selected columns' number
-      }
-    } 
-    data_PCM<-multi_pps_data[,Col_PCM]
-    data_PCM
-  })
   output$mytable2 <- DT::renderDataTable({
     DT::datatable({
-
-      Col_PCM=c()
-      col_var2=show_vars2()
-      for (i in 1:length(col_var2)){
-        if (col_var2[i]!=0){
-          Col_PCM=c(Col_PCM,i)
-        }
-      } 
+      
+      Col_PCM <- which(1 == show_vars2())
   
       data_PCM <- multi_df_output$data #the data frame is set
       data_PCM<-data_PCM[,Col_PCM]
@@ -2056,22 +2063,6 @@ server<-function(input,output,session){
       clean_multi_pps_data$data <- data_PCM #assign the clean table to the data that is available
       #for downloading
       
-      rows <- nrow(data_PCM)
-      vectorofbuttons <- c(rep(0, rows))
-      row_count <- 1
-      
-      while(row_count < rows + 1){
-        #this creates a vector of html action buttons to add to the table
-        vectorofbuttons[row_count] <- as.character(
-          actionButton(inputId = paste0("button_", data_PCM[row_count,1]),
-                       label = "Add Part",
-                       onclick = 'Shiny.onInputChange(\"add_button\",  this.id)')
-        )
-        row_count <- row_count + 1
-      } #end while adding the html stuff
-      
-      data_PCM$"" <- vectorofbuttons
-      data_PCM <- data_PCM[,c(ncol(data_PCM), 1:(ncol(data_PCM)-1))]
       
       return(data_PCM)
 
@@ -2101,6 +2092,16 @@ server<-function(input,output,session){
   
   
   multishoppingcart <- reactiveValues(
+    #this is a shopping cart to hold all the multi extrusion parts and SAP batches that a user wants.
+    #this is linked to the output data, so only the output data located of the associated batches 
+    #in the shopping cart is displayed
+    data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
+                      "SAP Batch" = numeric(0), "Delete Batch" = numeric(0),
+                      stringsAsFactors = FALSE,
+                      check.names = FALSE)
+  ) #end multishoppingcart
+  
+  multishoppingcartparts <- reactiveValues(
     #this is a shopping cart to hold all the multi extrusion parts and SAP batches that a user wants.
     #this is linked to the output data, so only the output data located of the associated batches 
     #in the shopping cart is displayed
@@ -2145,9 +2146,54 @@ server<-function(input,output,session){
     new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
     
     colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
-    multishoppingcart$data <- rbind(multishoppingcart$data, new_data, stringsAsFactors = FALSE)
-    colnames(multishoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
-  })
+    
+    
+    if (length(grep(part, singleshoppingcart$data$"Part")) == 0){
+      multishoppingcart$data <- rbind(multishoppingcart$data, new_data, stringsAsFactors = FALSE)
+      colnames(multishoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    }
+    else{
+      #Do nothing if the part is already there
+    }
+  }) #End observeEvent(input$multiadd_button)
+  
+  observeEvent(input$multiadd_button,{
+    #this observes whether the user clicked a button to add a part to the part only shopping cart
+    part <- strsplit(input$multiadd_button, "_")[[1]][2]
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"multidelete_part_button\",  this.id)'))
+    
+    
+    #This determines if there are batches for the part
+    SAP_batches <- multi_tari_parameter_data$`SAP Batch Number`[multi_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+    
+    
+    if (length(grep(part, multishoppingcartparts$data$"Part")) == 0){
+      multishoppingcartparts$data <- rbind(multishoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+      colnames(multishoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+    }
+    else{
+      #Do nothing if the part is already there
+    }
+    
+  }) #end observeEvent(input$multiadd_button)
   
   
   observeEvent(input$multidelete_part_button,{
@@ -2155,6 +2201,7 @@ server<-function(input,output,session){
     #'all batches associated to the part are removed
     part <- strsplit(input$multidelete_part_button, "_")[[1]][2]
     multishoppingcart$data <- multishoppingcart$data[multishoppingcart$data$'Part' != part,]
+    multishoppingcartparts$data <- multishoppingcartparts$data[multishoppingcartparts$data$'Part' != part,]
   })
   
   observeEvent(input$multidelete_batch_button,{
@@ -2175,14 +2222,210 @@ server<-function(input,output,session){
     escape = FALSE,
     server = FALSE) #for the shoppingcart
   
-  output$downloadMPPSData <- downloadHandler(
+  output$multishoppingcartparts <- renderDataTable({
+    #'this is a table that only lists the parts for quick viewing
+    return(multishoppingcartparts$data)
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE,
+  options=list(pageLength=5)   # make the shopping cart page shorter
+  ) #for the shoppingcart
+  
+  
+  output$multidownloadSPPSData <- downloadHandler(
     #downlaod the data
     filename = function() { paste("Multi-Layer PPS Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(clean_multi_pps_data$data, file)
+      #I remove the first column so the HTML is not outputed
+      write.csv(clean_multi_pps_data$data[2:ncol(clean_multi_pps_data$data)], file)
+    }
+  )
+
+  
+  output$multidownloadSPPSDataAll <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Multi PPS Data", '.csv', sep='') },
+    content = function(file) {
+      #I remove the first column so the HTML is not outputed
+      write.csv(multi_df_output$data[2:ncol(multi_df_output$data)], file)
     }
   )
   
+  output$multishoppingcartpps <- renderDataTable({
+    #this is to render a datatable that has all the PPS information of parts that have been saved
+    #to the shopping cart
+    
+    data <- multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcartparts$data$'Part'),]
+    return(data)
+    
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE
+  )
+  
+  
+  
+  output$multicartdownloadpps <- downloadHandler(
+    #downlaod the multi PPS data from the shopping cart
+    filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
+    content = function(file) {
+      write.csv(multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcart$data$'Part'),], file)
+    }
+  )
+  
+  observeEvent(input$checkmultitooling,{
+    #this checks all the checkboxes associated with multi tooling inputs
+    updateCheckboxInput(session, inputId = "PCMB_d", label = "Barrel",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMDS_d", label = "Die Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMDLL_d", label = "Die Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMTS_d", label = "Tip Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMTLL_d", label = "Tip Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMSP_d", label = "Screw Print",value = TRUE)
+    
+  }) #end obserEvent for input$checkmultitooling
+  
+  
+  observeEvent(input$uncheckmultitooling,{
+    #this unchecks all the checkboxes associated with multi tooling inputs
+    updateCheckboxInput(session, inputId = "PCMB_d", label = "Barrel",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMDS_d", label = "Die Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMDLL_d", label = "Die Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMTS_d", label = "Tip Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMTLL_d", label = "Tip Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMSP_d", label = "Screw Print",value = FALSE)
+    
+  }) #end obserEvent for input$uncheckmultitooling
+  
+  
+  observeEvent(input$checkmultiparameters,{
+    #this checks all the checkboxes associated with multi processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCMFT_d", label = "Feedthroat Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMBZT1_d", label = "Barrel Zone 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMBZT2_d", label = "Barrel Zone 2 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMBZT3_d", label = "Barrel Zone 3 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMCT_d", label = "Clamp Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMAT_d", label = "Adapter Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMDT1_d", label = "Die 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMDT2_d", label = "Die 2 Temperature F",value = TRUE)
+    
+  }) #end obserEvent for input$checkmultiparameters
+  
+  
+  observeEvent(input$uncheckmultiparameters,{
+    #this unchecks all the checkboxes associated with multi processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCMFT_d", label = "Feedthroat Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMBZT1_d", label = "Barrel Zone 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMBZT2_d", label = "Barrel Zone 2 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMBZT3_d", label = "Barrel Zone 3 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMCT_d", label = "Clamp Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMAT_d", label = "Adapter Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMDT1_d", label = "Die 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMDT2_d", label = "Die 2 Temperature F",value = FALSE)
+    
+  }) #end obserEvent for input$uncheckmultiparameters
+  
+  observeEvent(input$checkmultidimensions,{
+    #this checks all the checkboxes associated with multi dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCMTE_d", label = "Tapered End",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMIDI_d", label = "Inner Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMODI_d", label = "Outer Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMIWT_d", label = "Inner Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMMWT_d", label = "Middle Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMOWT_d", label = "Outer Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMTWT_d", label = "Total Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMOR_d", label = "Out of Roundness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMCCT_d", label = "Concentricity",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMLength_d", label = "Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMToLength_d", label = "Total Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMPPD_d", label = "Perpendicularity (in)",value = TRUE)
+    
+  }) #end obserEvent for input$checkmultidimensions
+  
+  
+  observeEvent(input$uncheckmultidimensions,{
+    #this unchecks all the checkboxes associated with multi dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCMTE_d", label = "Tapered End",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMIDI_d", label = "Inner Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMODI_d", label = "Outer Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMIWT_d", label = "Inner Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMMWT_d", label = "Middle Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMOWT_d", label = "Outer Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMTWT_d", label = "Total Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMOR_d", label = "Out of Roundness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMCCT_d", label = "Concentricity",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMLength_d", label = "Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMToLength_d", label = "Total Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMPPD_d", label = "Perpendicularity (in)",value = FALSE)
+    
+  }) #end obserEvent for input$uncheckmultidimensions
+  
+  observeEvent(input$checkmultispecial,{
+    #this checks all the checkboxes associated with multi special operation inputs
+    updateCheckboxInput(session, inputId = "PCMNEXIV_d", label = "NEXIV",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMAnnealed_d", label = "Annealed",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMCaliper_d", label = "Caliper",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMOS_d", label = "OD Sort",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMMP_d", label = "Melt Pump",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMHT_d", label = "Hypo Tip",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMSPD_d", label = "Sparker Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMSLD_d", label = "Slicking Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMDLN_d", label = "Delamination",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMULT_d", label = "Ultrasonic",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMVC_d", label = "Vacuum Calibration",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMIRD_d", label = "Irradiated",value = TRUE)
+    
+  }) #end obserEvent for input$checkmultispecial
+  
+  
+  observeEvent(input$uncheckmultispecial,{
+    #this unchecks all the checkboxes associated with multi special operation inputs
+    updateCheckboxInput(session, inputId = "PCMNEXIV_d", label = "NEXIV",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMAnnealed_d", label = "Annealed",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMCaliper_d", label = "Caliper",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMOS_d", label = "OD Sort",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMMP_d", label = "Melt Pump",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMHT_d", label = "Hypo Tip",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMSPD_d", label = "Sparker Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMSLD_d", label = "Slicking Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMDLN_d", label = "Delamination",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMULT_d", label = "Ultrasonic",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMVC_d", label = "Vacuum Calibration",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMIRD_d", label = "Irradiated",value = FALSE)
+    
+  }) #end obserEvent for input$uncheckmultispecial
+  
+  observeEvent(input$resetmultiinputs,{
+    #this will reset the multi inputs when clicked
+    #It first removes all the dataframes that have been created, resets the input values,
+    #and then it resets the stack
+    setMDFList(NULL) #resetst the DF list
+    
+    current_inputs <- isolate(multi_inputs())
+    original_inputs <- getOriginalMIVector()
+    
+    differ_indices <- which(current_inputs != original_inputs)
+    value_names <- names(current_inputs[differ_indices])
+    
+    print(paste0("observeEvent(input$resetmultiinputs): ",value_names))
+    
+    count <- 1
+    #this while loop iterates through all the values that differed
+    while (count < length(value_names) + 1){
+      current_name <- value_names[count]
+      resetMI(current_name)
+      count <- count + 1
+    }#end while
+    
+    setMIStack(c()) #creates an empty stack
+    
+    #sets the data table to the original data set
+    multi_df_output$data <- multi_pps_data
+    
+  }) #end obserEvent for input$resetmultiinputs
   
   
   #### Tapered PPS ####
@@ -2328,6 +2571,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) == 0){
       #the name is not currently in the stack
@@ -2351,6 +2595,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) != 0){
       #the name is not currently in the stack
@@ -2637,6 +2882,7 @@ server<-function(input,output,session){
     
     grepname <- gsub("\\(", "\\\\(", checkbox_name)
     grepname <- gsub("\\)", "\\\\)", grepname)
+    grepname <- paste0("^", grepname) #must start with it to avoid mis matches
     
     inputs <- names(isolate(tapered_inputs()))
     input_ids <- getTIIDVector()
@@ -2739,6 +2985,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name) #must start with it to avoid mis matches
           
           stack_index <- grep(updated_index_name, current_tistack) #gets the index in the stack
           
@@ -2810,6 +3057,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name) #must start with it to avoid mis matches
           
           stack_index <- grep(updated_index_name, current_tistack) #gets the index in the stack
           
