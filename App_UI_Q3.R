@@ -1602,7 +1602,38 @@ ui<-navbarPage("Extrusion Application",
                # some plots with choices for the plots
                tabPanel("Analysis",
                         sidebarLayout(
-                          sidebarPanel(),
+                          sidebarPanel(
+                            #Choice of Database:MES, Scrap code
+                            radioButtons("dataset", "Data set",
+                                         choices = c("MES", "Scrap code"), inline = TRUE),
+                            conditionalPanel("input.dataset === 'MES'",
+                                             radioButtons("MESType", "Type",
+                                                          choices = c("Sinlge", "Multi", "Tapered"), inline = TRUE)
+                                             ),
+                            selectInput("Xais","x-axis",
+                                        c("Start Time"="Start Time"
+                                          
+                                        ),
+                                        selectize = F),
+                            selectInput("Yais","y-axis",
+                                        c(
+                                          "Yied Qty" ="Yield Qty",
+                                          "Start Qty" ="Start Qty",
+                                          "Yield Rate" ="Yield Rate"
+                                        ),
+                                        selectize = F),
+                            selectInput("PlotFilter", "Plot Filter",
+                                        c(
+                                          
+                                        ),
+                                        selectize = F)
+                      
+                            #Conditional Panel, if MES were chosen, then choices of Sinlge, Multi, Tapered
+                              # Filter: a dropdown list
+                              #
+                            #
+                            #Download the plot || brushed data point's table
+                          ),
                           mainPanel()
                         )),
                
