@@ -970,6 +970,11 @@ server<-function(input,output,session){
     }
     else{
       #Do nothing if the part is already there
+      showModal(modalDialog(
+        title = "Add Part Number",
+        "The part is already in the shopping cart",
+        easyClose = T
+      ))
     }
     
   })
@@ -3695,12 +3700,6 @@ server<-function(input,output,session){
     #get the part from the text input box
     part <- input$SinglePartNum_input
     
-      showModal(modalDialog(
-        title = "Add Part Number",
-        "Success",
-        easyClose = T
-      ))
-      
       
     print(part)
     
@@ -3733,8 +3732,26 @@ server<-function(input,output,session){
     new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
     
     colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
-    singleshoppingcart$data <- rbind(singleshoppingcart$data, new_data, stringsAsFactors = FALSE)
-    colnames(singleshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    
+    
+    if (length(grep(part, singleshoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, single_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        singleshoppingcart$data <- rbind(singleshoppingcart$data, new_data, stringsAsFactors = FALSE)
+        colnames(singleshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        
+      }
+      else{
+        #otherwise do nothing
+      }
+    }
+    else{
+      #else do nothing
+    }
+    
+    
   })
   
   observeEvent(input$singleMadd_button,{
@@ -3747,16 +3764,327 @@ server<-function(input,output,session){
                    label = "Delete Part",
                    onclick = 'Shiny.onInputChange(\"singledelete_part_button\",  this.id)'))
     
-    new_data <- cbind(part, deletepart)
+    #This determines if there are batches for the part
+    SAP_batches <- single_tari_parameter_data$`SAP Batch Number`[single_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
     
-    colnames(new_data) <- c("Part", "Delete Part")
-    singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
-    colnames(singleshoppingcartparts$data) <- c("Part", "Delete Part")
-    updateTextInput(session,"SinglePartNum_input",value = "") #update input box, reset it to be blank
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+    
+    if (length(grep(part, singleshoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, single_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+        colnames(singleshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+        updateTextInput(session,"SinglePartNum_input",value = "") #update input box, reset it to be blank
+        
+        
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "Success",
+          easyClose = T
+        ))
+        
+      }
+      else{
+        #otherwise do nothing
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A Valid Part Number Was Not Entered",
+          easyClose = T
+        ))
+      }
+      
+    }
+    else{
+      #else do nothing
+      updateTextInput(session,"SinglePartNum_input",value = "") #update input box, reset it to be blank
+      
+      showModal(modalDialog(
+        title = "Add Part Number",
+        "The part is already in the shopping cart",
+        easyClose = T
+      ))
+      
+    }
+    
+  }) #end observeEvent for add single manual
+  
+  
+  
+  observeEvent(input$multiMadd_button,{
+    #used by multi Mnanually add button in the shopping cart
+    #get the part from the text input box
+    part <- input$MultiPartNum_input
+    
+    
+    print(part)
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"multidelete_part_button\",  this.id)'))
+    
+    #Get the SAP batches
+    SAP_batches <- multi_tari_parameter_data$`SAP Batch Number`[multi_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    #Action button to delete batch
+    batch_count <- 1
+    vectorofbuttons <- c(rep(0, length(SAP_batches)))
+    
+    while(batch_count < length(SAP_batches) + 1){
+      vectorofbuttons[batch_count] <- as.character(
+        actionButton(inputId = paste0("button_", SAP_batches[batch_count]),
+                     label = "Delete Batch",
+                     onclick = 'Shiny.onInputChange(\"multidelete_batch_button\",  this.id)'))
+      batch_count <- batch_count + 1
+    }
+    
+    #Vectors of parts and buttons
+    partvector <- rep(part, numberofbatches)
+    deletepartvector <- rep(deletepart, numberofbatches)
+    
+    new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
+    
+    colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    
+    
+    if (length(grep(part, multishoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, multi_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        multishoppingcart$data <- rbind(multishoppingcart$data, new_data, stringsAsFactors = FALSE)
+        colnames(multishoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        
+      }
+      else{
+        #otherwise do nothing
+      }
+    }
+    else{
+      #else do nothing
+    }
+    
+    
   })
   
-
-}
+  observeEvent(input$multiMadd_button,{
+    #this observes whether the user manually add a part to shopping cart
+    part <- input$MultiPartNum_input
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"multidelete_part_button\",  this.id)'))
+    
+    #This determines if there are batches for the part
+    SAP_batches <- multi_tari_parameter_data$`SAP Batch Number`[multi_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+    
+    if (length(grep(part, multishoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, multi_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        multishoppingcartparts$data <- rbind(multishoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+        colnames(multishoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+        updateTextInput(session,"MultiPartNum_input",value = "") #update input box, reset it to be blank
+        
+        
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "Success",
+          easyClose = T
+        ))
+        
+      }
+      else{
+        #otherwise do nothing
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A Valid Part Number Was Not Entered",
+          easyClose = T
+        ))
+      }
+      
+    }
+    else{
+      #else do nothing
+      updateTextInput(session,"MultiPartNum_input",value = "") #update input box, reset it to be blank
+      
+      showModal(modalDialog(
+        title = "Add Part Number",
+        "The part is already in the shopping cart",
+        easyClose = T
+      ))
+      
+    }
+    
+  }) #end observeEvent for add multi manual
+  
+  
+  observeEvent(input$taperedMadd_button,{
+    #used by tapered Mnanually add button in the shopping cart
+    #get the part from the text input box
+    part <- input$TaperedPartNum_input
+    
+    
+    print(part)
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"tapereddelete_part_button\",  this.id)'))
+    
+    #Get the SAP batches
+    SAP_batches <- tapered_tari_parameter_data$`SAP Batch Number`[tapered_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    #Action button to delete batch
+    batch_count <- 1
+    vectorofbuttons <- c(rep(0, length(SAP_batches)))
+    
+    while(batch_count < length(SAP_batches) + 1){
+      vectorofbuttons[batch_count] <- as.character(
+        actionButton(inputId = paste0("button_", SAP_batches[batch_count]),
+                     label = "Delete Batch",
+                     onclick = 'Shiny.onInputChange(\"tapereddelete_batch_button\",  this.id)'))
+      batch_count <- batch_count + 1
+    }
+    
+    #Vectors of parts and buttons
+    partvector <- rep(part, numberofbatches)
+    deletepartvector <- rep(deletepart, numberofbatches)
+    
+    new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
+    
+    colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    
+    
+    if (length(grep(part, taperedshoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, tapered_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        taperedshoppingcart$data <- rbind(taperedshoppingcart$data, new_data, stringsAsFactors = FALSE)
+        colnames(taperedshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        
+      }
+      else{
+        #otherwise do nothing
+      }
+    }
+    else{
+      #else do nothing
+    }
+    
+    
+  })
+  
+  observeEvent(input$taperedMadd_button,{
+    #this observes whether the user manually add a part to shopping cart
+    part <- input$TaperedPartNum_input
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"tapereddelete_part_button\",  this.id)'))
+    
+    #This determines if there are batches for the part
+    SAP_batches <- tapered_tari_parameter_data$`SAP Batch Number`[tapered_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+    
+    if (length(grep(part, taperedshoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, tapered_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        taperedshoppingcartparts$data <- rbind(taperedshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+        colnames(taperedshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+        updateTextInput(session,"TaperedPartNum_input",value = "") #update input box, reset it to be blank
+        
+        
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "Success",
+          easyClose = T
+        ))
+        
+      }
+      else{
+        #otherwise do nothing
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A Valid Part Number Was Not Entered",
+          easyClose = T
+        ))
+      }
+      
+    }
+    else{
+      #else do nothing
+      updateTextInput(session,"TaperedPartNum_input",value = "") #update input box, reset it to be blank
+      
+      showModal(modalDialog(
+        title = "Add Part Number",
+        "The part is already in the shopping cart",
+        easyClose = T
+      ))
+      
+    }
+    
+  }) #end observeEvent for add tapered manual
+  
+  
+  
+} #end server
   
 
 
