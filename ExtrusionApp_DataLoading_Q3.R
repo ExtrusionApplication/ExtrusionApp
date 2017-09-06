@@ -323,3 +323,22 @@ while (count < nrow(multi_pps_data) + 1){
 #this then adds the html to the table
 multi_pps_data$"" <- multi_buttons_vector
 multi_pps_data <- multi_pps_data[,c(ncol(multi_pps_data), 1:(ncol(multi_pps_data)-1))]
+
+#getting the tapered-layer buttons
+count <- 1
+tapered_buttons_vector <- c(rep(0,nrow(tapered_pps_data)))
+while (count < nrow(tapered_pps_data) + 1){
+  #runs through the tapered-layer PPS and creates a vector of html entries for action buttons for the
+  #tapered-layer PPS data table.
+  tapered_buttons_vector[count] <- as.character(
+    actionButton(inputId = paste0("button_", tapered_pps_data[count,1]),
+                 label = "Add Part",
+                 onclick = 'Shiny.onInputChange(\"taperedadd_button\",  this.id)')
+  )
+  
+  count <- count + 1
+}#end tapered_pps_data buttons
+
+#this then adds the html to the table
+tapered_pps_data$"" <- tapered_buttons_vector
+tapered_pps_data <- tapered_pps_data[,c(ncol(tapered_pps_data), 1:(ncol(tapered_pps_data)-1))]

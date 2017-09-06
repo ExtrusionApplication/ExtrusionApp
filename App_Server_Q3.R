@@ -2440,23 +2440,24 @@ server<-function(input,output,session){
   
   #the assign will initialize the tiidvector
   assign("tiidvector", 
-         c("input$PCSPN", "input$PCSPD", "input$PCSRN", "input$PCSRD", "input$PCSPPSN", 
-           "input$PCSDS_min", "input$PCSDS_max", "input$PCSDLL", "input$PCSTS_min", "input$PCSTS_max",
-           "input$PCSTLL", "input$PCSSP", 
-           "input$PCSFT_min", "input$PCSFT_max", "input$PCSBZT1_min", "input$PCSBZT1_max",
-           "input$PCSBZT2_min", "input$PCSBZT2_max", "input$PCSBZT3_min", "input$PCSBZT3_max",
-           "input$PCSCT_min", "input$PCSCT_max", "input$PCSAT_min", "input$PCSAT_max",
-           "input$PCSDT1_min", "input$PCSDT1_max", "input$PCSDT2_min", "input$PCSDT2_max",
-           "input$PCTPIDI_min", "input$PCTPIDI_max", "input$PCTPODI_min", "input$PCTPODI_max", "input$PCTPWT_min", 
-           "input$PCTPWT_max","input$PCTPOR_min", "input$PCTPOR_max", "input$PCTPCCT_min", "input$PCTPCCT_max",
-           "input$PCTDIDI_min", "input$PCTDIDI_max", "input$PCTDODI_min", "input$PCTDODI_max", "input$PCTDWT_min",
-           "input$PCTDWT_max", "input$PCTDOR_min", "input$PCTDOR_max", "input$PCTDCCT_min", "input$PCTDCCT_max",
-           "input$PCTPLength_min", "input$PCTPLength_max", "input$PCTTLength_min", "input$PCTTLength_max",
-           "input$PCTDLength_min", "input$PCTDLength_max", "input$PCTToLength_min", "input$PCTToLength_max",
-           "input$PCSPPD",
-           "input$PCSNEXIV", "input$PCSAnnealed", "input$PCSCaliper", "input$PCSOS",
-           "input$PCSMP", "input$PCSHT", "input$PCSSPD", "input$PCSSLD", "input$PCSDLN", "input$PCSULT",
-           "input$PCSVC", "input$PCSIRD"), 
+         c("Placeholoder", 
+           "PCSPN", "PCSPD", "PCSRN", "PCSRD", "PCSPPSN", 
+           "PCSDS_min", "PCSDS_max", "PCSDLL", "PCSTS_min", "PCSTS_max",
+           "PCSTLL", "PCSSP", 
+           "PCSFT_min", "PCSFT_max", "PCSBZT1_min", "PCSBZT1_max",
+           "PCSBZT2_min", "PCSBZT2_max", "PCSBZT3_min", "PCSBZT3_max",
+           "PCSCT_min", "PCSCT_max", "PCSAT_min", "PCSAT_max",
+           "PCSDT1_min", "PCSDT1_max", "PCSDT2_min", "PCSDT2_max",
+           "PCTPIDI_min", "PCTPIDI_max", "PCTPODI_min", "PCTPODI_max", "PCTPWT_min", 
+           "PCTPWT_max","PCTPOR_min", "PCTPOR_max", "PCTPCCT_min", "PCTPCCT_max",
+           "PCTDIDI_min", "PCTDIDI_max", "PCTDODI_min", "PCTDODI_max", "PCTDWT_min",
+           "PCTDWT_max", "PCTDOR_min", "PCTDOR_max", "PCTDCCT_min", "PCTDCCT_max",
+           "PCTPLength_min", "PCTPLength_max", "PCTTLength_min", "PCTTLength_max",
+           "PCTDLength_min", "PCTDLength_max", "PCTToLength_min", "PCTToLength_max",
+           "PCSPPD",
+           "PCSNEXIV", "PCSAnnealed", "PCSCaliper", "PCSOS",
+           "PCSMP", "PCSHT", "PCSSPD", "PCSSLD", "PCSDLN", "PCSULT",
+           "PCSVC", "PCSIRD"), 
          envir = e3)
   
   
@@ -2887,7 +2888,6 @@ server<-function(input,output,session){
     inputs <- names(isolate(tapered_inputs()))
     input_ids <- getTIIDVector()
     original_inputs <- getOriginalTIVector()
-    print(original_inputs)
     
     input_indices <- grep(grepname, inputs)
     
@@ -2969,6 +2969,9 @@ server<-function(input,output,session){
         #Nothing will be analyzed
         print("A parameter was changed but the value was changed to what the previous value was")
       }
+      else if (length(index_differ) > 1){
+        #multiple selected or deselected, so do nothing
+      }
       else{
         
         index_name <- names(current_tivector[index_differ])
@@ -3034,6 +3037,9 @@ server<-function(input,output,session){
       
       if (length(index_differ) == 0){
         #Nothing will be analyzed since the value was changed to TRUE
+      }
+      else if (length(index_differ) > 1){
+        #multiple selected or deselected, so do nothing
       }
       else{
         
@@ -3107,11 +3113,11 @@ server<-function(input,output,session){
 
   
   
-  # obtain the output of checkbox from functions and make a list to store them----multi Extrusion PPS Data
+  # obtain the output of checkbox from functions and make a list to store them----tapered Extrusion PPS Data
 
   
   show_vars3<-reactive({
-    checkboxes <- as.numeric(c(input$PCTPN_d,input$PCTPD_d,input$PCTRN_d,input$PCTRD_d,
+    checkboxes <- as.numeric(c(TRUE,input$PCTPN_d,input$PCTPD_d,input$PCTRN_d,input$PCTRD_d,
                                input$PCTPPSN_d,input$PCTDS_d,input$PCTDLL_d,input$PCTTS_d,
                                input$PCTTLL_d,input$PCTSP_d,input$PCTFT_d,
                  input$PCTBZT1_d,input$PCTBZT2_d,input$PCTBZT3_d,input$PCTCT_d,input$PCTAT_d,
@@ -3125,7 +3131,8 @@ server<-function(input,output,session){
                  input$PCTSPD_d,input$PCTSLD_d,input$PCTDLN_d,input$PCTULT_d,input$PCTVC_d,
                  input$PCTIRD_d))
     
-    names(checkboxes) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(checkboxes) <- c("Placeholder",
+                           "Part Number", "Part Description", "Resin Number", "Resin Description",
                            "PPS Number",
                            "Die Size (in)", "Die Land Length (in)",
                            "Tip Size (in)", "Tip Land Length (in)", "Screw Print",
@@ -3152,7 +3159,7 @@ server<-function(input,output,session){
   #this variable will store all the inputs of the tapered extrusions
   tapered_inputs <- reactive({
     #this variable will store all the inputs of of the tapered extrusions
-    inputs3 <- c(input$PCTPN, input$PCTPD, input$PCTRN, input$PCTRD, input$PCTPPSN, 
+    inputs3 <- c("Placeholder", input$PCTPN, input$PCTPD, input$PCTRN, input$PCTRD, input$PCTPPSN, 
                 input$PCTDS_min, input$PCTDS_max, input$PCTDLL, input$PCTTS_min, input$PCTTS_max,
                 input$PCTTLL, input$PCTSP, 
                 input$PCTFT_min, input$PCTFT_max, input$PCTBZT1_min, input$PCTBZT1_max,
@@ -3170,10 +3177,11 @@ server<-function(input,output,session){
                 input$PCTMP, input$PCTHT, input$PCTSPD, input$PCTSLD, input$PCTDLN, input$PCTULT,
                 input$PCTVC, input$PCTIRD
     )
-    names(inputs3) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(inputs3) <- c("Placeholder",
+                        "Part Number", "Part Description", "Resin Number", "Resin Description",
                        "PPS Number",
-                       "Die Size (in) Min", "Die Size (in) Max", "Die Land (in) Length", 
-                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land (in) Length", "Screw Print",
+                       "Die Size (in) Min", "Die Size (in) Max", "Die Land Length (in)", 
+                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land Length (in)", "Screw Print",
                        "Feedthroat Temperature  F Min", "Feedthroat Temperature  F Max",
                        "Barrel Zone 1 Temperature  F Min", "Barrel Zone 1 Temperature  F Max",
                        "Barrel Zone 2 Temperature  F Min", "Barrel Zone 2 Temperature  F Max",
@@ -3219,39 +3227,16 @@ server<-function(input,output,session){
   
   
   output$mytable3 <- DT::renderDataTable({
+    
     DT::datatable({
-      Col_PCT=c()
-      col_var3=show_vars3()
-      for (i in 1:length(col_var3)){
-        if (col_var3[i]!=0){
-          Col_PCT=c(Col_PCT,i)
-        }
-      } 
-      data_PCT<-tapered_pps_data[,Col_PCT]
+      
+      Col_PCT <- which(1 == show_vars3())
       
       data_PCT <- tapered_df_output$data #the data frame is set
-      data_PCT <- data_PCT[,Col_PCT] #only get the columns that have been checked
+      data_PCT<-data_PCT[,Col_PCT]
       
       clean_tapered_pps_data$data <- data_PCT #assign the clean table to the data that is available
       #for downloading
-      
-      rows <- nrow(data_PCT)
-      vectorofbuttons <- c(rep(0, rows))
-      row_count <- 1
-      
-      while(row_count < rows + 1){
-        #this creates a vector of html action buttons to add to the table
-        vectorofbuttons[row_count] <- as.character(
-          actionButton(inputId = paste0("button_", data_PCT[row_count,1]),
-                       label = "Add Part",
-                       onclick = 'Shiny.onInputChange(\"taperedadd_button\",  this.id)')
-        )
-        row_count <- row_count + 1
-      } #end while adding the html stuff
-      
-      data_PCT$"" <- vectorofbuttons
-      data_PCT <- data_PCT[,c(ncol(data_PCT), 1:(ncol(data_PCT)-1))]
-      
       
       return(data_PCT)
     },
@@ -3282,6 +3267,16 @@ server<-function(input,output,session){
   
   taperedshoppingcart <- reactiveValues(
     #this is a shopping cart to hold all the singl extrusion parts and SAP batches that a user wants.
+    #this is linked to the output data, so only the output data located of the associated batches 
+    #in the shopping cart is displayed
+    data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
+                      "SAP Batch" = numeric(0), "Delete Batch" = numeric(0),
+                      stringsAsFactors = FALSE,
+                      check.names = FALSE)
+  ) #end taperedshoppingcart
+  
+  taperedshoppingcartparts <- reactiveValues(
+    #this is a shopping cart to hold all the tapered extrusion parts and SAP batches that a user wants.
     #this is linked to the output data, so only the output data located of the associated batches 
     #in the shopping cart is displayed
     data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
@@ -3329,12 +3324,51 @@ server<-function(input,output,session){
     colnames(taperedshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
   })
   
+  observeEvent(input$taperedadd_button,{
+    #this observes whether the user clicked a button to add a part to the part only shopping cart
+    part <- strsplit(input$taperedadd_button, "_")[[1]][2]
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"tapereddelete_part_button\",  this.id)'))
+    
+    
+    #This determines if there are batches for the part
+    SAP_batches <- tapered_tari_parameter_data$`SAP Batch Number`[tapered_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+    
+    
+    if (length(grep(part, taperedshoppingcartparts$data$"Part")) == 0){
+      taperedshoppingcartparts$data <- rbind(taperedshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+      colnames(taperedshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+    }
+    else{
+      #Do nothing if the part is already there
+    }
+    
+  }) #end observeEvent(input$taperedadd_button)
+  
   
   observeEvent(input$tapereddelete_part_button,{
     #'this observes whether a person deleted a part from the shopping cart. If the button is clicked
     #'all batches associated to the part are removed
     part <- strsplit(input$tapereddelete_part_button, "_")[[1]][2]
     taperedshoppingcart$data <- taperedshoppingcart$data[taperedshoppingcart$data$'Part' != part,]
+    taperedshoppingcartparts$data <- taperedshoppingcartparts$data[taperedshoppingcartparts$data$'Part' != part,]
   })
   
   observeEvent(input$tapereddelete_batch_button,{
@@ -3355,14 +3389,218 @@ server<-function(input,output,session){
     escape = FALSE,
     server = FALSE) #for the shoppingcart
   
+  output$taperedshoppingcartparts <- renderDataTable({
+    #'this is a table that only lists the parts for quick viewing
+    return(taperedshoppingcartparts$data)
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE,
+  options=list(pageLength=5)   # make the shopping cart page shorter
+  ) #for the shoppingcart
+  
 
-  output$downloadTPPSData <- downloadHandler(
+  
+  
+  output$tapereddownloadSPPSData <- downloadHandler(
     #downlaod the data
-    filename = function() { paste0("Tapered PPS Data", ".csv") },
+    filename = function() { paste("tapered-Layer PPS Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(clean_tapered_pps_data$data, file)
+      #I remove the first column so the HTML is not outputed
+      write.csv(clean_tapered_pps_data$data[2:ncol(clean_tapered_pps_data$data)], file)
     }
   )
+  
+  
+  output$tapereddownloadSPPSDataAll <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("tapered PPS Data", '.csv', sep='') },
+    content = function(file) {
+      #I remove the first column so the HTML is not outputed
+      write.csv(tapered_df_output$data[2:ncol(tapered_df_output$data)], file)
+    }
+  )
+  
+  output$taperedshoppingcartpps <- renderDataTable({
+    #this is to render a datatable that has all the PPS information of parts that have been saved
+    #to the shopping cart
+    
+    data <- tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcartparts$data$'Part'),]
+    return(data)
+    
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE
+  )
+  
+  
+  
+  output$taperedcartdownloadpps <- downloadHandler(
+    #downlaod the tapered PPS data from the shopping cart
+    filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
+    content = function(file) {
+      write.csv(tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcart$data$'Part'),], file)
+    }
+  )
+  
+  observeEvent(input$checktaperedtooling,{
+    #this checks all the checkboxes associated with tapered tooling inputs
+    updateCheckboxInput(session, inputId = "PCTB_d", label = "Barrel",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDS_d", label = "Die Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDLL_d", label = "Die Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTTS_d", label = "Tip Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTTLL_d", label = "Tip Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTSP_d", label = "Screw Print",value = TRUE)
+    
+  }) #end obserEvent for input$checktaperedtooling
+  
+  
+  observeEvent(input$unchecktaperedtooling,{
+    #this unchecks all the checkboxes associated with tapered tooling inputs
+    updateCheckboxInput(session, inputId = "PCTB_d", label = "Barrel",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDS_d", label = "Die Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDLL_d", label = "Die Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTTS_d", label = "Tip Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTTLL_d", label = "Tip Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTSP_d", label = "Screw Print",value = FALSE)
+    
+  }) #end obserEvent for input$unchecktaperedtooling
+  
+  
+  observeEvent(input$checktaperedparameters,{
+    #this checks all the checkboxes associated with tapered processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCTFT_d", label = "Feedthroat Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTBZT1_d", label = "Barrel Zone 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTBZT2_d", label = "Barrel Zone 2 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTBZT3_d", label = "Barrel Zone 3 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTCT_d", label = "Clamp Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTAT_d", label = "Adapter Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDT1_d", label = "Die 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDT2_d", label = "Die 2 Temperature F",value = TRUE)
+    
+  }) #end obserEvent for input$checktaperedparameters
+  
+  
+  observeEvent(input$unchecktaperedparameters,{
+    #this unchecks all the checkboxes associated with tapered processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCTFT_d", label = "Feedthroat Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTBZT1_d", label = "Barrel Zone 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTBZT2_d", label = "Barrel Zone 2 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTBZT3_d", label = "Barrel Zone 3 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTCT_d", label = "Clamp Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTAT_d", label = "Adapter Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDT1_d", label = "Die 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDT2_d", label = "Die 2 Temperature F",value = FALSE)
+    
+  }) #end obserEvent for input$unchecktaperedparameters
+  
+  observeEvent(input$checktapereddimensions,{
+    #this checks all the checkboxes associated with tapered dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCTPIDI_d", label = "Proximal Inner Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPODI_d", label = "Proximal Outer Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPWT_d", label = "Proximal Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPOR_d", label = "Proximal Out of Roundness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPCCT_d", label = "Proximal Concentricity (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDIDI_d", label = "Distal Inner Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDODI_d", label = "Distal Outer Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDWT_d", label = "Distal Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDOR_d", label = "Distal Out of Roundness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDCCT_d", label = "Distal Concentricity (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPLength_d", label = "Proximal Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTTLength_d", label = "Transition Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDLength_d", label = "Distal Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTToLength_d", label = "Total Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPPD_d", label = "Perpendicularity (in)",value = TRUE)
+    
+  }) #end obserEvent for input$checktapereddimensions
+  
+  
+  observeEvent(input$unchecktapereddimensions,{
+    #this unchecks all the checkboxes associated with tapered dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCTPIDI_d", label = "Proximal Inner Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPODI_d", label = "Proximal Outer Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPWT_d", label = "Proximal Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPOR_d", label = "Proximal Out of Roundness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPCCT_d", label = "Proximal Concentricity (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDIDI_d", label = "Distal Inner Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDODI_d", label = "Distal Outer Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDWT_d", label = "Distal Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDOR_d", label = "Distal Out of Roundness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDCCT_d", label = "Distal Concentricity (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPLength_d", label = "Proximal Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTTLength_d", label = "Transition Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDLength_d", label = "Distal Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTToLength_d", label = "Total Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPPD_d", label = "Perpendicularity (in)",value = FALSE)
+    
+  }) #end obserEvent for input$unchecktapereddimensions
+  
+  observeEvent(input$checktaperedspecial,{
+    #this checks all the checkboxes associated with tapered special operation inputs
+    updateCheckboxInput(session, inputId = "PCTNEXIV_d", label = "NEXIV",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTAnnealed_d", label = "Annealed",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTCaliper_d", label = "Caliper",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTOS_d", label = "OD Sort",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTMP_d", label = "Melt Pump",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTHT_d", label = "Hypo Tip",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTSPD_d", label = "Sparker Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTSLD_d", label = "Slicking Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDLN_d", label = "Delamination",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTULT_d", label = "Ultrasonic",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTVC_d", label = "Vacuum Calibration",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTIRD_d", label = "Irradiated",value = TRUE)
+    
+  }) #end obserEvent for input$checktaperedspecial
+  
+  
+  observeEvent(input$unchecktaperedspecial,{
+    #this unchecks all the checkboxes associated with tapered special operation inputs
+    updateCheckboxInput(session, inputId = "PCTNEXIV_d", label = "NEXIV",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTAnnealed_d", label = "Annealed",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTCaliper_d", label = "Caliper",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTOS_d", label = "OD Sort",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTMP_d", label = "Melt Pump",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTHT_d", label = "Hypo Tip",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTSPD_d", label = "Sparker Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTSLD_d", label = "Slicking Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDLN_d", label = "Delamination",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTULT_d", label = "Ultrasonic",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTVC_d", label = "Vacuum Calibration",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTIRD_d", label = "Irradiated",value = FALSE)
+    
+  }) #end obserEvent for input$unchecktaperedspecial
+  
+  observeEvent(input$resettaperedinputs,{
+    #this will reset the tapered inputs when clicked
+    #It first removes all the dataframes that have been created, resets the input values,
+    #and then it resets the stack
+    setMDFList(NULL) #resetst the DF list
+    
+    current_inputs <- isolate(tapered_inputs())
+    original_inputs <- getOriginalTIVector()
+    
+    differ_indices <- which(current_inputs != original_inputs)
+    value_names <- names(current_inputs[differ_indices])
+    
+    print(paste0("observeEvent(input$resettaperedinputs): ",value_names))
+    
+    count <- 1
+    #this while loop iterates through all the values that differed
+    while (count < length(value_names) + 1){
+      current_name <- value_names[count]
+      resetTI(current_name)
+      count <- count + 1
+    }#end while
+    
+    setTIStack(c()) #creates an empty stack
+    
+    #sets the data table to the original data set
+    tapered_df_output$data <- tapered_pps_data
+    
+  }) #end obserEvent for input$resettaperedinputs
   
   
   

@@ -1059,6 +1059,11 @@ ui<-navbarPage("Extrusion Application",
                                                             c("All",unique(as.character(single_pps_data$`Screw Print`))))
                                               )))
                                    ),#end Tooling
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checktaperedtooling", "Show All Tooling"),
+                                     actionButton("unchecktaperedtooling", "Hide All Tooling")
+                                   ),
                                    #Processing Attributes
                                    fluidRow(
                                      tags$h1(strong("Processing Attribute"),style="font-size:25px;",align="left"),
@@ -1189,6 +1194,11 @@ ui<-navbarPage("Extrusion Application",
                                                        numericInput("PCTDT2_max",label = NULL,value=PCTDT2max,step=5)
                                                      )
                                               )))), #end Processing Attribute 2
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checktaperedparameters", "Show All Tooling"),
+                                     actionButton("unchecktaperedparameters", "Hide All Tooling")
+                                   ),
                                    #Dimentional Attribute
                                    fluidRow(
                                      tags$h1(strong("Dimentional Attribute"),style="font-size:25px;",align="left"),
@@ -1253,7 +1263,7 @@ ui<-navbarPage("Extrusion Application",
                                                      )
                                               ))),
                                      column(2,
-                                            fluidRow(checkboxInput("PCTPCCT_d","Proximal Concentricity",value=F)),
+                                            fluidRow(checkboxInput("PCTPCCT_d","Proximal Concentricity (in)",value=F)),
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
@@ -1331,7 +1341,7 @@ ui<-navbarPage("Extrusion Application",
                                                      )
                                               ))),
                                      column(2,
-                                            fluidRow(checkboxInput("PCTDCCT_d","Distal Concentricity",value=F)),
+                                            fluidRow(checkboxInput("PCTDCCT_d","Distal Concentricity (in)",value=F)),
                                             fluidRow(
                                               column(6,
                                                      conditionalPanel(
@@ -1420,6 +1430,11 @@ ui<-navbarPage("Extrusion Application",
                                               )))
                                      
                                    ),#end of attribute 3
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checktapereddimensions", "Show All Tooling"),
+                                     actionButton("unchecktapereddimensions", "Hide All Tooling")
+                                   ),
                                    #Special Operation
                                    fluidRow(
                                      tags$h1(strong("Special Operation"),style="font-size:25px;",align="left"),
@@ -1508,13 +1523,20 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCTIRD",label = NULL,choices=c("All","yes","NA"))
                                               )))
                                    ), #end Special Operation
-                                   
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checktaperedspecial", "Show All Tooling"),
+                                     actionButton("unchecktaperedspecial", "Hide All Tooling")
+                                   ),
                                    fluidRow(
                                      DT::dataTableOutput("mytable3")
                                    ),
                                    fluidRow(
-                                     downloadButton('downloadTPPSData','Download Tapered PPS Data')
+                                     downloadButton('tapereddownloadSPPSData','Download Tapered PPS Data'),
+                                     downloadButton('tapereddownloadSPPSDataAll','Download Tapered PPS Data with All Parameters'),
+                                     actionButton('resettaperedinputs', "Reset Tapered Input Parameters")
                                    )
+                                   
                           )#end Tapered Extrusion PPS Data
                ),
                
@@ -1642,6 +1664,11 @@ ui<-navbarPage("Extrusion Application",
                           ),
                           tabPanel("Tapered Extrusion",
                                    fluidRow(
+                                     DT::dataTableOutput("taperedshoppingcartpps"),
+                                     fluidRow(
+                                       downloadButton('taperedcartdownloadpps',
+                                                      'Download Tapered Shopping Cart PPS Data')
+                                     )
                                    )
                           )
                ),
@@ -1665,7 +1692,11 @@ ui<-navbarPage("Extrusion Application",
                                     dataTableOutput("multishoppingcart")
                                     #Multi-layer Extrusion Parts
                            ),
-                           tabPanel("Tapered Extrusion Cart"
+                           tabPanel("Tapered Extrusion Cart",
+                                    textInput("TaperedPartNum_input","Part Number"),
+                                    actionButton("taperedMadd_button","Add"),
+                                    dataTableOutput("taperedshoppingcartparts"),
+                                    dataTableOutput("taperedshoppingcart")
                                     #Tapered Extrusion Parts
                            ),
                            tabPanel("Total Extrusion Cart"
@@ -1676,7 +1707,7 @@ ui<-navbarPage("Extrusion Application",
                          
                          
                  ),
-                 draggable = T,right = 20,top = 100
+                 draggable = F,right = 20,top = 50, fixed = F
                  
                )
 
