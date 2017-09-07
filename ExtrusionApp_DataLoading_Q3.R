@@ -300,31 +300,39 @@ screw_data[is.na(screw_data)]<-""
   #Parameter
 temp=as.data.frame(matrix(0,nrow=nrow(single_tari_parameter_data),ncol=2))
 colnames(temp)=c("Start Date","Start Time")
+# let use has the ability to narrow down the date range by month and day
 temp[,1:2]=str_split_fixed(single_tari_parameter_data$`Start Time`,' ',2)
 temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
+# add the original start time back the its table. it will be used by the data analysis
 single_tari_parameter_data=cbind(single_tari_parameter_data[,1:which(colnames(single_tari_parameter_data)=="Start Time")-1],
                        temp,single_tari_parameter_data[,(which(colnames(single_tari_parameter_data)=="Start Time")+1):ncol(single_tari_parameter_data)],"Start Time"=c(single_tari_parameter_data$`Start Time`))
   #Submitter
 temp=as.data.frame(matrix(0,nrow=nrow(single_tari_submitter_data),ncol=2))
 colnames(temp)=c("Start Date","Start Time")
+# let use has the ability to narrow down the date range by month and day
 temp[,1:2]=str_split_fixed(single_tari_submitter_data$`Start Time`,' ',2)
 temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
+# add the original start time back the its table. it will be used by the data analysis
 single_tari_submitter_data=cbind(single_tari_submitter_data[,1:which(colnames(single_tari_submitter_data)=="Start Time")-1],
                                  temp,single_tari_submitter_data[,(which(colnames(single_tari_submitter_data)=="Start Time")+1):ncol(single_tari_submitter_data)],"Start Time"=c(single_tari_submitter_data$`Start Time`))
 
   #Time
 temp=as.data.frame(matrix(0,nrow=nrow(single_tari_time_data),ncol=2))
 colnames(temp)=c("Start Date","Start Time")
+# let use has the ability to narrow down the date range by month and day
 temp[,1:2]=str_split_fixed(single_tari_time_data$`Start Time`,' ',2)
 temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
+# add the original start time back the its table. it will be used by the data analysis
 single_tari_time_data=cbind(single_tari_time_data[,1:which(colnames(single_tari_time_data)=="Start Time")-1],
                             temp,single_tari_time_data[,(which(colnames(single_tari_time_data)=="Start Time")+1):ncol(single_tari_time_data)],"Start Time"=c(single_tari_time_data$`Start Time`))
 
   #total
 temp=as.data.frame(matrix(0,nrow=nrow(single_tari_total_data),ncol=2))
 colnames(temp)=c("Start Date","Start Time")
+# let use has the ability to narrow down the date range by month and day
 temp[,1:2]=str_split_fixed(single_tari_total_data$`Start Time`,' ',2)
 temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
+# add the original start time back the its table. it will be used by the data analysis
 single_tari_total_data=cbind(single_tari_total_data[,1:which(colnames(single_tari_total_data)=="Start Time")-1],
                              temp,single_tari_total_data[,(which(colnames(single_tari_total_data)=="Start Time")+1):ncol(single_tari_total_data)],"Start Time"=c(single_tari_total_data$`Start Time`))
 
