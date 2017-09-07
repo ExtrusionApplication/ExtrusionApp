@@ -3654,21 +3654,21 @@ server<-function(input,output,session){
   filter = "top")
   
   #Testing the appstats data
-  # output$nexiv <- renderDataTable({
-  #   #This returns the table of the Applied Stats Nexiv Data based on the SAP batch numbers in the
-  #   #shopping cart
-  #   data <- nexiv[nexiv$`Batch #` %in% singleshoppingcart$data$'SAP Batch',]
-  #   return(data)
-  # },
-  # filter = "top")
+  output$nexiv <- renderDataTable({
+    #This returns the table of the Applied Stats Nexiv Data based on the SAP batch numbers in the
+    #shopping cart
+    data <- nexiv[nexiv$`Batch #` %in% singleshoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top")
   
-  # output$laserlinc <- renderDataTable({
-  #   #This returns the table of the Applied Stats laserlinc data based on the SAP batch numbers in the
-  #   #shopping cart
-  #   data <- ll[ll$`Lot Number` %in% singleshoppingcart$data$'SAP Batch',]
-  #   return(data)
-  # },
-  # filter = "top")
+  output$laserlinc <- renderDataTable({
+    #This returns the table of the Applied Stats laserlinc data based on the SAP batch numbers in the
+    #shopping cart
+    data <- laserlinc[laserlinc$`Lot Number` %in% singleshoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top")
   # end Single Extrusion PPS Data Server part and Shopping cart
   
   

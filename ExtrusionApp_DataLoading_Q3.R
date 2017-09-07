@@ -28,6 +28,8 @@ ll2 <- read.csv(test3, header = TRUE, stringsAsFactors = FALSE,
                 check.names = FALSE)
 n2 <- read.csv(test4, header = TRUE, stringsAsFactors = FALSE, 
                check.names = FALSE)
+nexiv <- rbind.fill(n1, n2)
+laserlinc <- rbind.fill(ll1, ll2)
 
 
 #Creating variables across all sessions
