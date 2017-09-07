@@ -1586,7 +1586,7 @@ ui<-navbarPage("Extrusion Application",
                ),
                
                #Tapered Extrusion MES Data table rendering
-               navbarMenu("Single Extrusion MES Data",
+               navbarMenu("Tapered Extrusion MES Data",
                           tabPanel("MES Parameters and Yield",
                                    fluidRow(
                                    )
@@ -1626,19 +1626,19 @@ ui<-navbarPage("Extrusion Application",
                
                
                #Applied Stats Data table rendering
-               # navbarMenu("AppStats Data",
-               #            #Single Extrusion PPS Data
-               #            tabPanel("Nexiv",
-               #                     fluidRow(
-               #                       DT::dataTableOutput("nexiv")
-               #                     )
-               #            ),
-               #            tabPanel("Laserlinc",
-               #                     fluidRow(
-               #                       DT::dataTableOutput("laserlinc")
-               #                     )
-               #            )
-               # ), #end the NavbarMenu
+               navbarMenu("AppStats Data",
+                          #Single Extrusion PPS Data
+                          tabPanel("Nexiv",
+                                   fluidRow(
+                                     DT::dataTableOutput("nexiv")
+                                   )
+                          ),
+                          tabPanel("Laserlinc",
+                                   fluidRow(
+                                     DT::dataTableOutput("laserlinc")
+                                   )
+                          )
+               ), #end the NavbarMenu
                
                
                #Shopping Cart PPS Data table rendering
