@@ -1707,7 +1707,8 @@ ui<-navbarPage("Extrusion Application",
                          
                          
                  ),
-                 draggable = F,right = 20,top = 50, fixed = F
+                 draggable = F,right = 20,top = 50, fixed = F,
+                 style = "z-index = 1000"
                  
                )
 
