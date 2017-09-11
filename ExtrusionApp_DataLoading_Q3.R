@@ -28,48 +28,63 @@ ll2 <- read.csv(test3, header = TRUE, stringsAsFactors = FALSE,
                 check.names = FALSE)
 n2 <- read.csv(test4, header = TRUE, stringsAsFactors = FALSE, 
                check.names = FALSE)
+nexiv <- rbind.fill(n1, n2)
+laserlinc <- rbind.fill(ll1, ll2)
 
 
 #Creating variables across all sessions
 path <- "//Mgrovef1/shared/Operations/EXTRUSIO/Felipe Correa Netto/Extrusion Application/Data/UI Data"
-single_pps_file <- "Single PPS Data Filled GTE.csv"
-#single_tari_file <- "Single Tari Data.csv"
-single_tari_file <- "MES Data_Single Tari Data.csv"
-multi_pps_file <- "Multi-Layered PPS Data Filled GTE.csv"
-tapered_pps_file <- "Tapered PPS Data Filled GTE.csv"
-resin_file <- "Resin Information.csv"
-screw_file <- "Screw Properties.csv"
-parameter_file <- "Single Parameters and Yield.csv"
-time_file <- "Tari Time.csv"
-submitter_file <- "Tari Submitter.csv"
-total_file <- "Tari Total.csv"
+single_pps_file <- "Single PPS Data_UI_30 August 2017.csv"
+multi_pps_file <- "Multi-Layered PPS Data_UI_30 August 2017.csv"
+tapered_pps_file <- "Tapered PPS Data_UI_30 August 2017.csv"
+
+single_parameter_file <- "Single Parameters and Yield.csv"
+single_time_file <- "Single Tari Time.csv"
+single_submitter_file <- "Single Tari Submitter.csv"
+single_total_file <- "Single Tari Total.csv"
+
+multi_parameter_file <- "Multi Parameters and Yield.csv"
+multi_time_file <- "Multi Tari Time.csv"
+multi_submitter_file <- "Multi Tari Submitter.csv"
+multi_total_file <- "Multi Tari Total.csv"
+
+
 scrapcode_file <- "Scrap Codes.csv"
 
+resin_file <- "Resin Information.csv"
+screw_file <- "Screw Properties.csv"
+
 single_pps_pathfile <- paste(path, single_pps_file, sep = "/")
-single_tari_pathfile <- paste(path, single_tari_file, sep = "/")
 multi_pps_pathfile <- paste(path, multi_pps_file, sep = "/")
 tapered_pps_pathfile <- paste(path, tapered_pps_file, sep = "/")
+
+single_parameter_filepath <- paste(path, single_parameter_file, sep = "/")
+single_time_filepath <- paste(path, single_time_file, sep = "/")
+single_submitter_filepath <- paste(path, single_submitter_file, sep = "/")
+single_total_filepath <- paste(path, single_total_file, sep = "/")
+
+multi_parameter_filepath <- paste(path, multi_parameter_file, sep = "/")
+multi_time_filepath <- paste(path, multi_time_file, sep = "/")
+multi_submitter_filepath <- paste(path, multi_submitter_file, sep = "/")
+multi_total_filepath <- paste(path, multi_total_file, sep = "/")
+
+scrapcode_filepath <- paste(path, scrapcode_file, sep = "/")
+
 resin_pathfile <- paste(path, resin_file, sep = "/")
 screw_pathfile <- paste(path, screw_file, sep = "/")
-single_parameter_filepath <- paste(path, parameter_file, sep = "/")
-single_time_filepath <- paste(path, time_file, sep = "/")
-single_submitter_filepath <- paste(path, submitter_file, sep = "/")
-single_total_filepath <- paste(path, total_file, sep = "/")
-scrapcode_filepath <- paste(path, scrapcode_file, sep = "/")
+
+
+###
+
 
 single_pps_data <- read.csv(single_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                             check.names = FALSE)
 single_pps_names <- names(single_pps_data)
-single_tari_data <- read.csv(single_tari_pathfile, header = TRUE, stringsAsFactors = FALSE, 
-                             check.names = FALSE)
 multi_pps_data <- read.csv(multi_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                            check.names = FALSE)
 tapered_pps_data <- read.csv(tapered_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                              check.names = FALSE)
-resin_data <- read.csv(resin_pathfile, header = TRUE, stringsAsFactors = FALSE, 
-                       check.names = FALSE)
-screw_data <- read.csv(screw_pathfile, header = TRUE, stringsAsFactors = FALSE, 
-                       check.names = FALSE)
+
 single_tari_parameter_data <- read.csv(single_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
 single_tari_time_data <- read.csv(single_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
@@ -78,51 +93,27 @@ single_tari_submitter_data <- read.csv(single_submitter_filepath, header = TRUE,
                        check.names = FALSE)
 single_tari_total_data <- read.csv(single_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
+
+multi_tari_parameter_data <- read.csv(multi_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                       check.names = FALSE)
+multi_tari_time_data <- read.csv(multi_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                  check.names = FALSE)
+multi_tari_submitter_data <- read.csv(multi_submitter_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                       check.names = FALSE)
+multi_tari_total_data <- read.csv(multi_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                   check.names = FALSE)
+
+
 scrapcodes_data <- read.csv(scrapcode_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
 
+resin_data <- read.csv(resin_pathfile, header = TRUE, stringsAsFactors = FALSE, 
+                       check.names = FALSE)
+screw_data <- read.csv(screw_pathfile, header = TRUE, stringsAsFactors = FALSE, 
+                       check.names = FALSE)
 
 
-#### Button vectors for PPS documents ####
-
-#getting the single buttons
-count <- 1
-single_buttons_vector <- c(rep(0,nrow(single_pps_data)))
-while (count < nrow(single_pps_data) + 1){
-  #runs through the single PPS and creates a vector of html entries for action buttons for the
-  #single PPS data table.
-  single_buttons_vector[count] <- as.character(
-    actionButton(inputId = paste0("button_", single_pps_data[count,1]),
-                 label = "Add Part",
-                 onclick = 'Shiny.onInputChange(\"singleadd_button\",  this.id)')
-  )
-  
-  count <- count + 1
-}#end single_pps_data buttons
-
-#this then adds the html to the table
-single_pps_data$"" <- single_buttons_vector
-single_pps_data <- single_pps_data[,c(ncol(single_pps_data), 1:(ncol(single_pps_data)-1))]
-
-
-
-
-#getting the multi-layer buttons
-count <- 1
-multi_buttons_vector <- c(rep(0,nrow(multi_pps_data)))
-while (count < nrow(multi_pps_data) + 1){
-  #runs through the multi-layer PPS and creates a vector of html entries for action buttons for the
-  #multi-layer PPS data table.
-  multi_buttons_vector[count] <- as.character(
-    actionButton(inputId = paste0("button_", multi_pps_data[count,1]),
-                 label = "Add Part",
-                 onclick = 'Shiny.onInputChange(\"multiadd_button\",  this.id)')
-  )
-  
-  count <- count + 1
-}#end multi_pps_data buttons
-
-
+###
 
 
 #getting the tapered buttons
@@ -368,3 +359,64 @@ for (i in 1:nrow(multi_pps_data)){
   }
 }
 
+#### Button vectors for PPS documents ####
+
+#getting the single buttons
+count <- 1
+single_buttons_vector <- c(rep(0,nrow(single_pps_data)))
+while (count < nrow(single_pps_data) + 1){
+  #runs through the single PPS and creates a vector of html entries for action buttons for the
+  #single PPS data table.
+  single_buttons_vector[count] <- as.character(
+    actionButton(inputId = paste0("button_", single_pps_data[count,1]),
+                 label = "Add Part",
+                 onclick = 'Shiny.onInputChange(\"singleadd_button\",  this.id)')
+  )
+  
+  count <- count + 1
+}#end single_pps_data buttons
+
+#this then adds the html to the table
+single_pps_data$"" <- single_buttons_vector
+single_pps_data <- single_pps_data[,c(ncol(single_pps_data), 1:(ncol(single_pps_data)-1))]
+
+
+
+
+#getting the multi-layer buttons
+count <- 1
+multi_buttons_vector <- c(rep(0,nrow(multi_pps_data)))
+while (count < nrow(multi_pps_data) + 1){
+  #runs through the multi-layer PPS and creates a vector of html entries for action buttons for the
+  #multi-layer PPS data table.
+  multi_buttons_vector[count] <- as.character(
+    actionButton(inputId = paste0("button_", multi_pps_data[count,1]),
+                 label = "Add Part",
+                 onclick = 'Shiny.onInputChange(\"multiadd_button\",  this.id)')
+  )
+  
+  count <- count + 1
+}#end multi_pps_data buttons
+
+#this then adds the html to the table
+multi_pps_data$"" <- multi_buttons_vector
+multi_pps_data <- multi_pps_data[,c(ncol(multi_pps_data), 1:(ncol(multi_pps_data)-1))]
+
+#getting the tapered-layer buttons
+count <- 1
+tapered_buttons_vector <- c(rep(0,nrow(tapered_pps_data)))
+while (count < nrow(tapered_pps_data) + 1){
+  #runs through the tapered-layer PPS and creates a vector of html entries for action buttons for the
+  #tapered-layer PPS data table.
+  tapered_buttons_vector[count] <- as.character(
+    actionButton(inputId = paste0("button_", tapered_pps_data[count,1]),
+                 label = "Add Part",
+                 onclick = 'Shiny.onInputChange(\"taperedadd_button\",  this.id)')
+  )
+  
+  count <- count + 1
+}#end tapered_pps_data buttons
+
+#this then adds the html to the table
+tapered_pps_data$"" <- tapered_buttons_vector
+tapered_pps_data <- tapered_pps_data[,c(ncol(tapered_pps_data), 1:(ncol(tapered_pps_data)-1))]
