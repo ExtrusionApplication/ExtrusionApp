@@ -1569,37 +1569,41 @@ ui<-navbarPage("Extrusion Application",
                navbarMenu("Multi-Layer Extrusion MES Data",
                           tabPanel("MES Parameters and Yield",
                                    fluidRow(
+                                     DT::dataTableOutput("multiMESparameters")
                                    )
                           ),
                           tabPanel("MES Time Stamps",
                                    fluidRow(
+                                     DT::dataTableOutput("multiMEStime")
                                    )
                           ),
                           tabPanel("MES Submitters",
                                    fluidRow(
+                                     DT::dataTableOutput("multiMESsubmitter")
                                    )
                           ),
                           tabPanel("MES Total",
                                    fluidRow(
+                                     DT::dataTableOutput("multiMEStotal")
                                    )
                           )
                ),
                
                #Tapered Extrusion MES Data table rendering
                navbarMenu("Tapered Extrusion MES Data",
-                          tabPanel("MES Parameters and Yield",
+                          tabPanel("Tapered Parameters and Yield",
                                    fluidRow(
                                    )
                           ),
-                          tabPanel("MES Time Stamps",
+                          tabPanel("Tapered Time Stamps",
                                    fluidRow(
                                    )
                           ),
-                          tabPanel("MES Submitters",
+                          tabPanel("Tapered Submitters",
                                    fluidRow(
                                    )
                           ),
-                          tabPanel("MES Total",
+                          tabPanel("Tapered Total",
                                    fluidRow(
                                    )
                           )
@@ -1616,6 +1620,7 @@ ui<-navbarPage("Extrusion Application",
                           ),
                           tabPanel("Multi-Layer Extrusion",
                                    fluidRow(
+                                     DT::dataTableOutput("multiscrapcodes")
                                    )
                           ),
                           tabPanel("Tapered Extrusion",

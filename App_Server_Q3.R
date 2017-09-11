@@ -3653,6 +3653,49 @@ server<-function(input,output,session){
   },
   filter = "top")
   
+  
+  output$multiMESparameters <- renderDataTable({
+    #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
+    #in the shopping cart
+    data <- multi_tari_parameter_data[multi_tari_parameter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top")
+  
+  output$multiMEStime <- renderDataTable({
+    #This returns the table of the MES input times based on the SAP batch numbers in the
+    #shopping cart
+    data <- multi_tari_time_data[multi_tari_time_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top")
+  
+  output$multiMESsubmitter <- renderDataTable({
+    #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
+    #shopping cart
+    data <- multi_tari_submitter_data[multi_tari_submitter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top")
+  
+  output$multiMEStotal <- renderDataTable({
+    #This returns the table of all MES inputs based on the SAP batch numbers in the
+    #shopping cart
+    data <- multi_tari_total_data[multi_tari_total_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top")
+  
+  output$multiscrapcodes <- renderDataTable({
+    #This returns the table of SAP scrap codes based on the SAP batch numbers in the
+    #shopping cart
+    data <- scrapcodes_data[scrapcodes_data$Order %in% multishoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top")
+  
+  
+  
   #Testing the appstats data
   output$nexiv <- renderDataTable({
     #This returns the table of the Applied Stats Nexiv Data based on the SAP batch numbers in the
