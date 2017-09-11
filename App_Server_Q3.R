@@ -13,6 +13,11 @@ server<-function(input,output,session){
   #' 4) The multi layered extrusion data set cleaning
   #' 5) The tapered extrusion data set cleaning
   
+  
+  
+  
+  #### Single PPS  ####
+  
   generateNewDF <- function(df, index_name, value){
     #this determines whether the index is max, min, or other. And then it cleans up the df based
     #on that and generates a new clean df
@@ -23,8 +28,9 @@ server<-function(input,output,session){
       parameter_name <- gsub(" Min", "", index_name)
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
-      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      column_index <- grep(paste0("^",parameter_name), names(df), ignore.case = TRUE)
       
       new_df <- df[df[,column_index] >= value,]
       return(new_df)
@@ -36,9 +42,10 @@ server<-function(input,output,session){
       parameter_name <- gsub(" Max", "", index_name)
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
       
-      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      column_index <- grep(paste0("^",parameter_name), names(df), ignore.case = TRUE)
       
       new_df <- df[df[,column_index] <= value,]
       return(new_df)
@@ -50,8 +57,9 @@ server<-function(input,output,session){
       parameter_name <- index_name
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
-      column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      column_index <- grep(paste0("^",parameter_name), names(df), ignore.case = TRUE)
       
       if (value == "All"){
         #if 'All' is selected
@@ -68,9 +76,6 @@ server<-function(input,output,session){
     
   }#end generateNewDf
   
-  
-  #### Single PPS  ####
-  
   e1 <- new.env(
     #This environment will store variable of inputs and stack that are used for comparison
     #of the input parameters that have been selected and changed
@@ -81,7 +86,7 @@ server<-function(input,output,session){
   
   #the assign will initialize the siidvector
   assign("siidvector", 
-         c("PCSPN", "PCSPD", "PCSRN", "PCSRD", "PCSPPSN", 
+         c("Placeholder", "PCSPN", "PCSPD", "PCSRN", "PCSRD", "PCSPPSN", 
            "PCSDS_min", "PCSDS_max", "PCSDLL", "PCSTS_min", "PCSTS_max",
            "PCSTLL", "PCSSP", 
            "PCSFT_min", "PCSFT_max", "PCSBZT1_min", "PCSBZT1_max",
@@ -209,6 +214,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) == 0){
       #the name is not currently in the stack
@@ -232,6 +238,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) != 0){
       #the name is not currently in the stack
@@ -518,6 +525,7 @@ server<-function(input,output,session){
     
     grepname <- gsub("\\(", "\\\\(", checkbox_name)
     grepname <- gsub("\\)", "\\\\)", grepname)
+    grepname <- paste0("^", grepname) #must start with it to avoid mis matches
     
     inputs <- names(isolate(single_inputs()))
     input_ids <- getSIIDVector()
@@ -586,7 +594,8 @@ server<-function(input,output,session){
     #'It does not check to see if the input has been selected, but rather, if the user has changed
     #'the search input.'
     
-    print("Input Observed")
+    print("observeEvent(single_inputs()): Input Observed")
+    
     
     if (exists("sivector", e1)){
       #checks to see if the vector has been created yet. This is to prevent the initialization
@@ -600,9 +609,17 @@ server<-function(input,output,session){
       #grep 'FALSE' will find that index.
       index_differ <- grep("FALSE", (current_sivector == old_sivector))
       
+      print(paste0("observeEvent(single_inputs()): The index differ is ", index_differ))
+      
       if (length(index_differ) == 0){
         #Nothing will be analyzed
-        print("A parameter was changed but the value was changed to what the previous value was")
+        print("observeEvent(single_inputs()): A parameter was changed but the value was changed to what the previous value was")
+      }
+      else if (length(index_differ) > 1){
+        #this means the values are being reset because a checkbox was unchecked for a max and min value
+        print("observeEvent(single_inputs()): The checkbox was unchecked")
+        #then do nothing because the values should not go in the stack
+        
       }
       else{
         
@@ -620,6 +637,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name) #must start with it to avoid mis matches
           
           stack_index <- grep(updated_index_name, current_sistack) #gets the index in the stack
           
@@ -667,7 +685,10 @@ server<-function(input,output,session){
       index_differ <- grep("FALSE", (current_scbvector == old_scbvector))
 
       if (length(index_differ) == 0){
-        #Nothing will be analyzed since the value was changed to TRUE
+        #Nothing will be analyzed since the value was not changed
+      }
+      else if (length(index_differ) > 1){
+        #multiple selected or deselected, so do nothing
       }
       else{
         
@@ -691,6 +712,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name)
 
           stack_index <- grep(updated_index_name, current_sistack) #gets the index in the stack
 
@@ -740,13 +762,14 @@ server<-function(input,output,session){
 
 
   # obtain the output of checkbox from functions and make a list to store them----Single Extrusion PPS Data
-  show_vars1<-reactive({
-    checkboxes <- as.numeric(c(input$PCSPN_d,input$PCSPD_d,input$PCSRN_d,input$PCSRD_d,input$PCSPPSN_d,input$PCSDS_d,input$PCSDLL_d,input$PCSTS_d,input$PCSTLL_d,input$PCSSP_d,input$PCSFT_d,
+  show_vars1 <- reactive({
+    #'Placholder' is for the action buttons. It is fiven a value of true so it is always displayed
+    checkboxes <- as.numeric(c(TRUE, input$PCSPN_d,input$PCSPD_d,input$PCSRN_d,input$PCSRD_d,input$PCSPPSN_d,input$PCSDS_d,input$PCSDLL_d,input$PCSTS_d,input$PCSTLL_d,input$PCSSP_d,input$PCSFT_d,
                  input$PCSBZT1_d,input$PCSBZT2_d,input$PCSBZT3_d,input$PCSCT_d,input$PCSAT_d,input$PCSDT1_d,input$PCSDT2_d,input$PCSIDI_d,input$PCSODI_d,input$PCSWT_d,
                  input$PCSOR_d,input$PCSCCT_d,input$PCSLength_d,input$PCSPPD_d,input$PCSNEXIV_d,input$PCSAnnealed_d,input$PCSCaliper_d,input$PCSOS_d,input$PCSMP_d,input$PCSHT_d,
                  input$PCSSPD_d,input$PCSSLD_d,input$PCSDLN_d,input$PCSULT_d,input$PCSVC_d,input$PCSIRD_d))
 
-    names(checkboxes) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(checkboxes) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
                            "PPS Number",
                            "Die Size (in)", "Die Land Length (in)",
                            "Tip Size (in)", "Tip Land Length (in)", "Screw Print",
@@ -768,7 +791,8 @@ server<-function(input,output,session){
   #this variable will store all the inputs of the single extrusions
   single_inputs <- reactive({
     #this variable will store all the inputs of of the single extrusions
-    inputs <- c(input$PCSPN, input$PCSPD, input$PCSRN, input$PCSRD, input$PCSPPSN, 
+    #'Placholder' is for the action buttons.
+    inputs <- c("Placeholder", input$PCSPN, input$PCSPD, input$PCSRN, input$PCSRD, input$PCSPPSN, 
                    input$PCSDS_min, input$PCSDS_max, input$PCSDLL, input$PCSTS_min, input$PCSTS_max,
                    input$PCSTLL, input$PCSSP, 
                    input$PCSFT_min, input$PCSFT_max, input$PCSBZT1_min, input$PCSBZT1_max,
@@ -783,10 +807,10 @@ server<-function(input,output,session){
                    input$PCSMP, input$PCSHT, input$PCSSPD, input$PCSSLD, input$PCSDLN, input$PCSULT,
                    input$PCSVC, input$PCSIRD
                    )
-    names(inputs) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(inputs) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
                        "PPS Number",
-                       "Die Size (in) Min", "Die Size (in) Max", "Die Land (in) Length", 
-                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land (in) Length", "Screw Print",
+                       "Die Size (in) Min", "Die Size (in) Max", "Die Land Length (in)", 
+                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land Length (in)", "Screw Print",
                        "Feedthroat Temperature  F Min", "Feedthroat Temperature  F Max",
                        "Barrel Zone 1 Temperature  F Min", "Barrel Zone 1 Temperature  F Max",
                        "Barrel Zone 2 Temperature  F Min", "Barrel Zone 2 Temperature  F Max",
@@ -810,29 +834,16 @@ server<-function(input,output,session){
   
   
   output$mytable1 <- DT::renderDataTable({
-    DT::datatable({
       
-      Col_PCS=c() #initialized the variable
+      Col_PCS <- which (1 == show_vars1())
       
-      col_var1=show_vars1()
-      col_var1 = c(1,col_var1) #because the first column is the buttons, this makes sure it is true
-      for (i in 1:length(col_var1)){
-        #this will go through col_var1 and determine which parameters have been checked
-        #only the parameters that have been checked will be displayed on the table
-        if (col_var1[i]!=0){
-          Col_PCS=c(Col_PCS,i)
-        }
-      }
-      
-      data_PCS <- isolate(single_df_output$data) #the data frame is set
+      data_PCS <- single_df_output$data #the data frame is set
       data_PCS <- data_PCS[,Col_PCS] #only get the columns that have been checked
       
       clean_single_pps_data$data <- data_PCS #assign the clean table to the data that is available
       #for downloading
       
       return(data_PCS)
-    }
-    )
   },
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',
@@ -871,7 +882,7 @@ server<-function(input,output,session){
   singleshoppingcartparts <- reactiveValues(
     #'this will hold only a list of parts, this way it is easier for users to look at all the parts
     #'when there are two many batches in the shopping cart.
-    data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
+    data = data.frame("Part" = numeric(0), "Batches?" = numeric(0), "Delete Part" = numeric(0),
                       stringsAsFactors = FALSE,
                       check.names = FALSE)
   )
@@ -880,7 +891,7 @@ server<-function(input,output,session){
     #this observes whether the user clicked a button to add a part to the shopping cart
     #get the part
     part <- strsplit(input$singleadd_button, "_")[[1]][2]
-    print(part)
+    print(paste0("observeEvent(input$singleadd_button): ", part))
     
     #Action button to delete part
     deletepart <- as.character(
@@ -893,6 +904,8 @@ server<-function(input,output,session){
     numberofbatches <- length(SAP_batches)
     
     #Action button to delete batch
+    #' if there are not batches the part will not be added to this shopping cart table but will
+    #' be added to the part
     batch_count <- 1
     vectorofbuttons <- c(rep(0, length(SAP_batches)))
     
@@ -911,8 +924,16 @@ server<-function(input,output,session){
     new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
     
     colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
-    singleshoppingcart$data <- rbind(singleshoppingcart$data, new_data, stringsAsFactors = FALSE)
-    colnames(singleshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    
+    if (length(grep(part, singleshoppingcart$data$"Part")) == 0){
+      singleshoppingcart$data <- rbind(singleshoppingcart$data, new_data, stringsAsFactors = FALSE)
+      colnames(singleshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    }
+    else{
+      #Do nothing if the part is already there
+    }
+    
+    
   })
   
   observeEvent(input$singleadd_button,{
@@ -925,11 +946,37 @@ server<-function(input,output,session){
                    label = "Delete Part",
                    onclick = 'Shiny.onInputChange(\"singledelete_part_button\",  this.id)'))
     
-    new_data <- cbind(part, deletepart)
     
-    colnames(new_data) <- c("Part", "Delete Part")
-    singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
-    colnames(singleshoppingcartparts$data) <- c("Part", "Delete Part")
+    #This determines if there are batches for the part
+    SAP_batches <- single_tari_parameter_data$`SAP Batch Number`[single_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+    
+    
+    if (length(grep(part, singleshoppingcartparts$data$"Part")) == 0){
+      singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+      colnames(singleshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+    }
+    else{
+      #Do nothing if the part is already there
+      showModal(modalDialog(
+        title = "Add Part Number",
+        "The part is already in the shopping cart",
+        easyClose = T
+      ))
+    }
+    
   })
   
   
@@ -978,7 +1025,17 @@ server<-function(input,output,session){
     #downlaod the data
     filename = function() { paste("Single PPS Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(clean_single_pps_data$data, file)
+      #I remove the first column so the HTML is not outputed
+      write.csv(clean_single_pps_data$data[2:ncol(clean_single_pps_data$data)], file)
+    }
+  )
+  
+  output$singledownloadSPPSDataAll <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Single PPS Data", '.csv', sep='') },
+    content = function(file) {
+      #I remove the first column so the HTML is not outputed
+      write.csv(single_df_output$data[2:ncol(single_df_output$data)], file)
     }
   )
   
@@ -986,7 +1043,7 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcart$data$'Part'),]
+    data <- single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcartparts$data$'Part'),]
     return(data)
     
   },
@@ -1005,6 +1062,144 @@ server<-function(input,output,session){
       write.csv(single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcart$data$'Part'),], file)
     }
   )
+  
+  observeEvent(input$checksingletooling,{
+    #this checks all the checkboxes associated with single tooling inputs
+    updateCheckboxInput(session, inputId = "PCSDS_d", label = "Die Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSDLL_d", label = "Die Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSTS_d", label = "Tip Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSTLL_d", label = "Tip Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSSP_d", label = "Screw Print",value = TRUE)
+    
+  }) #end obserEvent for input$checksingletooling
+  
+  
+  observeEvent(input$unchecksingletooling,{
+    #this unchecks all the checkboxes associated with single tooling inputs
+    updateCheckboxInput(session, inputId = "PCSDS_d", label = "Die Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSDLL_d", label = "Die Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSTS_d", label = "Tip Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSTLL_d", label = "Tip Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSSP_d", label = "Screw Print",value = FALSE)
+    
+  }) #end obserEvent for input$unchecksingletooling
+  
+  
+  observeEvent(input$checksingleparameters,{
+    #this checks all the checkboxes associated with single processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCSFT_d", label = "Feedthroat Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSBZT1_d", label = "Barrel Zone 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSBZT2_d", label = "Barrel Zone 2 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSBZT3_d", label = "Barrel Zone 3 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSCT_d", label = "Clamp Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSAT_d", label = "Adapter Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSDT1_d", label = "Die 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSDT2_d", label = "Die 2 Temperature F",value = TRUE)
+    
+  }) #end obserEvent for input$checksingleparameters
+  
+  
+  observeEvent(input$unchecksingleparameters,{
+    #this unchecks all the checkboxes associated with single processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCSFT_d", label = "Feedthroat Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSBZT1_d", label = "Barrel Zone 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSBZT2_d", label = "Barrel Zone 2 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSBZT3_d", label = "Barrel Zone 3 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSCT_d", label = "Clamp Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSAT_d", label = "Adapter Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSDT1_d", label = "Die 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSDT2_d", label = "Die 2 Temperature F",value = FALSE)
+    
+  }) #end obserEvent for input$unchecksingleparameters
+  
+  observeEvent(input$checksingledimensions,{
+    #this checks all the checkboxes associated with single dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCSIDI_d", label = "Inner Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSODI_d", label = "Outer Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSWT_d", label = "Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSOR_d", label = "Out of Roundness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSCCT_d", label = "Concentricity",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSLength_d", label = "Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSPPD_d", label = "Perpendicularity (in)",value = TRUE)
+    
+  }) #end obserEvent for input$checksingledimensions
+  
+  
+  observeEvent(input$unchecksingledimensions,{
+    #this unchecks all the checkboxes associated with single dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCSIDI_d", label = "Inner Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSODI_d", label = "Outer Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSWT_d", label = "Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSOR_d", label = "Out of Roundness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSCCT_d", label = "Concentricity",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSLength_d", label = "Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSPPD_d", label = "Perpendicularity (in)",value = FALSE)
+    
+  }) #end obserEvent for input$unchecksingledimensions
+  
+  observeEvent(input$checksinglespecial,{
+    #this checks all the checkboxes associated with single special operation inputs
+    updateCheckboxInput(session, inputId = "PCSNEXIV_d", label = "NEXIV",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSAnnealed_d", label = "Annealed",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSCaliper_d", label = "Caliper",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSOS_d", label = "OD Sort",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSMP_d", label = "Melt Pump",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSHT_d", label = "Hypo Tip",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSSPD_d", label = "Sparker Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSSLD_d", label = "Slicking Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSDLN_d", label = "Delamination",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSULT_d", label = "Ultrasonic",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSVC_d", label = "Vacuum Calibration",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSIRD_d", label = "Irradiated",value = TRUE)
+    
+  }) #end obserEvent for input$checksinglespecial
+  
+  
+  observeEvent(input$unchecksinglespecial,{
+    #this unchecks all the checkboxes associated with single special operation inputs
+    updateCheckboxInput(session, inputId = "PCSNEXIV_d", label = "NEXIV",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSAnnealed_d", label = "Annealed",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSCaliper_d", label = "Caliper",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSOS_d", label = "OD Sort",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSMP_d", label = "Melt Pump",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSHT_d", label = "Hypo Tip",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSSPD_d", label = "Sparker Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSSLD_d", label = "Slicking Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSDLN_d", label = "Delamination",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSULT_d", label = "Ultrasonic",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSVC_d", label = "Vacuum Calibration",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSIRD_d", label = "Irradiated",value = FALSE)
+    
+  }) #end obserEvent for input$unchecksinglespecial
+  
+  observeEvent(input$resetsingleinputs,{
+    #this will reset the single inputs when clicked
+    #It first removes all the dataframes that have been created, resets the input values,
+    #and then it resets the stack
+    setSDFList(NULL) #resetst the DF list
+    
+    current_inputs <- isolate(single_inputs())
+    original_inputs <- getOriginalSIVector()
+    
+    differ_indices <- which(current_inputs != original_inputs)
+    value_names <- names(current_inputs[differ_indices])
+    
+    print(paste0("observeEvent(input$resetsingleinputs): ",value_names))
+    
+    count <- 1
+    #this while loop iterates through all the values that differed
+    while (count < length(value_names) + 1){
+      current_name <- value_names[count]
+      resetSI(current_name)
+      count <- count + 1
+    }#end while
+    
+    setSIStack(c()) #creates an empty stack
+    
+    #sets the data table to the original data set
+    single_df_output$data <- single_pps_data
+    
+  }) #end obserEvent for input$resetsingleinputs
      
   
   
@@ -1021,6 +1216,7 @@ server<-function(input,output,session){
       parameter_name <- gsub(" Min", "", index_name)
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
       column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
       
@@ -1038,11 +1234,13 @@ server<-function(input,output,session){
       parameter_name <- gsub(" Max", "", index_name)
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
-      
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
       column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
       
-      middle_df <- df[df[,column_index] <= value,]
+      clean_df <- df[df[,column_index] != "", ] #this removes blanks
+      
+      middle_df <- clean_df[clean_df[,column_index] <= value,]
       
       part_numbers <- middle_df[,"Part Number"]#then it gets the unique part numbers
       new_df <- df[df[,"Part Number"] %in% part_numbers,]#then it cleans up the original df
@@ -1056,8 +1254,12 @@ server<-function(input,output,session){
       parameter_name <- index_name
       parameter_name <- gsub("\\(", "\\\\(", parameter_name)
       parameter_name <- gsub("\\)", "\\\\)", parameter_name)
+      parameter_name <- paste0("^", parameter_name) #must start with it to avoid mis matches
       
       column_index <- grep(parameter_name, names(df), ignore.case = TRUE)
+      
+      print(parameter_name)
+      print(column_index)
       
       if (value == "All"){
         #if 'All' is selected
@@ -1086,7 +1288,7 @@ server<-function(input,output,session){
   
   #the assign will initialize the miidvector
   assign("miidvector", 
-         c("PCMPN", "PCMPD", "PCMRN", "PCMRD", "PCMPPSN", 
+         c("Placeholder", "PCMPN", "PCMPD", "PCMRN", "PCMRD", "PCMPPSN", 
            "PCMDS_min", "PCMDS_max", "PCMDLL", "PCMTS_min", "PCMTS_max",
            "PCMTLL", "PCMSP", 
            "PCMFT_min", "PCMFT_max", "PCMBZT1_min", "PCMBZT1_max",
@@ -1143,22 +1345,22 @@ server<-function(input,output,session){
     
   } #end getMCBVector
   
-  setOriginalMCBVector <- function(vector){
+  setOriginalMIVector <- function(vector){
     #this sets the values for the original min and max input values
-    assign("originalmcbvector", vector, env = e2)
-  } #end setOriginalMCBVector
+    assign("originalmivector", vector, env = e2)
+  } #end setOriginalMIVector
   
-  getOriginalMCBVector <- function(vector){
+  getOriginalMIVector <- function(vector){
     #this gets the values for the original min and max input values
     
-    if(exists("originalmcbvector", e2)){
-      return(get("originalmcbvector", e2))
+    if(exists("originalmivector", e2)){
+      return(get("originalmivector", e2))
     }
     else{
       return(NA)
     }
     
-  } #end getOriginalMCBVector
+  } #end getOriginalMIVector
   
   setMIVector <- function(vector){
     #this sets the values for the multi input vector
@@ -1217,6 +1419,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) == 0){
       #the name is not currently in the stack
@@ -1240,6 +1443,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) != 0){
       #the name is not currently in the stack
@@ -1527,10 +1731,11 @@ server<-function(input,output,session){
     
     grepname <- gsub("\\(", "\\\\(", checkbox_name)
     grepname <- gsub("\\)", "\\\\)", grepname)
+    grepname <- paste0("^", grepname) #must start with it to avoid mis matches
     
     inputs <- names(isolate(multi_inputs()))
     input_ids <- getMIIDVector()
-    original_inputs <- getOriginalMCBVector()
+    original_inputs <- getOriginalMIVector()
     print(original_inputs)
     
     input_indices <- grep(grepname, inputs)
@@ -1595,7 +1800,7 @@ server<-function(input,output,session){
     #'It does not check to see if the input has been selected, but rather, if the user has changed
     #'the search input.'
     
-    print("Input Observed")
+    print("observeEvent(multi_inputs()): Input Observed")
     
     if (exists("mivector", e2)){
       #checks to see if the vector has been created yet. This is to prevent the initialization
@@ -1612,6 +1817,13 @@ server<-function(input,output,session){
       if (length(index_differ) == 0){
         #Nothing will be analyzed
         print("A parameter was changed but the value was changed to what the previous value was")
+        
+      }
+      else if (length(index_differ) > 1){
+        #this means the values are being reset because a checkbox was unchecked for a max and min value
+        print("observeEvent(multi_inputs()): The checkbox was unchecked")
+        #then do nothing because the values should not go in the stack
+        
       }
       else{
         
@@ -1629,6 +1841,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name) #must start with it to avoid mis matches
           
           stack_index <- grep(updated_index_name, current_mistack) #gets the index in the stack
           
@@ -1650,8 +1863,6 @@ server<-function(input,output,session){
       #if it has not been created, it sets the vector and stack
       #this is mainly to initialize data. The df_list does not need to be initialize as that is done
       #in the addMDFSeries()
-      
-      print("observeEvent(multi_inputs): The multi_input vector does not exist.")
       
       setMIVector(multi_inputs())
       setMIStack(c()) #creates an empty stack since no parameters have been changed yet
@@ -1680,6 +1891,9 @@ server<-function(input,output,session){
       if (length(index_differ) == 0){
         #Nothing will be analyzed since the value was changed to TRUE
       }
+      else if (length(index_differ) > 1){
+        #multiple selected or deselected, so do nothing
+      }
       else{
         
         print("observeEvent(show_vars2): The Checkbox Index_Differ Worked")
@@ -1702,6 +1916,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name) #must start with it to avoid mis matches
           
           stack_index <- grep(updated_index_name, current_mistack) #gets the index in the stack
           
@@ -1740,7 +1955,7 @@ server<-function(input,output,session){
       #if it has not been created, it sets the vector
       #this is mainly to initialize data.
       
-      setOriginalMCBVector(multi_inputs()) #initialize the original values
+      setOriginalMIVector(multi_inputs()) #initialize the original values
       setMCBVector(show_vars2()) #initialize the input values that will be changing with the app
       
     } #end if-else for scbvector existing
@@ -1755,7 +1970,7 @@ server<-function(input,output,session){
 
   show_vars2<-reactive({
     
-    checkboxes2 <- as.numeric(c(input$PCMPN_d,input$PCMPD_d,input$PCMRN_d,input$PCMRD_d,
+    checkboxes2 <- as.numeric(c(TRUE, input$PCMPN_d,input$PCMPD_d,input$PCMRN_d,input$PCMRD_d,
                                input$PCMPPSN_d, input$PCMET_d, input$PCMB_d,
                                input$PCMDS_d,input$PCMDLL_d,input$PCMTS_d,
                                input$PCMTLL_d,input$PCMSP_d,input$PCMFT_d,
@@ -1768,7 +1983,7 @@ server<-function(input,output,session){
                                input$PCMHT_d,input$PCMSPD_d,input$PCMSLD_d,input$PCMDLN_d,
                                input$PCMULT_d,input$PCMVC_d,input$PCMIRD_d))
     
-    names(checkboxes2) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(checkboxes2) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
                            "PPS Number", "Extrusion Type", "Barrel",
                            "Die Size (in)", "Die Land Length (in)",
                            "Tip Size (in)", "Tip Land Length (in)", "Screw Print",
@@ -1794,7 +2009,7 @@ server<-function(input,output,session){
   #this variable will store all the inputs of the multi extrusions
   multi_inputs <- reactive({
     #this variable will store all the inputs of of the multi extrusions
-    inputs2 <- c(input$PCMPN, input$PCMPD, input$PCMRN, input$PCMRD, input$PCMPPSN, 
+    inputs2 <- c("Placeholder", input$PCMPN, input$PCMPD, input$PCMRN, input$PCMRD, input$PCMPPSN, 
                 input$PCMDS_min, input$PCMDS_max, input$PCMDLL, input$PCMTS_min, input$PCMTS_max,
                 input$PCMTLL, input$PCMSP, 
                 input$PCMFT_min, input$PCMFT_max, input$PCMBZT1_min, input$PCMBZT1_max,
@@ -1813,10 +2028,10 @@ server<-function(input,output,session){
                 input$PCMMP, input$PCMHT, input$PCMSPD, input$PCMSLD, input$PCMDLN, input$PCMULT,
                 input$PCMVC, input$PCMIRD)
     
-    names(inputs2) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(inputs2) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
                        "PPS Number",
-                       "Die Size (in) Min", "Die Size (in) Max", "Die Land (in) Length", 
-                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land (in) Length", "Screw Print",
+                       "Die Size (in) Min", "Die Size (in) Max", "Die Land Length (in)", 
+                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land Length(in)", "Screw Print",
                        "Feedthroat Temperature  F Min", "Feedthroat Temperature  F Max",
                        "Barrel Zone 1 Temperature  F Min", "Barrel Zone 1 Temperature  F Max",
                        "Barrel Zone 2 Temperature  F Min", "Barrel Zone 2 Temperature  F Max",
@@ -1842,27 +2057,10 @@ server<-function(input,output,session){
   
   
   
-  #All Table Filter works are done below, and output a modified talbe. This table will be used by the renderdatatable, and download button
-  datasetInput<-reactive({
-    col_var2=show_vars2()
-    for (i in 1:length(col_var2)){
-      if (col_var2[i]!=0){
-        Col_PCM=c(Col_PCM,i) # obtain the selected columns' number
-      }
-    } 
-    data_PCM<-multi_pps_data[,Col_PCM]
-    data_PCM
-  })
   output$mytable2 <- DT::renderDataTable({
     DT::datatable({
-
-      Col_PCM=c()
-      col_var2=show_vars2()
-      for (i in 1:length(col_var2)){
-        if (col_var2[i]!=0){
-          Col_PCM=c(Col_PCM,i)
-        }
-      } 
+      
+      Col_PCM <- which(1 == show_vars2())
   
       data_PCM <- multi_df_output$data #the data frame is set
       data_PCM<-data_PCM[,Col_PCM]
@@ -1870,22 +2068,6 @@ server<-function(input,output,session){
       clean_multi_pps_data$data <- data_PCM #assign the clean table to the data that is available
       #for downloading
       
-      rows <- nrow(data_PCM)
-      vectorofbuttons <- c(rep(0, rows))
-      row_count <- 1
-      
-      while(row_count < rows + 1){
-        #this creates a vector of html action buttons to add to the table
-        vectorofbuttons[row_count] <- as.character(
-          actionButton(inputId = paste0("button_", data_PCM[row_count,1]),
-                       label = "Add Part",
-                       onclick = 'Shiny.onInputChange(\"add_button\",  this.id)')
-        )
-        row_count <- row_count + 1
-      } #end while adding the html stuff
-      
-      data_PCM$"" <- vectorofbuttons
-      data_PCM <- data_PCM[,c(ncol(data_PCM), 1:(ncol(data_PCM)-1))]
       
       return(data_PCM)
 
@@ -1915,6 +2097,16 @@ server<-function(input,output,session){
   
   
   multishoppingcart <- reactiveValues(
+    #this is a shopping cart to hold all the multi extrusion parts and SAP batches that a user wants.
+    #this is linked to the output data, so only the output data located of the associated batches 
+    #in the shopping cart is displayed
+    data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
+                      "SAP Batch" = numeric(0), "Delete Batch" = numeric(0),
+                      stringsAsFactors = FALSE,
+                      check.names = FALSE)
+  ) #end multishoppingcart
+  
+  multishoppingcartparts <- reactiveValues(
     #this is a shopping cart to hold all the multi extrusion parts and SAP batches that a user wants.
     #this is linked to the output data, so only the output data located of the associated batches 
     #in the shopping cart is displayed
@@ -1959,9 +2151,54 @@ server<-function(input,output,session){
     new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
     
     colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
-    multishoppingcart$data <- rbind(multishoppingcart$data, new_data, stringsAsFactors = FALSE)
-    colnames(multishoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
-  })
+    
+    
+    if (length(grep(part, singleshoppingcart$data$"Part")) == 0){
+      multishoppingcart$data <- rbind(multishoppingcart$data, new_data, stringsAsFactors = FALSE)
+      colnames(multishoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    }
+    else{
+      #Do nothing if the part is already there
+    }
+  }) #End observeEvent(input$multiadd_button)
+  
+  observeEvent(input$multiadd_button,{
+    #this observes whether the user clicked a button to add a part to the part only shopping cart
+    part <- strsplit(input$multiadd_button, "_")[[1]][2]
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"multidelete_part_button\",  this.id)'))
+    
+    
+    #This determines if there are batches for the part
+    SAP_batches <- multi_tari_parameter_data$`SAP Batch Number`[multi_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+    
+    
+    if (length(grep(part, multishoppingcartparts$data$"Part")) == 0){
+      multishoppingcartparts$data <- rbind(multishoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+      colnames(multishoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+    }
+    else{
+      #Do nothing if the part is already there
+    }
+    
+  }) #end observeEvent(input$multiadd_button)
   
   
   observeEvent(input$multidelete_part_button,{
@@ -1969,6 +2206,7 @@ server<-function(input,output,session){
     #'all batches associated to the part are removed
     part <- strsplit(input$multidelete_part_button, "_")[[1]][2]
     multishoppingcart$data <- multishoppingcart$data[multishoppingcart$data$'Part' != part,]
+    multishoppingcartparts$data <- multishoppingcartparts$data[multishoppingcartparts$data$'Part' != part,]
   })
   
   observeEvent(input$multidelete_batch_button,{
@@ -1989,14 +2227,210 @@ server<-function(input,output,session){
     escape = FALSE,
     server = FALSE) #for the shoppingcart
   
-  output$downloadMPPSData <- downloadHandler(
+  output$multishoppingcartparts <- renderDataTable({
+    #'this is a table that only lists the parts for quick viewing
+    return(multishoppingcartparts$data)
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE,
+  options=list(pageLength=5)   # make the shopping cart page shorter
+  ) #for the shoppingcart
+  
+  
+  output$multidownloadSPPSData <- downloadHandler(
     #downlaod the data
     filename = function() { paste("Multi-Layer PPS Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(clean_multi_pps_data$data, file)
+      #I remove the first column so the HTML is not outputed
+      write.csv(clean_multi_pps_data$data[2:ncol(clean_multi_pps_data$data)], file)
+    }
+  )
+
+  
+  output$multidownloadSPPSDataAll <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Multi PPS Data", '.csv', sep='') },
+    content = function(file) {
+      #I remove the first column so the HTML is not outputed
+      write.csv(multi_df_output$data[2:ncol(multi_df_output$data)], file)
     }
   )
   
+  output$multishoppingcartpps <- renderDataTable({
+    #this is to render a datatable that has all the PPS information of parts that have been saved
+    #to the shopping cart
+    
+    data <- multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcartparts$data$'Part'),]
+    return(data)
+    
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE
+  )
+  
+  
+  
+  output$multicartdownloadpps <- downloadHandler(
+    #downlaod the multi PPS data from the shopping cart
+    filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
+    content = function(file) {
+      write.csv(multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcart$data$'Part'),], file)
+    }
+  )
+  
+  observeEvent(input$checkmultitooling,{
+    #this checks all the checkboxes associated with multi tooling inputs
+    updateCheckboxInput(session, inputId = "PCMB_d", label = "Barrel",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMDS_d", label = "Die Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMDLL_d", label = "Die Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMTS_d", label = "Tip Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMTLL_d", label = "Tip Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMSP_d", label = "Screw Print",value = TRUE)
+    
+  }) #end obserEvent for input$checkmultitooling
+  
+  
+  observeEvent(input$uncheckmultitooling,{
+    #this unchecks all the checkboxes associated with multi tooling inputs
+    updateCheckboxInput(session, inputId = "PCMB_d", label = "Barrel",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMDS_d", label = "Die Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMDLL_d", label = "Die Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMTS_d", label = "Tip Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMTLL_d", label = "Tip Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMSP_d", label = "Screw Print",value = FALSE)
+    
+  }) #end obserEvent for input$uncheckmultitooling
+  
+  
+  observeEvent(input$checkmultiparameters,{
+    #this checks all the checkboxes associated with multi processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCMFT_d", label = "Feedthroat Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMBZT1_d", label = "Barrel Zone 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMBZT2_d", label = "Barrel Zone 2 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMBZT3_d", label = "Barrel Zone 3 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMCT_d", label = "Clamp Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMAT_d", label = "Adapter Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMDT1_d", label = "Die 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMDT2_d", label = "Die 2 Temperature F",value = TRUE)
+    
+  }) #end obserEvent for input$checkmultiparameters
+  
+  
+  observeEvent(input$uncheckmultiparameters,{
+    #this unchecks all the checkboxes associated with multi processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCMFT_d", label = "Feedthroat Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMBZT1_d", label = "Barrel Zone 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMBZT2_d", label = "Barrel Zone 2 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMBZT3_d", label = "Barrel Zone 3 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMCT_d", label = "Clamp Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMAT_d", label = "Adapter Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMDT1_d", label = "Die 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMDT2_d", label = "Die 2 Temperature F",value = FALSE)
+    
+  }) #end obserEvent for input$uncheckmultiparameters
+  
+  observeEvent(input$checkmultidimensions,{
+    #this checks all the checkboxes associated with multi dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCMTE_d", label = "Tapered End",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMIDI_d", label = "Inner Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMODI_d", label = "Outer Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMIWT_d", label = "Inner Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMMWT_d", label = "Middle Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMOWT_d", label = "Outer Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMTWT_d", label = "Total Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMOR_d", label = "Out of Roundness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMCCT_d", label = "Concentricity",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMLength_d", label = "Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMToLength_d", label = "Total Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMPPD_d", label = "Perpendicularity (in)",value = TRUE)
+    
+  }) #end obserEvent for input$checkmultidimensions
+  
+  
+  observeEvent(input$uncheckmultidimensions,{
+    #this unchecks all the checkboxes associated with multi dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCMTE_d", label = "Tapered End",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMIDI_d", label = "Inner Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMODI_d", label = "Outer Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMIWT_d", label = "Inner Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMMWT_d", label = "Middle Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMOWT_d", label = "Outer Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMTWT_d", label = "Total Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMOR_d", label = "Out of Roundness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMCCT_d", label = "Concentricity",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMLength_d", label = "Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMToLength_d", label = "Total Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMPPD_d", label = "Perpendicularity (in)",value = FALSE)
+    
+  }) #end obserEvent for input$uncheckmultidimensions
+  
+  observeEvent(input$checkmultispecial,{
+    #this checks all the checkboxes associated with multi special operation inputs
+    updateCheckboxInput(session, inputId = "PCMNEXIV_d", label = "NEXIV",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMAnnealed_d", label = "Annealed",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMCaliper_d", label = "Caliper",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMOS_d", label = "OD Sort",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMMP_d", label = "Melt Pump",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMHT_d", label = "Hypo Tip",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMSPD_d", label = "Sparker Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMSLD_d", label = "Slicking Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMDLN_d", label = "Delamination",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMULT_d", label = "Ultrasonic",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMVC_d", label = "Vacuum Calibration",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMIRD_d", label = "Irradiated",value = TRUE)
+    
+  }) #end obserEvent for input$checkmultispecial
+  
+  
+  observeEvent(input$uncheckmultispecial,{
+    #this unchecks all the checkboxes associated with multi special operation inputs
+    updateCheckboxInput(session, inputId = "PCMNEXIV_d", label = "NEXIV",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMAnnealed_d", label = "Annealed",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMCaliper_d", label = "Caliper",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMOS_d", label = "OD Sort",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMMP_d", label = "Melt Pump",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMHT_d", label = "Hypo Tip",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMSPD_d", label = "Sparker Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMSLD_d", label = "Slicking Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMDLN_d", label = "Delamination",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMULT_d", label = "Ultrasonic",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMVC_d", label = "Vacuum Calibration",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMIRD_d", label = "Irradiated",value = FALSE)
+    
+  }) #end obserEvent for input$uncheckmultispecial
+  
+  observeEvent(input$resetmultiinputs,{
+    #this will reset the multi inputs when clicked
+    #It first removes all the dataframes that have been created, resets the input values,
+    #and then it resets the stack
+    setMDFList(NULL) #resetst the DF list
+    
+    current_inputs <- isolate(multi_inputs())
+    original_inputs <- getOriginalMIVector()
+    
+    differ_indices <- which(current_inputs != original_inputs)
+    value_names <- names(current_inputs[differ_indices])
+    
+    print(paste0("observeEvent(input$resetmultiinputs): ",value_names))
+    
+    count <- 1
+    #this while loop iterates through all the values that differed
+    while (count < length(value_names) + 1){
+      current_name <- value_names[count]
+      resetMI(current_name)
+      count <- count + 1
+    }#end while
+    
+    setMIStack(c()) #creates an empty stack
+    
+    #sets the data table to the original data set
+    multi_df_output$data <- multi_pps_data
+    
+  }) #end obserEvent for input$resetmultiinputs
   
   
   #### Tapered PPS ####
@@ -2011,23 +2445,24 @@ server<-function(input,output,session){
   
   #the assign will initialize the tiidvector
   assign("tiidvector", 
-         c("input$PCSPN", "input$PCSPD", "input$PCSRN", "input$PCSRD", "input$PCSPPSN", 
-           "input$PCSDS_min", "input$PCSDS_max", "input$PCSDLL", "input$PCSTS_min", "input$PCSTS_max",
-           "input$PCSTLL", "input$PCSSP", 
-           "input$PCSFT_min", "input$PCSFT_max", "input$PCSBZT1_min", "input$PCSBZT1_max",
-           "input$PCSBZT2_min", "input$PCSBZT2_max", "input$PCSBZT3_min", "input$PCSBZT3_max",
-           "input$PCSCT_min", "input$PCSCT_max", "input$PCSAT_min", "input$PCSAT_max",
-           "input$PCSDT1_min", "input$PCSDT1_max", "input$PCSDT2_min", "input$PCSDT2_max",
-           "input$PCTPIDI_min", "input$PCTPIDI_max", "input$PCTPODI_min", "input$PCTPODI_max", "input$PCTPWT_min", 
-           "input$PCTPWT_max","input$PCTPOR_min", "input$PCTPOR_max", "input$PCTPCCT_min", "input$PCTPCCT_max",
-           "input$PCTDIDI_min", "input$PCTDIDI_max", "input$PCTDODI_min", "input$PCTDODI_max", "input$PCTDWT_min",
-           "input$PCTDWT_max", "input$PCTDOR_min", "input$PCTDOR_max", "input$PCTDCCT_min", "input$PCTDCCT_max",
-           "input$PCTPLength_min", "input$PCTPLength_max", "input$PCTTLength_min", "input$PCTTLength_max",
-           "input$PCTDLength_min", "input$PCTDLength_max", "input$PCTToLength_min", "input$PCTToLength_max",
-           "input$PCSPPD",
-           "input$PCSNEXIV", "input$PCSAnnealed", "input$PCSCaliper", "input$PCSOS",
-           "input$PCSMP", "input$PCSHT", "input$PCSSPD", "input$PCSSLD", "input$PCSDLN", "input$PCSULT",
-           "input$PCSVC", "input$PCSIRD"), 
+         c("Placeholoder", 
+           "PCSPN", "PCSPD", "PCSRN", "PCSRD", "PCSPPSN", 
+           "PCSDS_min", "PCSDS_max", "PCSDLL", "PCSTS_min", "PCSTS_max",
+           "PCSTLL", "PCSSP", 
+           "PCSFT_min", "PCSFT_max", "PCSBZT1_min", "PCSBZT1_max",
+           "PCSBZT2_min", "PCSBZT2_max", "PCSBZT3_min", "PCSBZT3_max",
+           "PCSCT_min", "PCSCT_max", "PCSAT_min", "PCSAT_max",
+           "PCSDT1_min", "PCSDT1_max", "PCSDT2_min", "PCSDT2_max",
+           "PCTPIDI_min", "PCTPIDI_max", "PCTPODI_min", "PCTPODI_max", "PCTPWT_min", 
+           "PCTPWT_max","PCTPOR_min", "PCTPOR_max", "PCTPCCT_min", "PCTPCCT_max",
+           "PCTDIDI_min", "PCTDIDI_max", "PCTDODI_min", "PCTDODI_max", "PCTDWT_min",
+           "PCTDWT_max", "PCTDOR_min", "PCTDOR_max", "PCTDCCT_min", "PCTDCCT_max",
+           "PCTPLength_min", "PCTPLength_max", "PCTTLength_min", "PCTTLength_max",
+           "PCTDLength_min", "PCTDLength_max", "PCTToLength_min", "PCTToLength_max",
+           "PCSPPD",
+           "PCSNEXIV", "PCSAnnealed", "PCSCaliper", "PCSOS",
+           "PCSMP", "PCSHT", "PCSSPD", "PCSSLD", "PCSDLN", "PCSULT",
+           "PCSVC", "PCSIRD"), 
          envir = e3)
   
   
@@ -2142,6 +2577,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) == 0){
       #the name is not currently in the stack
@@ -2165,6 +2601,7 @@ server<-function(input,output,session){
     #edit name
     rep_name <- gsub("\\(", "\\\\(", name)
     rep_name <- gsub("\\)", "\\\\)", rep_name)
+    rep_name <- paste0("^", rep_name) #must start with it to avoid mis matches
     
     if (length(grep(rep_name, stack)) != 0){
       #the name is not currently in the stack
@@ -2451,11 +2888,11 @@ server<-function(input,output,session){
     
     grepname <- gsub("\\(", "\\\\(", checkbox_name)
     grepname <- gsub("\\)", "\\\\)", grepname)
+    grepname <- paste0("^", grepname) #must start with it to avoid mis matches
     
     inputs <- names(isolate(tapered_inputs()))
     input_ids <- getTIIDVector()
     original_inputs <- getOriginalTIVector()
-    print(original_inputs)
     
     input_indices <- grep(grepname, inputs)
     
@@ -2537,6 +2974,9 @@ server<-function(input,output,session){
         #Nothing will be analyzed
         print("A parameter was changed but the value was changed to what the previous value was")
       }
+      else if (length(index_differ) > 1){
+        #multiple selected or deselected, so do nothing
+      }
       else{
         
         index_name <- names(current_tivector[index_differ])
@@ -2553,6 +2993,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name) #must start with it to avoid mis matches
           
           stack_index <- grep(updated_index_name, current_tistack) #gets the index in the stack
           
@@ -2602,6 +3043,9 @@ server<-function(input,output,session){
       if (length(index_differ) == 0){
         #Nothing will be analyzed since the value was changed to TRUE
       }
+      else if (length(index_differ) > 1){
+        #multiple selected or deselected, so do nothing
+      }
       else{
         
         print("observeEvent(show_vars3): The Checkbox Index_Differ Worked")
@@ -2624,6 +3068,7 @@ server<-function(input,output,session){
           #This needs to be updated because of the parenthese
           updated_index_name <- gsub("\\(", "\\\\(", index_name)
           updated_index_name <- gsub("\\)", "\\\\)", updated_index_name)
+          updated_index_name <- paste0("^", updated_index_name) #must start with it to avoid mis matches
           
           stack_index <- grep(updated_index_name, current_tistack) #gets the index in the stack
           
@@ -2673,11 +3118,11 @@ server<-function(input,output,session){
 
   
   
-  # obtain the output of checkbox from functions and make a list to store them----multi Extrusion PPS Data
+  # obtain the output of checkbox from functions and make a list to store them----tapered Extrusion PPS Data
 
   
   show_vars3<-reactive({
-    checkboxes <- as.numeric(c(input$PCTPN_d,input$PCTPD_d,input$PCTRN_d,input$PCTRD_d,
+    checkboxes <- as.numeric(c(TRUE,input$PCTPN_d,input$PCTPD_d,input$PCTRN_d,input$PCTRD_d,
                                input$PCTPPSN_d,input$PCTDS_d,input$PCTDLL_d,input$PCTTS_d,
                                input$PCTTLL_d,input$PCTSP_d,input$PCTFT_d,
                  input$PCTBZT1_d,input$PCTBZT2_d,input$PCTBZT3_d,input$PCTCT_d,input$PCTAT_d,
@@ -2691,7 +3136,8 @@ server<-function(input,output,session){
                  input$PCTSPD_d,input$PCTSLD_d,input$PCTDLN_d,input$PCTULT_d,input$PCTVC_d,
                  input$PCTIRD_d))
     
-    names(checkboxes) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(checkboxes) <- c("Placeholder",
+                           "Part Number", "Part Description", "Resin Number", "Resin Description",
                            "PPS Number",
                            "Die Size (in)", "Die Land Length (in)",
                            "Tip Size (in)", "Tip Land Length (in)", "Screw Print",
@@ -2718,7 +3164,7 @@ server<-function(input,output,session){
   #this variable will store all the inputs of the tapered extrusions
   tapered_inputs <- reactive({
     #this variable will store all the inputs of of the tapered extrusions
-    inputs3 <- c(input$PCTPN, input$PCTPD, input$PCTRN, input$PCTRD, input$PCTPPSN, 
+    inputs3 <- c("Placeholder", input$PCTPN, input$PCTPD, input$PCTRN, input$PCTRD, input$PCTPPSN, 
                 input$PCTDS_min, input$PCTDS_max, input$PCTDLL, input$PCTTS_min, input$PCTTS_max,
                 input$PCTTLL, input$PCTSP, 
                 input$PCTFT_min, input$PCTFT_max, input$PCTBZT1_min, input$PCTBZT1_max,
@@ -2736,10 +3182,11 @@ server<-function(input,output,session){
                 input$PCTMP, input$PCTHT, input$PCTSPD, input$PCTSLD, input$PCTDLN, input$PCTULT,
                 input$PCTVC, input$PCTIRD
     )
-    names(inputs3) <- c("Part Number", "Part Description", "Resin Number", "Resin Description",
+    names(inputs3) <- c("Placeholder",
+                        "Part Number", "Part Description", "Resin Number", "Resin Description",
                        "PPS Number",
-                       "Die Size (in) Min", "Die Size (in) Max", "Die Land (in) Length", 
-                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land (in) Length", "Screw Print",
+                       "Die Size (in) Min", "Die Size (in) Max", "Die Land Length (in)", 
+                       "Tip Size (in) Min","Tip Size (in) Max", "Tip Land Length (in)", "Screw Print",
                        "Feedthroat Temperature  F Min", "Feedthroat Temperature  F Max",
                        "Barrel Zone 1 Temperature  F Min", "Barrel Zone 1 Temperature  F Max",
                        "Barrel Zone 2 Temperature  F Min", "Barrel Zone 2 Temperature  F Max",
@@ -2785,39 +3232,16 @@ server<-function(input,output,session){
   
   
   output$mytable3 <- DT::renderDataTable({
+    
     DT::datatable({
-      Col_PCT=c()
-      col_var3=show_vars3()
-      for (i in 1:length(col_var3)){
-        if (col_var3[i]!=0){
-          Col_PCT=c(Col_PCT,i)
-        }
-      } 
-      data_PCT<-tapered_pps_data[,Col_PCT]
+      
+      Col_PCT <- which(1 == show_vars3())
       
       data_PCT <- tapered_df_output$data #the data frame is set
-      data_PCT <- data_PCT[,Col_PCT] #only get the columns that have been checked
+      data_PCT<-data_PCT[,Col_PCT]
       
       clean_tapered_pps_data$data <- data_PCT #assign the clean table to the data that is available
       #for downloading
-      
-      rows <- nrow(data_PCT)
-      vectorofbuttons <- c(rep(0, rows))
-      row_count <- 1
-      
-      while(row_count < rows + 1){
-        #this creates a vector of html action buttons to add to the table
-        vectorofbuttons[row_count] <- as.character(
-          actionButton(inputId = paste0("button_", data_PCT[row_count,1]),
-                       label = "Add Part",
-                       onclick = 'Shiny.onInputChange(\"taperedadd_button\",  this.id)')
-        )
-        row_count <- row_count + 1
-      } #end while adding the html stuff
-      
-      data_PCT$"" <- vectorofbuttons
-      data_PCT <- data_PCT[,c(ncol(data_PCT), 1:(ncol(data_PCT)-1))]
-      
       
       return(data_PCT)
     },
@@ -2848,6 +3272,16 @@ server<-function(input,output,session){
   
   taperedshoppingcart <- reactiveValues(
     #this is a shopping cart to hold all the singl extrusion parts and SAP batches that a user wants.
+    #this is linked to the output data, so only the output data located of the associated batches 
+    #in the shopping cart is displayed
+    data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
+                      "SAP Batch" = numeric(0), "Delete Batch" = numeric(0),
+                      stringsAsFactors = FALSE,
+                      check.names = FALSE)
+  ) #end taperedshoppingcart
+  
+  taperedshoppingcartparts <- reactiveValues(
+    #this is a shopping cart to hold all the tapered extrusion parts and SAP batches that a user wants.
     #this is linked to the output data, so only the output data located of the associated batches 
     #in the shopping cart is displayed
     data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
@@ -2895,12 +3329,51 @@ server<-function(input,output,session){
     colnames(taperedshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
   })
   
+  observeEvent(input$taperedadd_button,{
+    #this observes whether the user clicked a button to add a part to the part only shopping cart
+    part <- strsplit(input$taperedadd_button, "_")[[1]][2]
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"tapereddelete_part_button\",  this.id)'))
+    
+    
+    #This determines if there are batches for the part
+    SAP_batches <- tapered_tari_parameter_data$`SAP Batch Number`[tapered_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+    
+    
+    if (length(grep(part, taperedshoppingcartparts$data$"Part")) == 0){
+      taperedshoppingcartparts$data <- rbind(taperedshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+      colnames(taperedshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+    }
+    else{
+      #Do nothing if the part is already there
+    }
+    
+  }) #end observeEvent(input$taperedadd_button)
+  
   
   observeEvent(input$tapereddelete_part_button,{
     #'this observes whether a person deleted a part from the shopping cart. If the button is clicked
     #'all batches associated to the part are removed
     part <- strsplit(input$tapereddelete_part_button, "_")[[1]][2]
     taperedshoppingcart$data <- taperedshoppingcart$data[taperedshoppingcart$data$'Part' != part,]
+    taperedshoppingcartparts$data <- taperedshoppingcartparts$data[taperedshoppingcartparts$data$'Part' != part,]
   })
   
   observeEvent(input$tapereddelete_batch_button,{
@@ -2921,14 +3394,218 @@ server<-function(input,output,session){
     escape = FALSE,
     server = FALSE) #for the shoppingcart
   
+  output$taperedshoppingcartparts <- renderDataTable({
+    #'this is a table that only lists the parts for quick viewing
+    return(taperedshoppingcartparts$data)
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE,
+  options=list(pageLength=5)   # make the shopping cart page shorter
+  ) #for the shoppingcart
+  
 
-  output$downloadTPPSData <- downloadHandler(
+  
+  
+  output$tapereddownloadSPPSData <- downloadHandler(
     #downlaod the data
-    filename = function() { paste0("Tapered PPS Data", ".csv") },
+    filename = function() { paste("tapered-Layer PPS Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(clean_tapered_pps_data$data, file)
+      #I remove the first column so the HTML is not outputed
+      write.csv(clean_tapered_pps_data$data[2:ncol(clean_tapered_pps_data$data)], file)
     }
   )
+  
+  
+  output$tapereddownloadSPPSDataAll <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("tapered PPS Data", '.csv', sep='') },
+    content = function(file) {
+      #I remove the first column so the HTML is not outputed
+      write.csv(tapered_df_output$data[2:ncol(tapered_df_output$data)], file)
+    }
+  )
+  
+  output$taperedshoppingcartpps <- renderDataTable({
+    #this is to render a datatable that has all the PPS information of parts that have been saved
+    #to the shopping cart
+    
+    data <- tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcartparts$data$'Part'),]
+    return(data)
+    
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE
+  )
+  
+  
+  
+  output$taperedcartdownloadpps <- downloadHandler(
+    #downlaod the tapered PPS data from the shopping cart
+    filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
+    content = function(file) {
+      write.csv(tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcart$data$'Part'),], file)
+    }
+  )
+  
+  observeEvent(input$checktaperedtooling,{
+    #this checks all the checkboxes associated with tapered tooling inputs
+    updateCheckboxInput(session, inputId = "PCTB_d", label = "Barrel",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDS_d", label = "Die Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDLL_d", label = "Die Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTTS_d", label = "Tip Size (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTTLL_d", label = "Tip Land Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTSP_d", label = "Screw Print",value = TRUE)
+    
+  }) #end obserEvent for input$checktaperedtooling
+  
+  
+  observeEvent(input$unchecktaperedtooling,{
+    #this unchecks all the checkboxes associated with tapered tooling inputs
+    updateCheckboxInput(session, inputId = "PCTB_d", label = "Barrel",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDS_d", label = "Die Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDLL_d", label = "Die Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTTS_d", label = "Tip Size (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTTLL_d", label = "Tip Land Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTSP_d", label = "Screw Print",value = FALSE)
+    
+  }) #end obserEvent for input$unchecktaperedtooling
+  
+  
+  observeEvent(input$checktaperedparameters,{
+    #this checks all the checkboxes associated with tapered processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCTFT_d", label = "Feedthroat Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTBZT1_d", label = "Barrel Zone 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTBZT2_d", label = "Barrel Zone 2 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTBZT3_d", label = "Barrel Zone 3 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTCT_d", label = "Clamp Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTAT_d", label = "Adapter Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDT1_d", label = "Die 1 Temperature F",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDT2_d", label = "Die 2 Temperature F",value = TRUE)
+    
+  }) #end obserEvent for input$checktaperedparameters
+  
+  
+  observeEvent(input$unchecktaperedparameters,{
+    #this unchecks all the checkboxes associated with tapered processing parameters inputs
+    updateCheckboxInput(session, inputId = "PCTFT_d", label = "Feedthroat Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTBZT1_d", label = "Barrel Zone 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTBZT2_d", label = "Barrel Zone 2 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTBZT3_d", label = "Barrel Zone 3 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTCT_d", label = "Clamp Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTAT_d", label = "Adapter Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDT1_d", label = "Die 1 Temperature F",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDT2_d", label = "Die 2 Temperature F",value = FALSE)
+    
+  }) #end obserEvent for input$unchecktaperedparameters
+  
+  observeEvent(input$checktapereddimensions,{
+    #this checks all the checkboxes associated with tapered dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCTPIDI_d", label = "Proximal Inner Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPODI_d", label = "Proximal Outer Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPWT_d", label = "Proximal Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPOR_d", label = "Proximal Out of Roundness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPCCT_d", label = "Proximal Concentricity (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDIDI_d", label = "Distal Inner Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDODI_d", label = "Distal Outer Diameter (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDWT_d", label = "Distal Wall Thickness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDOR_d", label = "Distal Out of Roundness (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDCCT_d", label = "Distal Concentricity (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPLength_d", label = "Proximal Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTTLength_d", label = "Transition Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDLength_d", label = "Distal Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTToLength_d", label = "Total Length (in)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTPPD_d", label = "Perpendicularity (in)",value = TRUE)
+    
+  }) #end obserEvent for input$checktapereddimensions
+  
+  
+  observeEvent(input$unchecktapereddimensions,{
+    #this unchecks all the checkboxes associated with tapered dimensional attribute inputs
+    updateCheckboxInput(session, inputId = "PCTPIDI_d", label = "Proximal Inner Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPODI_d", label = "Proximal Outer Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPWT_d", label = "Proximal Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPOR_d", label = "Proximal Out of Roundness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPCCT_d", label = "Proximal Concentricity (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDIDI_d", label = "Distal Inner Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDODI_d", label = "Distal Outer Diameter (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDWT_d", label = "Distal Wall Thickness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDOR_d", label = "Distal Out of Roundness (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDCCT_d", label = "Distal Concentricity (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPLength_d", label = "Proximal Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTTLength_d", label = "Transition Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDLength_d", label = "Distal Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTToLength_d", label = "Total Length (in)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTPPD_d", label = "Perpendicularity (in)",value = FALSE)
+    
+  }) #end obserEvent for input$unchecktapereddimensions
+  
+  observeEvent(input$checktaperedspecial,{
+    #this checks all the checkboxes associated with tapered special operation inputs
+    updateCheckboxInput(session, inputId = "PCTNEXIV_d", label = "NEXIV",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTAnnealed_d", label = "Annealed",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTCaliper_d", label = "Caliper",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTOS_d", label = "OD Sort",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTMP_d", label = "Melt Pump",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTHT_d", label = "Hypo Tip",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTSPD_d", label = "Sparker Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTSLD_d", label = "Slicking Die",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTDLN_d", label = "Delamination",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTULT_d", label = "Ultrasonic",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTVC_d", label = "Vacuum Calibration",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTIRD_d", label = "Irradiated",value = TRUE)
+    
+  }) #end obserEvent for input$checktaperedspecial
+  
+  
+  observeEvent(input$unchecktaperedspecial,{
+    #this unchecks all the checkboxes associated with tapered special operation inputs
+    updateCheckboxInput(session, inputId = "PCTNEXIV_d", label = "NEXIV",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTAnnealed_d", label = "Annealed",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTCaliper_d", label = "Caliper",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTOS_d", label = "OD Sort",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTMP_d", label = "Melt Pump",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTHT_d", label = "Hypo Tip",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTSPD_d", label = "Sparker Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTSLD_d", label = "Slicking Die",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTDLN_d", label = "Delamination",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTULT_d", label = "Ultrasonic",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTVC_d", label = "Vacuum Calibration",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTIRD_d", label = "Irradiated",value = FALSE)
+    
+  }) #end obserEvent for input$unchecktaperedspecial
+  
+  observeEvent(input$resettaperedinputs,{
+    #this will reset the tapered inputs when clicked
+    #It first removes all the dataframes that have been created, resets the input values,
+    #and then it resets the stack
+    setMDFList(NULL) #resetst the DF list
+    
+    current_inputs <- isolate(tapered_inputs())
+    original_inputs <- getOriginalTIVector()
+    
+    differ_indices <- which(current_inputs != original_inputs)
+    value_names <- names(current_inputs[differ_indices])
+    
+    print(paste0("observeEvent(input$resettaperedinputs): ",value_names))
+    
+    count <- 1
+    #this while loop iterates through all the values that differed
+    while (count < length(value_names) + 1){
+      current_name <- value_names[count]
+      resetTI(current_name)
+      count <- count + 1
+    }#end while
+    
+    setTIStack(c()) #creates an empty stack
+    
+    #sets the data table to the original data set
+    tapered_df_output$data <- tapered_pps_data
+    
+  }) #end obserEvent for input$resettaperedinputs
   
   
   
@@ -2977,21 +3654,21 @@ server<-function(input,output,session){
   filter = "top")
   
   #Testing the appstats data
-  # output$nexiv <- renderDataTable({
-  #   #This returns the table of the Applied Stats Nexiv Data based on the SAP batch numbers in the
-  #   #shopping cart
-  #   data <- nexiv[nexiv$`Batch #` %in% singleshoppingcart$data$'SAP Batch',]
-  #   return(data)
-  # },
-  # filter = "top")
+  output$nexiv <- renderDataTable({
+    #This returns the table of the Applied Stats Nexiv Data based on the SAP batch numbers in the
+    #shopping cart
+    data <- nexiv[nexiv$`Batch #` %in% singleshoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top")
   
-  # output$laserlinc <- renderDataTable({
-  #   #This returns the table of the Applied Stats laserlinc data based on the SAP batch numbers in the
-  #   #shopping cart
-  #   data <- ll[ll$`Lot Number` %in% singleshoppingcart$data$'SAP Batch',]
-  #   return(data)
-  # },
-  # filter = "top")
+  output$laserlinc <- renderDataTable({
+    #This returns the table of the Applied Stats laserlinc data based on the SAP batch numbers in the
+    #shopping cart
+    data <- laserlinc[laserlinc$`Lot Number` %in% singleshoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top")
   # end Single Extrusion PPS Data Server part and Shopping cart
   
   
@@ -3023,12 +3700,6 @@ server<-function(input,output,session){
     #get the part from the text input box
     part <- input$SinglePartNum_input
     
-      showModal(modalDialog(
-        title = "Add Part Number",
-        "Success",
-        easyClose = T
-      ))
-      
       
     print(part)
     
@@ -3061,8 +3732,26 @@ server<-function(input,output,session){
     new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
     
     colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
-    singleshoppingcart$data <- rbind(singleshoppingcart$data, new_data, stringsAsFactors = FALSE)
-    colnames(singleshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    
+    
+    if (length(grep(part, singleshoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, single_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        singleshoppingcart$data <- rbind(singleshoppingcart$data, new_data, stringsAsFactors = FALSE)
+        colnames(singleshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        
+      }
+      else{
+        #otherwise do nothing
+      }
+    }
+    else{
+      #else do nothing
+    }
+    
+    
   })
   
   observeEvent(input$singleMadd_button,{
@@ -3075,16 +3764,327 @@ server<-function(input,output,session){
                    label = "Delete Part",
                    onclick = 'Shiny.onInputChange(\"singledelete_part_button\",  this.id)'))
     
-    new_data <- cbind(part, deletepart)
+    #This determines if there are batches for the part
+    SAP_batches <- single_tari_parameter_data$`SAP Batch Number`[single_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
     
-    colnames(new_data) <- c("Part", "Delete Part")
-    singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
-    colnames(singleshoppingcartparts$data) <- c("Part", "Delete Part")
-    updateTextInput(session,"SinglePartNum_input",value = "") #update input box, reset it to be blank
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+    
+    if (length(grep(part, singleshoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, single_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+        colnames(singleshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+        updateTextInput(session,"SinglePartNum_input",value = "") #update input box, reset it to be blank
+        
+        
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "Success",
+          easyClose = T
+        ))
+        
+      }
+      else{
+        #otherwise do nothing
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A Valid Part Number Was Not Entered",
+          easyClose = T
+        ))
+      }
+      
+    }
+    else{
+      #else do nothing
+      updateTextInput(session,"SinglePartNum_input",value = "") #update input box, reset it to be blank
+      
+      showModal(modalDialog(
+        title = "Add Part Number",
+        "The part is already in the shopping cart",
+        easyClose = T
+      ))
+      
+    }
+    
+  }) #end observeEvent for add single manual
+  
+  
+  
+  observeEvent(input$multiMadd_button,{
+    #used by multi Mnanually add button in the shopping cart
+    #get the part from the text input box
+    part <- input$MultiPartNum_input
+    
+    
+    print(part)
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"multidelete_part_button\",  this.id)'))
+    
+    #Get the SAP batches
+    SAP_batches <- multi_tari_parameter_data$`SAP Batch Number`[multi_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    #Action button to delete batch
+    batch_count <- 1
+    vectorofbuttons <- c(rep(0, length(SAP_batches)))
+    
+    while(batch_count < length(SAP_batches) + 1){
+      vectorofbuttons[batch_count] <- as.character(
+        actionButton(inputId = paste0("button_", SAP_batches[batch_count]),
+                     label = "Delete Batch",
+                     onclick = 'Shiny.onInputChange(\"multidelete_batch_button\",  this.id)'))
+      batch_count <- batch_count + 1
+    }
+    
+    #Vectors of parts and buttons
+    partvector <- rep(part, numberofbatches)
+    deletepartvector <- rep(deletepart, numberofbatches)
+    
+    new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
+    
+    colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    
+    
+    if (length(grep(part, multishoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, multi_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        multishoppingcart$data <- rbind(multishoppingcart$data, new_data, stringsAsFactors = FALSE)
+        colnames(multishoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        
+      }
+      else{
+        #otherwise do nothing
+      }
+    }
+    else{
+      #else do nothing
+    }
+    
+    
   })
   
-
-}
+  observeEvent(input$multiMadd_button,{
+    #this observes whether the user manually add a part to shopping cart
+    part <- input$MultiPartNum_input
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"multidelete_part_button\",  this.id)'))
+    
+    #This determines if there are batches for the part
+    SAP_batches <- multi_tari_parameter_data$`SAP Batch Number`[multi_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+    
+    if (length(grep(part, multishoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, multi_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        multishoppingcartparts$data <- rbind(multishoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+        colnames(multishoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+        updateTextInput(session,"MultiPartNum_input",value = "") #update input box, reset it to be blank
+        
+        
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "Success",
+          easyClose = T
+        ))
+        
+      }
+      else{
+        #otherwise do nothing
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A Valid Part Number Was Not Entered",
+          easyClose = T
+        ))
+      }
+      
+    }
+    else{
+      #else do nothing
+      updateTextInput(session,"MultiPartNum_input",value = "") #update input box, reset it to be blank
+      
+      showModal(modalDialog(
+        title = "Add Part Number",
+        "The part is already in the shopping cart",
+        easyClose = T
+      ))
+      
+    }
+    
+  }) #end observeEvent for add multi manual
+  
+  
+  observeEvent(input$taperedMadd_button,{
+    #used by tapered Mnanually add button in the shopping cart
+    #get the part from the text input box
+    part <- input$TaperedPartNum_input
+    
+    
+    print(part)
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"tapereddelete_part_button\",  this.id)'))
+    
+    #Get the SAP batches
+    SAP_batches <- tapered_tari_parameter_data$`SAP Batch Number`[tapered_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    #Action button to delete batch
+    batch_count <- 1
+    vectorofbuttons <- c(rep(0, length(SAP_batches)))
+    
+    while(batch_count < length(SAP_batches) + 1){
+      vectorofbuttons[batch_count] <- as.character(
+        actionButton(inputId = paste0("button_", SAP_batches[batch_count]),
+                     label = "Delete Batch",
+                     onclick = 'Shiny.onInputChange(\"tapereddelete_batch_button\",  this.id)'))
+      batch_count <- batch_count + 1
+    }
+    
+    #Vectors of parts and buttons
+    partvector <- rep(part, numberofbatches)
+    deletepartvector <- rep(deletepart, numberofbatches)
+    
+    new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
+    
+    colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+    
+    
+    if (length(grep(part, taperedshoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, tapered_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        taperedshoppingcart$data <- rbind(taperedshoppingcart$data, new_data, stringsAsFactors = FALSE)
+        colnames(taperedshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        
+      }
+      else{
+        #otherwise do nothing
+      }
+    }
+    else{
+      #else do nothing
+    }
+    
+    
+  })
+  
+  observeEvent(input$taperedMadd_button,{
+    #this observes whether the user manually add a part to shopping cart
+    part <- input$TaperedPartNum_input
+    
+    #Action button to delete part
+    deletepart <- as.character(
+      actionButton(inputId = paste0("button_", part),
+                   label = "Delete Part",
+                   onclick = 'Shiny.onInputChange(\"tapereddelete_part_button\",  this.id)'))
+    
+    #This determines if there are batches for the part
+    SAP_batches <- tapered_tari_parameter_data$`SAP Batch Number`[tapered_tari_parameter_data$`Material Number` == part]
+    numberofbatches <- length(SAP_batches)
+    
+    if(numberofbatches > 0){
+      #if there are batches
+      batches <- "Yes"
+    }
+    else{
+      batches <- "No"
+    }
+    
+    new_data <- cbind(part, batches, deletepart)
+    
+    colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+    
+    if (length(grep(part, taperedshoppingcartparts$data$"Part")) == 0){
+      #if part is not in the shopping cart yet. add it
+      part_updated <- paste0("^", part, "$") #this will be used for grep if the part is in the dataset
+      if (length(grep(part_updated, tapered_pps_data$`Part Number`)) > 0){
+        #if it is in the data set, then add the part
+        taperedshoppingcartparts$data <- rbind(taperedshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+        colnames(taperedshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+        updateTextInput(session,"TaperedPartNum_input",value = "") #update input box, reset it to be blank
+        
+        
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "Success",
+          easyClose = T
+        ))
+        
+      }
+      else{
+        #otherwise do nothing
+        #The addition worked
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A Valid Part Number Was Not Entered",
+          easyClose = T
+        ))
+      }
+      
+    }
+    else{
+      #else do nothing
+      updateTextInput(session,"TaperedPartNum_input",value = "") #update input box, reset it to be blank
+      
+      showModal(modalDialog(
+        title = "Add Part Number",
+        "The part is already in the shopping cart",
+        easyClose = T
+      ))
+      
+    }
+    
+  }) #end observeEvent for add tapered manual
+  
+  
+  
+} #end server
   
 
 
