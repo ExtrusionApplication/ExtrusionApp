@@ -3394,6 +3394,7 @@ server<-function(input,output,session){
     escape = FALSE,
     server = FALSE) #for the shoppingcart
   
+
   output$taperedshoppingcartparts <- renderDataTable({
     #'this is a table that only lists the parts for quick viewing
     return(taperedshoppingcartparts$data)
@@ -3404,6 +3405,7 @@ server<-function(input,output,session){
   server = FALSE,
   options=list(pageLength=5)   # make the shopping cart page shorter
   ) #for the shoppingcart
+
   
 
   
@@ -3427,6 +3429,7 @@ server<-function(input,output,session){
     }
   )
   
+
   output$taperedshoppingcartpps <- renderDataTable({
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
@@ -3435,11 +3438,23 @@ server<-function(input,output,session){
     return(data)
     
   },
+
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
   filter = "top",
-  rownames = FALSE,
-  escape = FALSE,
-  server = FALSE
-  )
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) 
+  
+  
+  
+ 
   
   
   
@@ -3612,22 +3627,50 @@ server<-function(input,output,session){
   
   #### EXTRA ####
   
-
-  output$singleMESparameters <- renderDataTable({
+  SingleMESparametersData<-reactive({
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
     data <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
+    return (data)
+  })
+    
+   output$singleMESparameters <- renderDataTable({
+  #This will display the chosen part number on the Single MES Parameters tab
+  data <- SingleMESparametersData()
     return(data)
   },
-  filter = "top")
+    options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) 
   
-  output$singleMEStime <- renderDataTable({
+ 
+    output$singleMEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
     #shopping cart
     data <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) #end Single Extrusion PPS Data
   
   output$singleMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
@@ -3635,15 +3678,38 @@ server<-function(input,output,session){
     data <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) #end Single Extrusion PPS Data
   
+    
   output$singleMEStotal <- renderDataTable({
     #This returns the table of all MES inputs based on the SAP batch numbers in the
     #shopping cart
     data <- single_tari_total_data[single_tari_total_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) #end Single Extrusion PPS Data
   
   output$singlescrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
@@ -3651,7 +3717,18 @@ server<-function(input,output,session){
     data <- scrapcodes_data[scrapcodes_data$Order %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) #end Single Extrusion PPS Data
   
   
   output$multiMESparameters <- renderDataTable({
@@ -3715,14 +3792,7 @@ server<-function(input,output,session){
   # end Single Extrusion PPS Data Server part and Shopping cart
   
   
-  # Error Message---Manually add part number to shopping cart, if there is no such part number in the datadase, then return a error message
-  # observeEvent(input$singleMadd_button,{
-  #   showModal(modalDialog(
-  #     title = "Add Part Number",
-  #     "Success",
-  #     easyClose = T
-  #   ))
-  # })
+
   
   
 # Test--SHow The numbe of part number that have been added to shopping cart
@@ -3802,6 +3872,7 @@ server<-function(input,output,session){
     part <- input$SinglePartNum_input
     
     #Action button to delete part
+    
     deletepart <- as.character(
       actionButton(inputId = paste0("button_", part),
                    label = "Delete Part",
@@ -3927,6 +3998,7 @@ server<-function(input,output,session){
     
   })
   
+
   observeEvent(input$multiMadd_button,{
     #this observes whether the user manually add a part to shopping cart
     part <- input$MultiPartNum_input
@@ -4125,14 +4197,138 @@ server<-function(input,output,session){
     
   }) #end observeEvent for add tapered manual
   
+  #***************Data Analysis Tab******************************
   
   
+  Single<-reactive({
+    data<-SingleMESparametersData()
+    return(data)
+  })
+  
+  
+  # Multi<-reactive({
+  #   data<-MultiMESparametersData()
+  #   return(data)
+  # })
+  # Tapered<-({
+  #   data<-TaperedMESparametersData()
+  #   return(data)
+  # })
+  
+  # Swith the data set
+  plotdata <- reactive({
+    switch(input$MESType, "Single" = Single(), "Multi"=Multi(),"Tapered"=Tapered())
+  })
+
+
+  output$test_display <- renderDataTable({
+    #This will display the chosen part number on the Single MES Parameters tab
+    data <- plotdata()
+    return(data)
+  },
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) #end Single Extrusion PPS Data
+  
+  
+  
+  
+  
+  
+  
+  #***********Plot Part**********************
+  #Create a function to generate the plot
+  
+  
+  
+  # output$plotui <- renderUI({
+  #   plotOutput("myplot", height=300,
+  #              click = "plot_click",
+  #              dblclick = dblclickOpts(
+  #                id = "plot_dblclick",
+  #                delay = input$dblclick_delay
+  #              ),
+  #              brush = brushOpts(
+  #                id = "plot_brush",
+  #                delay = input$brush_delay,
+  #                delayType = input$brush_policy,
+  #                direction = input$brush_dir,
+  #                resetOnNew = input$brush_reset
+  #              )
+  #   )
+  # })
+  
+  
+  
+  # myPlot<-function(){
+  #   dat <- plotdata()
+  #   pc <- ggplot(plotdata(), aes_string(xvar(), yvar())) +
+  #     geom_point() +
+  #     theme_bw()
+  #   return(pc)
+  # }
+  # 
+  
+  
+  #Display the plot on the Analysis Tab
+  
+  
+  # 
+  # output$plot<-renderPlot({
+  #   myPlot()
+  # })
+  # 
+  
+  
+  #Download the plot to local
+  
+  
+  
+  # output$plotdownload <- downloadHandler(
+  #   filename =  function() {
+  #     paste(input$plottitle, input$savetype, sep=".")
+  #   },
+  #   # content is a function with argument file. content writes the plot to the device
+  #   
+  # 
+  #   content = function(file) {
+  #     if(input$savetype == "png")
+  #       png(file) # open the png device
+  #     else
+  #       pdf(file) # open the pdf device
+  #     myPlot() 
+  #     dev.off()  # turn the device off
+  #     
+  #   } 
+  # )
+  
+  
+#**********Data Table Part***************
+  
+  
+  # output$plot_brushed_points <- DT::renderDataTable({
+  #   dat <- plotdata()
+  #   
+  #   res <- brushedPoints(dat, input$plot_brush)
+  #   
+  #   datatable(res)
+  # })
+  
+  
+  
+  
+
 } #end server
   
-
-
-
-
 
 # Run the application 
 shinyApp(ui = ui, server = server)

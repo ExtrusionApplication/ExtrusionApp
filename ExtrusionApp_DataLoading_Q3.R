@@ -54,10 +54,6 @@ scrapcode_file <- "Scrap Codes.csv"
 resin_file <- "Resin Information.csv"
 screw_file <- "Screw Properties.csv"
 
-
-###
-
-
 single_pps_pathfile <- paste(path, single_pps_file, sep = "/")
 multi_pps_pathfile <- paste(path, multi_pps_file, sep = "/")
 tapered_pps_pathfile <- paste(path, tapered_pps_file, sep = "/")
@@ -291,19 +287,64 @@ screw_data[is.na(screw_data)]<-""
 
 
 
-#Output--MES--get the start date from Start Time
-temp=as.data.frame(matrix(0,nrow=nrow(single_tari_data),ncol=2))
+#MES-Single--get the start date and time  from Start Time
+  #Parameter
+temp=as.data.frame(matrix(0,nrow=nrow(single_tari_parameter_data),ncol=2))
 colnames(temp)=c("Start Date","Start Time")
-temp[,1:2]=str_split_fixed(single_tari_data$`Start Time`,' ',2)
+# let use has the ability to narrow down the date range by month and day
+temp[,1:2]=str_split_fixed(single_tari_parameter_data$`Start Time`,' ',2)
 temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
-single_tari_data=cbind(single_tari_data[,1:which(colnames(single_tari_data)=="Start Time")-1],
-                       temp,single_tari_data[,(which(colnames(single_tari_data)=="Start Time")+1):ncol(single_tari_data)])
-Time_Start=sqldf("select Min([Start Date]) from single_tari_data")
+# add the original start time back the its table. it will be used by the data analysis
+single_tari_parameter_data=cbind(single_tari_parameter_data[,1:which(colnames(single_tari_parameter_data)=="Start Time")-1],
+                       temp,single_tari_parameter_data[,(which(colnames(single_tari_parameter_data)=="Start Time")+1):ncol(single_tari_parameter_data)],"Start Time"=c(single_tari_parameter_data$`Start Time`))
+  #Submitter
+temp=as.data.frame(matrix(0,nrow=nrow(single_tari_submitter_data),ncol=2))
+colnames(temp)=c("Start Date","Start Time")
+# let use has the ability to narrow down the date range by month and day
+temp[,1:2]=str_split_fixed(single_tari_submitter_data$`Start Time`,' ',2)
+temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
+# add the original start time back the its table. it will be used by the data analysis
+single_tari_submitter_data=cbind(single_tari_submitter_data[,1:which(colnames(single_tari_submitter_data)=="Start Time")-1],
+                                 temp,single_tari_submitter_data[,(which(colnames(single_tari_submitter_data)=="Start Time")+1):ncol(single_tari_submitter_data)],"Start Time"=c(single_tari_submitter_data$`Start Time`))
+
+  #Time
+temp=as.data.frame(matrix(0,nrow=nrow(single_tari_time_data),ncol=2))
+colnames(temp)=c("Start Date","Start Time")
+# let use has the ability to narrow down the date range by month and day
+temp[,1:2]=str_split_fixed(single_tari_time_data$`Start Time`,' ',2)
+temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
+# add the original start time back the its table. it will be used by the data analysis
+single_tari_time_data=cbind(single_tari_time_data[,1:which(colnames(single_tari_time_data)=="Start Time")-1],
+                            temp,single_tari_time_data[,(which(colnames(single_tari_time_data)=="Start Time")+1):ncol(single_tari_time_data)],"Start Time"=c(single_tari_time_data$`Start Time`))
+
+  #total
+temp=as.data.frame(matrix(0,nrow=nrow(single_tari_total_data),ncol=2))
+colnames(temp)=c("Start Date","Start Time")
+# let use has the ability to narrow down the date range by month and day
+temp[,1:2]=str_split_fixed(single_tari_total_data$`Start Time`,' ',2)
+temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
+# add the original start time back the its table. it will be used by the data analysis
+single_tari_total_data=cbind(single_tari_total_data[,1:which(colnames(single_tari_total_data)=="Start Time")-1],
+                             temp,single_tari_total_data[,(which(colnames(single_tari_total_data)=="Start Time")+1):ncol(single_tari_total_data)],"Start Time"=c(single_tari_total_data$`Start Time`))
+
+#Get the date range for Single MES--Use Parameter to do so
+Time_Start=sqldf("select Min([Start Date]) from single_tari_parameter_data")
 Time_Start<-as.numeric(Time_Start)
 Time_Start<-as.Date(Time_Start,origin="1970-01-01")
-Time_End<-sqldf("select Max([Start Date]) from single_tari_data")
+Time_End<-sqldf("select Max([Start Date]) from single_tari_parameter_data")
 Time_End<-as.numeric(Time_End)
 Time_End<-as.Date(Time_End,origin="1970-01-01")
+
+
+#MES-Multi--get the start date and time from Start Time
+
+#Get the date range for Multi MES
+
+#MES-Tapered--get the start date and time from Start Time
+#Get the date range for tapered MES
+
+
+
 
 
 
