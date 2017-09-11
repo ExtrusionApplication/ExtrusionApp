@@ -35,43 +35,60 @@ laserlinc <- rbind.fill(ll1, ll2)
 #Creating variables across all sessions
 path <- "//Mgrovef1/shared/Operations/EXTRUSIO/Felipe Correa Netto/Extrusion Application/Data/UI Data"
 single_pps_file <- "Single PPS Data_UI_30 August 2017.csv"
-#single_tari_file <- "Single Tari Data.csv"
-single_tari_file <- "MES Data_Single Tari Data.csv"
 multi_pps_file <- "Multi-Layered PPS Data_UI_30 August 2017.csv"
 tapered_pps_file <- "Tapered PPS Data_UI_30 August 2017.csv"
-resin_file <- "Resin Information.csv"
-screw_file <- "Screw Properties.csv"
-parameter_file <- "Parameters and Yield.csv"
-time_file <- "Tari Time.csv"
-submitter_file <- "Tari Submitter.csv"
-total_file <- "Tari Total.csv"
+
+single_parameter_file <- "Single Parameters and Yield.csv"
+single_time_file <- "Single Tari Time.csv"
+single_submitter_file <- "Single Tari Submitter.csv"
+single_total_file <- "Single Tari Total.csv"
+
+multi_parameter_file <- "Multi Parameters and Yield.csv"
+multi_time_file <- "Multi Tari Time.csv"
+multi_submitter_file <- "Multi Tari Submitter.csv"
+multi_total_file <- "Multi Tari Total.csv"
+
+
 scrapcode_file <- "Scrap Codes.csv"
 
+resin_file <- "Resin Information.csv"
+screw_file <- "Screw Properties.csv"
+
+
+###
+
+
 single_pps_pathfile <- paste(path, single_pps_file, sep = "/")
-single_tari_pathfile <- paste(path, single_tari_file, sep = "/")
 multi_pps_pathfile <- paste(path, multi_pps_file, sep = "/")
 tapered_pps_pathfile <- paste(path, tapered_pps_file, sep = "/")
+
+single_parameter_filepath <- paste(path, single_parameter_file, sep = "/")
+single_time_filepath <- paste(path, single_time_file, sep = "/")
+single_submitter_filepath <- paste(path, single_submitter_file, sep = "/")
+single_total_filepath <- paste(path, single_total_file, sep = "/")
+
+multi_parameter_filepath <- paste(path, multi_parameter_file, sep = "/")
+multi_time_filepath <- paste(path, multi_time_file, sep = "/")
+multi_submitter_filepath <- paste(path, multi_submitter_file, sep = "/")
+multi_total_filepath <- paste(path, multi_total_file, sep = "/")
+
+scrapcode_filepath <- paste(path, scrapcode_file, sep = "/")
+
 resin_pathfile <- paste(path, resin_file, sep = "/")
 screw_pathfile <- paste(path, screw_file, sep = "/")
-single_parameter_filepath <- paste(path, parameter_file, sep = "/")
-single_time_filepath <- paste(path, time_file, sep = "/")
-single_submitter_filepath <- paste(path, submitter_file, sep = "/")
-single_total_filepath <- paste(path, total_file, sep = "/")
-scrapcode_filepath <- paste(path, scrapcode_file, sep = "/")
+
+
+###
+
 
 single_pps_data <- read.csv(single_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                             check.names = FALSE)
 single_pps_names <- names(single_pps_data)
-single_tari_data <- read.csv(single_tari_pathfile, header = TRUE, stringsAsFactors = FALSE, 
-                             check.names = FALSE)
 multi_pps_data <- read.csv(multi_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                            check.names = FALSE)
 tapered_pps_data <- read.csv(tapered_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                              check.names = FALSE)
-resin_data <- read.csv(resin_pathfile, header = TRUE, stringsAsFactors = FALSE, 
-                       check.names = FALSE)
-screw_data <- read.csv(screw_pathfile, header = TRUE, stringsAsFactors = FALSE, 
-                       check.names = FALSE)
+
 single_tari_parameter_data <- read.csv(single_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
 single_tari_time_data <- read.csv(single_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
@@ -80,9 +97,27 @@ single_tari_submitter_data <- read.csv(single_submitter_filepath, header = TRUE,
                        check.names = FALSE)
 single_tari_total_data <- read.csv(single_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
+
+multi_tari_parameter_data <- read.csv(multi_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                       check.names = FALSE)
+multi_tari_time_data <- read.csv(multi_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                  check.names = FALSE)
+multi_tari_submitter_data <- read.csv(multi_submitter_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                       check.names = FALSE)
+multi_tari_total_data <- read.csv(multi_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                   check.names = FALSE)
+
+
 scrapcodes_data <- read.csv(scrapcode_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
 
+resin_data <- read.csv(resin_pathfile, header = TRUE, stringsAsFactors = FALSE, 
+                       check.names = FALSE)
+screw_data <- read.csv(screw_pathfile, header = TRUE, stringsAsFactors = FALSE, 
+                       check.names = FALSE)
+
+
+###
 
 
 #getting the tapered buttons
