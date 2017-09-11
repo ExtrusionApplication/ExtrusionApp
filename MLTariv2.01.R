@@ -148,8 +148,7 @@ generateTariDataFrame <- function(data){
                            "Puller Speed Submitter")
   
   
-  
-  
+ 
   
   df_columnlength <- length(column_names)
   
@@ -430,7 +429,7 @@ generateTariDataFrame <- function(data){
                             Ext2_barrel_pressure_submit ,Ext2_adapter_pressure_submit,Ext2_mpoutlet_pressure_submit,
                             Ext3_barrel_pressure_submit ,Ext3_adapter_pressure_submit,Ext3_mpoutlet_pressure_submit,
                             puller_speed_submit)
-      
+
       
       submit_df[overall_batch_count, ] <- submit_data_vector
       
@@ -625,4 +624,7 @@ getValue <- function(data,ColName){
   
   return(output)
   
+
 }#end getValue Function
+
+
