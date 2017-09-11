@@ -2940,13 +2940,19 @@ server<-function(input,output,session){
   
   #### EXTRA ####
   
-
-  output$singleMESparameters <- renderDataTable({
+  #Generate the SingleMESparameters seperately, so that we can display it and use this data table in the 
+  #data analysis tab
+  
+  SingleMESparametersData<-reactive({
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
-    #filter on Date Range
     data <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
+    return (data)
+  })
 
+  output$singleMESparameters <- renderDataTable({
+  #This will display the chosen part number on the Single MES Parameters tab
+    data <- SingleMESparametersData()
     return(data)
   },
   options = list(orderClasses = TRUE,
@@ -3139,6 +3145,7 @@ server<-function(input,output,session){
     part <- input$SinglePartNum_input
     
     #Action button to delete part
+    
     deletepart <- as.character(
       actionButton(inputId = paste0("button_", part),
                    label = "Delete Part",
@@ -3158,13 +3165,135 @@ server<-function(input,output,session){
   #***************Data Analysis Tab******************************
   
   
+  Single<-reactive({
+    data<-SingleMESparametersData()
+    return(data)
+  })
+  
+  
+  # Multi<-reactive({
+  #   data<-MultiMESparametersData()
+  #   return(data)
+  # })
+  # Tapered<-({
+  #   data<-TaperedMESparametersData()
+  #   return(data)
+  # })
+  
+  # Swith the data set
+  plotdata <- reactive({
+    switch(input$MESType, "Single" = Single(), "Multi"=Multi(),"Tapered"=Tapered())
+  })
+
+
+  output$test_display <- renderDataTable({
+    #This will display the chosen part number on the Single MES Parameters tab
+    data <- plotdata()
+    return(data)
+  },
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',
+                                        targets = "_all"
+                 )
+                 ),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE) #end Single Extrusion PPS Data
+  
+  
+  
+  
+  
+  
+  
+  #***********Plot Part**********************
+  #Create a function to generate the plot
+  
+  
+  
+  # output$plotui <- renderUI({
+  #   plotOutput("myplot", height=300,
+  #              click = "plot_click",
+  #              dblclick = dblclickOpts(
+  #                id = "plot_dblclick",
+  #                delay = input$dblclick_delay
+  #              ),
+  #              brush = brushOpts(
+  #                id = "plot_brush",
+  #                delay = input$brush_delay,
+  #                delayType = input$brush_policy,
+  #                direction = input$brush_dir,
+  #                resetOnNew = input$brush_reset
+  #              )
+  #   )
+  # })
+  
+  
+  
+  # myPlot<-function(){
+  #   dat <- plotdata()
+  #   pc <- ggplot(plotdata(), aes_string(xvar(), yvar())) +
+  #     geom_point() +
+  #     theme_bw()
+  #   return(pc)
+  # }
+  # 
+  
+  
+  #Display the plot on the Analysis Tab
+  
+  
+  # 
+  # output$plot<-renderPlot({
+  #   myPlot()
+  # })
+  # 
+  
+  
+  #Download the plot to local
+  
+  
+  
+  # output$plotdownload <- downloadHandler(
+  #   filename =  function() {
+  #     paste(input$plottitle, input$savetype, sep=".")
+  #   },
+  #   # content is a function with argument file. content writes the plot to the device
+  #   
+  # 
+  #   content = function(file) {
+  #     if(input$savetype == "png")
+  #       png(file) # open the png device
+  #     else
+  #       pdf(file) # open the pdf device
+  #     myPlot() 
+  #     dev.off()  # turn the device off
+  #     
+  #   } 
+  # )
+  
+  
+#**********Data Table Part***************
+  
+  
+  # output$plot_brushed_points <- DT::renderDataTable({
+  #   dat <- plotdata()
+  #   
+  #   res <- brushedPoints(dat, input$plot_brush)
+  #   
+  #   datatable(res)
+  # })
+  
+  
+  
+  
 
 }
   
-
-
-
-
 
 # Run the application 
 shinyApp(ui = ui, server = server)
