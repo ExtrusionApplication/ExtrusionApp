@@ -1,4 +1,13 @@
 # ExtrusionApp
 
-AnalysisTab:Lingjie is creating a new analysis tab in this branch. In this branch, a new tab called Analysis will be created, and we will put the plot analysis in it.
-  
+So far, we totally have three main R files in the Extrusion App: UI,Server, Funcion 
+
+### UI
+### Server
+
+### Function
+(This R file contains of several external functions)
+#### 1. dropdownbutton
+This drop down list function can be used to make a multi choice drop down list. This function can be used by both the filter on the plot part and also any multiple choice in the previous tab
+#### 2. 
+
