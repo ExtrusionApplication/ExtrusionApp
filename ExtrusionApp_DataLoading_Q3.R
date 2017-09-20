@@ -1,18 +1,20 @@
 #This R code is used to load csv or xls file into R. And clean the raw data based on demand.
 #And we need to add more code to update our database daily
-library(shiny)
-library(bootstrap)
-library(jpeg)
-library(ggplot2)
-library(DT)
-library(stringr)
-library(gsubfn)
-library(proto)
-library(sqldf)
-library(plyr)
+require(shiny)
+require(bootstrap)
+require(jpeg)
+require(ggplot2)
+require(DT)
+require(stringr)
+require(gsubfn)
+require(proto)
+require(sqldf)
+require(plyr)
 
 
 #LOADING DATA
+
+source("//Mgrovef1/shared/Operations/EXTRUSIO/Felipe Correa Netto/Extrusion Application/Extra Files/Resin_Cleaning.R")
 
 
 #Testing the appstats data
@@ -48,10 +50,15 @@ multi_time_file <- "Multi Tari Time.csv"
 multi_submitter_file <- "Multi Tari Submitter.csv"
 multi_total_file <- "Multi Tari Total.csv"
 
+tapered_parameter_file <- "Tapered Parameters and Yield.csv"
+tapered_time_file <- "Tapered Tari Time.csv"
+tapered_submitter_file <- "Tapered Tari Submitter.csv"
+tapered_total_file <- "Tapered Tari Total.csv"
+
 
 scrapcode_file <- "Scrap Codes.csv"
 
-resin_file <- "Resin Information.csv"
+resin_file <- "Total Resin Information.csv"
 screw_file <- "Screw Properties.csv"
 
 
@@ -71,6 +78,11 @@ multi_parameter_filepath <- paste(path, multi_parameter_file, sep = "/")
 multi_time_filepath <- paste(path, multi_time_file, sep = "/")
 multi_submitter_filepath <- paste(path, multi_submitter_file, sep = "/")
 multi_total_filepath <- paste(path, multi_total_file, sep = "/")
+
+tapered_parameter_filepath <- paste(path, tapered_parameter_file, sep = "/")
+tapered_time_filepath <- paste(path, tapered_time_file, sep = "/")
+tapered_submitter_filepath <- paste(path, tapered_submitter_file, sep = "/")
+tapered_total_filepath <- paste(path, tapered_total_file, sep = "/")
 
 scrapcode_filepath <- paste(path, scrapcode_file, sep = "/")
 
@@ -106,6 +118,15 @@ multi_tari_submitter_data <- read.csv(multi_submitter_filepath, header = TRUE, s
                                        check.names = FALSE)
 multi_tari_total_data <- read.csv(multi_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
                                    check.names = FALSE)
+
+tapered_tari_parameter_data <- read.csv(tapered_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                      check.names = FALSE)
+tapered_tari_time_data <- read.csv(tapered_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                 check.names = FALSE)
+tapered_tari_submitter_data <- read.csv(tapered_submitter_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                      check.names = FALSE)
+tapered_tari_total_data <- read.csv(tapered_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                  check.names = FALSE)
 
 
 scrapcodes_data <- read.csv(scrapcode_filepath, header = TRUE, stringsAsFactors = FALSE, 
@@ -283,25 +304,66 @@ PCTToLengthmin=tapered_pps_range[[1,26]];PCTToLengthmax=tapered_pps_range[[2,26]
 
 #convert NA to blank for all length and temperature values
 single_pps_data[is.na(single_pps_data)]<-""
-single_tari_data[is.na(single_tari_data)]<-""
 multi_pps_data[is.na(multi_pps_data)]<-""
 tapered_pps_data[is.na(tapered_pps_data)]<-""
+
+single_tari_parameter_data[is.na(single_tari_parameter_data)]<-""
+single_tari_time_data[is.na(single_tari_time_data)]<-""
+single_tari_submitter_data[is.na(single_tari_submitter_data)]<-""
+single_tari_total_data[is.na(single_tari_total_data)]<-""
+
+multi_tari_parameter_data[is.na(multi_tari_parameter_data)]<-""
+multi_tari_time_data[is.na(multi_tari_time_data)]<-""
+multi_tari_submitter_data[is.na(multi_tari_submitter_data)]<-""
+multi_tari_total_data[is.na(multi_tari_total_data)]<-""
+
+tapered_tari_parameter_data[is.na(tapered_tari_parameter_data)]<-""
+tapered_tari_time_data[is.na(tapered_tari_time_data)]<-""
+tapered_tari_submitter_data[is.na(tapered_tari_submitter_data)]<-""
+tapered_tari_total_data[is.na(tapered_tari_total_data)]<-""
+
 resin_data[is.na(resin_data)]<-""
 screw_data[is.na(screw_data)]<-""
 
 
 
 #Output--MES--get the start date from Start Time
-temp=as.data.frame(matrix(0,nrow=nrow(single_tari_data),ncol=2))
+temp=as.data.frame(matrix(0,nrow=nrow(single_tari_parameter_data),ncol=2))
 colnames(temp)=c("Start Date","Start Time")
-temp[,1:2]=str_split_fixed(single_tari_data$`Start Time`,' ',2)
+temp[,1:2]=str_split_fixed(single_tari_parameter_data$`Start Time`,' ',2)
 temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
-single_tari_data=cbind(single_tari_data[,1:which(colnames(single_tari_data)=="Start Time")-1],
-                       temp,single_tari_data[,(which(colnames(single_tari_data)=="Start Time")+1):ncol(single_tari_data)])
-Time_Start=sqldf("select Min([Start Date]) from single_tari_data")
+single_tari_parameter_data=cbind(single_tari_parameter_data[,1:which(colnames(single_tari_parameter_data)=="Start Time")-1],
+                       temp,single_tari_parameter_data[,(which(colnames(single_tari_parameter_data)=="Start Time")+1):ncol(single_tari_parameter_data)])
+Time_Start=sqldf("select Min([Start Date]) from single_tari_parameter_data")
 Time_Start<-as.numeric(Time_Start)
 Time_Start<-as.Date(Time_Start,origin="1970-01-01")
-Time_End<-sqldf("select Max([Start Date]) from single_tari_data")
+Time_End<-sqldf("select Max([Start Date]) from single_tari_parameter_data")
+Time_End<-as.numeric(Time_End)
+Time_End<-as.Date(Time_End,origin="1970-01-01")
+
+temp=as.data.frame(matrix(0,nrow=nrow(multi_tari_parameter_data),ncol=2))
+colnames(temp)=c("Start Date","Start Time")
+temp[,1:2]=str_split_fixed(multi_tari_parameter_data$`Start Time`,' ',2)
+temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
+multi_tari_parameter_data=cbind(multi_tari_parameter_data[,1:which(colnames(multi_tari_parameter_data)=="Start Time")-1],
+                                 temp,multi_tari_parameter_data[,(which(colnames(multi_tari_parameter_data)=="Start Time")+1):ncol(multi_tari_parameter_data)])
+Time_Start=sqldf("select Min([Start Date]) from multi_tari_parameter_data")
+Time_Start<-as.numeric(Time_Start)
+Time_Start<-as.Date(Time_Start,origin="1970-01-01")
+Time_End<-sqldf("select Max([Start Date]) from multi_tari_parameter_data")
+Time_End<-as.numeric(Time_End)
+Time_End<-as.Date(Time_End,origin="1970-01-01")
+
+temp=as.data.frame(matrix(0,nrow=nrow(tapered_tari_parameter_data),ncol=2))
+colnames(temp)=c("Start Date","Start Time")
+temp[,1:2]=str_split_fixed(tapered_tari_parameter_data$`Start Time`,' ',2)
+temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
+tapered_tari_parameter_data=cbind(tapered_tari_parameter_data[,1:which(colnames(tapered_tari_parameter_data)=="Start Time")-1],
+                                 temp,tapered_tari_parameter_data[,(which(colnames(tapered_tari_parameter_data)=="Start Time")+1):ncol(tapered_tari_parameter_data)])
+Time_Start=sqldf("select Min([Start Date]) from tapered_tari_parameter_data")
+Time_Start<-as.numeric(Time_Start)
+Time_Start<-as.Date(Time_Start,origin="1970-01-01")
+Time_End<-sqldf("select Max([Start Date]) from tapered_tari_parameter_data")
 Time_End<-as.numeric(Time_End)
 Time_End<-as.Date(Time_End,origin="1970-01-01")
 
@@ -317,6 +379,17 @@ for (i in 1:nrow(multi_pps_data)){
     multi_pps_data[i,"PPS Number"]=multi_pps_data[i-1,"PPS Number"]
   }
 }
+
+
+
+
+
+#### Adding the Resin Information ####
+
+single_pps_data <- addResinsToParts(single_pps_data, resin_data)
+multi_pps_data <- addResinsToParts(multi_pps_data, resin_data)
+tapered_pps_data <- addResinsToParts(tapered_pps_data, resin_data)
+
 
 #### Button vectors for PPS documents ####
 

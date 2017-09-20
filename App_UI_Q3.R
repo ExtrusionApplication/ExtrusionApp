@@ -1,14 +1,14 @@
-library(shiny)
-library(bootstrap)
-library(jpeg)
-library(ggplot2)
-library(DT)
-library(stringr)
-library(gsubfn)
-library(proto)
-library(sqldf)
-library(shinyjs)
-library(shinyBS)
+require(shiny)
+require(bootstrap)
+require(jpeg)
+require(ggplot2)
+require(DT)
+require(stringr)
+require(gsubfn)
+require(proto)
+require(sqldf)
+require(shinyjs)
+require(shinyBS)
 
 
 #_s:name of the checkbox
@@ -21,7 +21,7 @@ library(shinyBS)
 ui<-navbarPage("Extrusion Application",
                navbarMenu("Part Catalog",   #Create a dropdown list named as Part Catalog containing of Single, Multi,and Tapered
                           #Single Extrusion PPS Data
-                          tabPanel("Single Extrusion PPS Data",
+                          tabPanel("Single Layer Extrusion PPS Data",
                                    #Part Resin
                                    fluidRow(
                                      tags$h1(strong("Part Resin"),style="font-size:25px;",align="left"), #Use tag to add a hearder 
@@ -72,6 +72,55 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCSPPSN",label = NULL,
                                                             c("All",unique(as.character(single_pps_data$`PPS Number`))))
                                               )))
+                                   ),
+                                   #Resin Information
+                                   fluidRow(
+                                     tags$h1(strong("Resin Information"),style="font-size:25px;",align="left"),
+                                     #Resin Families
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRF_d","Resin Families",value=F))
+                                     ), 
+                                     #Is Resin Blended with Anything?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRBQ_d","Is Resin Blended with Anything?",value=F))
+                                            ), 
+                                     #Is Resin a Polymer Blend?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRPBQ_d","Is Resin a Polymer Blend?",value=F))
+                                            ),
+                                     #Is Resin Filled?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRFQ_d","Is Resin Filled?",value=F))
+                                            ),
+                                     #Resin Fillers
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRFi_d","Resin Fillers",value=F))
+                                            ),
+                                     #Is Resin Colored?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRCQ_d","Is Resin Colored?",value=F))
+                                            ),
+                                     #Resin Color
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRC_d","Resin Color",value=F))
+                                            ),
+                                     #Is Resin Radiopaque?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRRQ_d","Is Resin Radiopaque?",value=F))
+                                            ),
+                                     #Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRDu_d","Resin Durometer (D)",value=F))
+                                            ),
+                                     #Average Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRADu_d","Average Durometer (D)",value=F))
+                                            )
+                                   ),#end Resin Information
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checksingleresininfo", "Show All Resin Information"),
+                                     actionButton("unchecksingleresininfo", "Hide All Resin Information")
                                    ),
                                    #Tooling
                                    fluidRow(
@@ -420,7 +469,7 @@ ui<-navbarPage("Extrusion Application",
                                    )
                           ),#end Single Extrusion PPS Data
                           #Multi Extrusion PPS Data---UI
-                          tabPanel("Multi Extrusion PPS Data",
+                          tabPanel("Multi-Layer Extrusion PPS Data",
                                    #Part Resin
                                    fluidRow(
                                      tags$h1(strong("Part Resin"),style="font-size:25px;",align="left"),
@@ -473,16 +522,66 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCMPPSN",label = NULL,
                                                             c("All",unique(as.character(multi_pps_data$`PPS Number`))))
 
-                                              ))),
-                                     #Extrusion Type
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMET_d","Extrusion Type",value=T))
-                                            )
+                                              )))
 
+                                   ),
+                                   
+                                   #Resin Information
+                                   fluidRow(
+                                     tags$h1(strong("Resin Information"),style="font-size:25px;",align="left"),
+                                     #Resin Families
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRF_d","Resin Families",value=F))
+                                     ), 
+                                     #Is Resin Blended with Anything?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRBQ_d","Is Resin Blended with Anything?",value=F))
+                                     ), 
+                                     #Is Resin a Polymer Blend?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRPBQ_d","Is Resin a Polymer Blend?",value=F))
+                                     ),
+                                     #Is Resin Filled?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRFQ_d","Is Resin Filled?",value=F))
+                                     ),
+                                     #Resin Fillers
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRFi_d","Resin Fillers",value=F))
+                                     ),
+                                     #Is Resin Colored?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRCQ_d","Is Resin Colored?",value=F))
+                                     ),
+                                     #Resin Color
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRC_d","Resin Color",value=F))
+                                     ),
+                                     #Is Resin Radiopaque?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRRQ_d","Is Resin Radiopaque?",value=F))
+                                     ),
+                                     #Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRDu_d","Resin Durometer (D)",value=F))
+                                     ),
+                                     #Average Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRADu_d","Average Durometer (D)",value=F))
+                                     )
+                                   ),#end Resin Information
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checkmultiresininfo", "Show All Resin Information"),
+                                     actionButton("uncheckmultiresininfo", "Hide All Resin Information")
                                    ),
                                    #Tooling
                                    fluidRow(
                                      tags$h1(strong("Tooling"),style="font-size:25px;",align="left"),
+                                     #Extrusion Type
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMET_d","Extrusion Type",value=T))
+                                     ),
                                      #Barrel
                                      column(2,
                                             fluidRow(checkboxInput("PCMB_d","Barrel",value=F))
@@ -998,6 +1097,56 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCTPPSN",label = NULL,
                                                             c("All",unique(as.character(single_pps_data$`PPS Number`))))
                                               )))
+                                   ),
+                                   
+                                   #Resin Information
+                                   fluidRow(
+                                     tags$h1(strong("Resin Information"),style="font-size:25px;",align="left"),
+                                     #Resin Families
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRF_d","Resin Families",value=F))
+                                     ), 
+                                     #Is Resin Blended with Anything?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRBQ_d","Is Resin Blended with Anything?",value=F))
+                                     ), 
+                                     #Is Resin a Polymer Blend?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRPBQ_d","Is Resin a Polymer Blend?",value=F))
+                                     ),
+                                     #Is Resin Filled?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRFQ_d","Is Resin Filled?",value=F))
+                                     ),
+                                     #Resin Fillers
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRFi_d","Resin Fillers",value=F))
+                                     ),
+                                     #Is Resin Colored?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRCQ_d","Is Resin Colored?",value=F))
+                                     ),
+                                     #Resin Color
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRC_d","Resin Color",value=F))
+                                     ),
+                                     #Is Resin Radiopaque?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRRQ_d","Is Resin Radiopaque?",value=F))
+                                     ),
+                                     #Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRDu_d","Resin Durometer (D)",value=F))
+                                     ),
+                                     #Average Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRADu_d","Average Durometer (D)",value=F))
+                                     )
+                                   ),#end Resin Information
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checktaperedresininfo", "Show All Resin Information"),
+                                     actionButton("unchecktaperedresininfo", "Hide All Resin Information")
                                    ),
                                    #Tooling
                                    fluidRow(
@@ -1593,18 +1742,22 @@ ui<-navbarPage("Extrusion Application",
                navbarMenu("Tapered Extrusion MES Data",
                           tabPanel("Tapered Parameters and Yield",
                                    fluidRow(
+                                     DT::dataTableOutput("taperedMESparameters")
                                    )
                           ),
                           tabPanel("Tapered Time Stamps",
                                    fluidRow(
+                                     DT::dataTableOutput("taperedMEStime")
                                    )
                           ),
                           tabPanel("Tapered Submitters",
                                    fluidRow(
+                                     DT::dataTableOutput("taperedMESsubmitter")
                                    )
                           ),
                           tabPanel("Tapered Total",
                                    fluidRow(
+                                     DT::dataTableOutput("taperedMEStotal")
                                    )
                           )
                ),
@@ -1625,6 +1778,7 @@ ui<-navbarPage("Extrusion Application",
                           ),
                           tabPanel("Tapered Extrusion",
                                    fluidRow(
+                                     DT::dataTableOutput("taperedscrapcodes")
                                    )
                           )
                ),
@@ -1641,6 +1795,21 @@ ui<-navbarPage("Extrusion Application",
                           tabPanel("Laserlinc",
                                    fluidRow(
                                      DT::dataTableOutput("laserlinc")
+                                   )
+                          )
+               ), #end the NavbarMenu
+               
+               #Extra Features
+               navbarMenu("Extra Information",
+                          #Single Extrusion PPS Data
+                          tabPanel("Resin Information",
+                                   fluidRow(
+                                     DT::dataTableOutput("resin_data_ui")
+                                   )
+                          ),
+                          tabPanel("Screw Print Information",
+                                   fluidRow(
+                                     DT::dataTableOutput("screw_data_ui")
                                    )
                           )
                ), #end the NavbarMenu
