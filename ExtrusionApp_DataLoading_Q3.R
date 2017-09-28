@@ -124,6 +124,10 @@ extra_sampling_data <- read.csv(extra_sampling_pathfile, header = TRUE, stringsA
 all_sampling_data <- read.csv(all_sampling_pathfile, header = TRUE, stringsAsFactors = FALSE,
                                  check.names = FALSE)
 
+multi_sampling_data[is.na(multi_sampling_data)] <- ""
+tapered_sampling_data[is.na(tapered_sampling_data)] <- ""
+
+
 single_tari_parameter_data <- read.csv(single_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
 single_tari_time_data <- read.csv(single_time_filepath, header = TRUE, stringsAsFactors = FALSE, 

@@ -4319,32 +4319,167 @@ server<-function(input,output,session){
   
   #### Sampling and Test Method Information ####
   
-  output$single_sampling_ui <- renderDataTable(single_sampling_data,
-                                          filter = "top",
+  single_sampling_data_test <- reactiveValues(data = single_sampling_data)
+  
+  observeEvent(input$search_single_sampling,{
+    search <- c(input$sspn, input$ssppsn, input$ssatt, input$ssmm, input$sssam, input$sslsl,
+                input$sslcl, input$sstar, input$ssucl, input$ssusl, input$ssprean, input$sspostan,
+                input$ssoff, input$sspostirr)
+    columns <- ncol(single_sampling_data)
+    count <- 1
+    placeholder <- single_sampling_data
+    
+    while (count < columns + 1){
+      placeholder <- placeholder[grep(search[count], placeholder[,count], ignore.case = TRUE),]
+      count <- count + 1
+    }#end while
+    
+    
+    single_sampling_data_test$data <- placeholder
+    
+  })
+  
+  observeEvent(input$reset_single_sampling,{
+    single_sampling_data_test$data <- single_sampling_data
+  })
+  
+  
+  output$single_sampling_ui <- renderDataTable(single_sampling_data_test$data,
                                           rownames = FALSE,
                                           escape = FALSE,
                                           server = FALSE)
   
-  output$multi_sampling_ui <- renderDataTable(multi_sampling_data,
-                                               filter = "top",
+  
+  
+  #Multi
+  multi_sampling_data_test <- reactiveValues(data = multi_sampling_data)
+  
+  observeEvent(input$search_multi_sampling,{
+    search <- c(input$mspn, input$msppsn, input$msatt, input$msmm, input$mssam, input$mslsl,
+                input$mslcl, input$mstar, input$msucl, input$msusl, input$msprean, input$mspostan,
+                input$msoff, input$mspostirr)
+    columns <- ncol(multi_sampling_data)
+    count <- 1
+    placeholder <- multi_sampling_data
+    
+    while (count < columns + 1){
+      placeholder <- placeholder[grep(search[count], placeholder[,count], ignore.case = TRUE),]
+      count <- count + 1
+    }#end while
+    
+    
+    multi_sampling_data_test$data <- placeholder
+    
+  })
+  
+  observeEvent(input$reset_multi_sampling,{
+    multi_sampling_data_test$data <- multi_sampling_data
+  })
+  
+  output$multi_sampling_ui <- renderDataTable(multi_sampling_data_test$data,
                                                rownames = FALSE,
                                                escape = FALSE,
                                                server = FALSE)
   
-  output$tapered_sampling_ui <- renderDataTable(tapered_sampling_data,
-                                               filter = "top",
+  
+  
+  
+  
+  #Tapered
+  tapered_sampling_data_test <- reactiveValues(data = tapered_sampling_data)
+  
+  observeEvent(input$search_tapered_sampling,{
+    search <- c(input$tspn, input$tsppsn, input$tsatt, input$tsmm, input$tssam, input$tslsl,
+                input$tslcl, input$tstar, input$tsucl, input$tsusl, input$tsprean, input$tspostan,
+                input$tsoff, input$tspostirr)
+    columns <- ncol(tapered_sampling_data)
+    count <- 1
+    placeholder <- tapered_sampling_data
+    
+    while (count < columns + 1){
+      placeholder <- placeholder[grep(search[count], placeholder[,count], ignore.case = TRUE),]
+      count <- count + 1
+    }#end while
+    
+    
+    tapered_sampling_data_test$data <- placeholder
+    
+  })
+  
+  observeEvent(input$reset_tapered_sampling,{
+    tapered_sampling_data_test$data <- tapered_sampling_data
+  })
+  
+  output$tapered_sampling_ui <- renderDataTable(tapered_sampling_data_test$data,
                                                rownames = FALSE,
                                                escape = FALSE,
                                                server = FALSE)
   
-  output$extra_sampling_ui <- renderDataTable(extra_sampling_data,
-                                               filter = "top",
+  
+  
+  
+  
+  #Extra
+  extra_sampling_data_test <- reactiveValues(data = extra_sampling_data)
+  
+  observeEvent(input$search_extra_sampling,{
+    search <- c(input$espn, input$esppsn, input$esatt, input$esmm, input$essam, input$eslsl,
+                input$eslcl, input$estar, input$esucl, input$esusl, input$esprean, input$espostan,
+                input$esoff, input$espostirr)
+    columns <- ncol(extra_sampling_data)
+    count <- 1
+    placeholder <- extra_sampling_data
+    
+    while (count < columns + 1){
+      placeholder <- placeholder[grep(search[count], placeholder[,count], ignore.case = TRUE),]
+      count <- count + 1
+    }#end while
+    
+    
+    extra_sampling_data_test$data <- placeholder
+    
+  })
+  
+  observeEvent(input$reset_extra_sampling,{
+    extra_sampling_data_test$data <- extra_sampling_data
+  })
+  
+  output$extra_sampling_ui <- renderDataTable(extra_sampling_data_test$data,
                                                rownames = FALSE,
                                                escape = FALSE,
                                                server = FALSE)
   
-  output$all_sampling_ui <- renderDataTable(all_sampling_data,
-                                               filter = "top",
+  
+  
+  
+  
+  
+  #All
+  all_sampling_data_test <- reactiveValues(data = all_sampling_data)
+  
+  observeEvent(input$search_all_sampling,{
+    search <- c(input$aspn, input$asppsn, input$asatt, input$asmm, input$assam, input$aslsl,
+                input$aslcl, input$astar, input$asucl, input$asusl, input$asprean, input$aspostan,
+                input$asoff, input$aspostirr)
+    columns <- ncol(all_sampling_data)
+    count <- 1
+    placeholder <- all_sampling_data
+    
+    while (count < columns + 1){
+      placeholder <- placeholder[grep(search[count], placeholder[,count], ignore.case = TRUE),]
+      count <- count + 1
+    }#end while
+    
+    
+    all_sampling_data_test$data <- placeholder
+    
+  })
+  
+  observeEvent(input$reset_all_sampling,{
+    all_sampling_data_test$data <- all_sampling_data
+  })
+  
+  output$all_sampling_ui <- renderDataTable(all_sampling_data_test$data,
                                                rownames = FALSE,
                                                escape = FALSE,
                                                server = FALSE)
