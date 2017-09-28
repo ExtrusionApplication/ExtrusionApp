@@ -1690,6 +1690,35 @@ ui<-navbarPage("Extrusion Application",
                ),
                
                
+               #Sampling and Test method information
+               navbarMenu("Sampling and Test Method Information",
+                          tabPanel("Single Extrusion",
+                                   fluidRow(
+                                     DT::dataTableOutput("single_sampling_ui")
+                                   )
+                          ),
+                          tabPanel("Multi-Layer Extrusion",
+                                   fluidRow(
+                                     DT::dataTableOutput("multi_sampling_ui")
+                                   )
+                          ),
+                          tabPanel("Tapered Extrusion",
+                                   fluidRow(
+                                     DT::dataTableOutput("tapered_sampling_ui")
+                                   )
+                          ),
+                          tabPanel("Extra Extrusion",
+                                   fluidRow(
+                                     DT::dataTableOutput("extra_sampling_ui")
+                                   )
+                          ),
+                          tabPanel("All Extrusion",
+                                   fluidRow(
+                                     DT::dataTableOutput("all_sampling_ui")
+                                   )
+                          )
+               ), #End sampling and test method navbar
+               
                #Single Extrusion MES Data table rendering
                navbarMenu("Single Extrusion MES Data",
                           tabPanel("MES Parameters and Yield",

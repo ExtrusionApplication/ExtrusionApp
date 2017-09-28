@@ -4316,6 +4316,42 @@ server<-function(input,output,session){
     
   }) #end observeEvent for add tapered manual
   
+  
+  #### Sampling and Test Method Information ####
+  
+  output$single_sampling_ui <- renderDataTable(single_sampling_data,
+                                          filter = "top",
+                                          rownames = FALSE,
+                                          escape = FALSE,
+                                          server = FALSE)
+  
+  output$multi_sampling_ui <- renderDataTable(multi_sampling_data,
+                                               filter = "top",
+                                               rownames = FALSE,
+                                               escape = FALSE,
+                                               server = FALSE)
+  
+  output$tapered_sampling_ui <- renderDataTable(tapered_sampling_data,
+                                               filter = "top",
+                                               rownames = FALSE,
+                                               escape = FALSE,
+                                               server = FALSE)
+  
+  output$extra_sampling_ui <- renderDataTable(extra_sampling_data,
+                                               filter = "top",
+                                               rownames = FALSE,
+                                               escape = FALSE,
+                                               server = FALSE)
+  
+  output$all_sampling_ui <- renderDataTable(all_sampling_data,
+                                               filter = "top",
+                                               rownames = FALSE,
+                                               escape = FALSE,
+                                               server = FALSE)
+  
+  
+  
+  
   #### Extra Information ####
   
   #The resin data

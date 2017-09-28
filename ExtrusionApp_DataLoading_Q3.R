@@ -40,6 +40,12 @@ single_pps_file <- "Single PPS Data_UI_30 August 2017.csv"
 multi_pps_file <- "Multi-Layered PPS Data_UI_30 August 2017.csv"
 tapered_pps_file <- "Tapered PPS Data_UI_30 August 2017.csv"
 
+single_sampling_file <- "Single Sampling.csv"
+multi_sampling_file <- "Multi Sampling.csv"
+tapered_sampling_file <- "Tapered Sampling.csv"
+extra_sampling_file <- "Extra Sampling.csv"
+all_sampling_file <- "All Sampling.csv"
+
 single_parameter_file <- "Single Parameters and Yield.csv"
 single_time_file <- "Single Tari Time.csv"
 single_submitter_file <- "Single Tari Submitter.csv"
@@ -68,6 +74,12 @@ screw_file <- "Screw Properties.csv"
 single_pps_pathfile <- paste(path, single_pps_file, sep = "/")
 multi_pps_pathfile <- paste(path, multi_pps_file, sep = "/")
 tapered_pps_pathfile <- paste(path, tapered_pps_file, sep = "/")
+
+single_sampling_pathfile <- paste(path, single_sampling_file, sep = "/")
+multi_sampling_pathfile <- paste(path, multi_sampling_file, sep = "/")
+tapered_sampling_pathfile <- paste(path, tapered_sampling_file, sep = "/")
+extra_sampling_pathfile <- paste(path, extra_sampling_file, sep = "/")
+all_sampling_pathfile <- paste(path, all_sampling_file, sep = "/")
 
 single_parameter_filepath <- paste(path, single_parameter_file, sep = "/")
 single_time_filepath <- paste(path, single_time_file, sep = "/")
@@ -100,6 +112,17 @@ multi_pps_data <- read.csv(multi_pps_pathfile, header = TRUE, stringsAsFactors =
                            check.names = FALSE)
 tapered_pps_data <- read.csv(tapered_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                              check.names = FALSE)
+
+single_sampling_data <- read.csv(single_sampling_pathfile, header = TRUE, stringsAsFactors = FALSE,
+                                 check.names = FALSE)
+multi_sampling_data <- read.csv(multi_sampling_pathfile, header = TRUE, stringsAsFactors = FALSE,
+                                 check.names = FALSE)
+tapered_sampling_data <- read.csv(tapered_sampling_pathfile, header = TRUE, stringsAsFactors = FALSE,
+                                 check.names = FALSE)
+extra_sampling_data <- read.csv(extra_sampling_pathfile, header = TRUE, stringsAsFactors = FALSE,
+                                 check.names = FALSE)
+all_sampling_data <- read.csv(all_sampling_pathfile, header = TRUE, stringsAsFactors = FALSE,
+                                 check.names = FALSE)
 
 single_tari_parameter_data <- read.csv(single_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
