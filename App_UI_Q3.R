@@ -18,7 +18,7 @@ require(shinyBS)
 #PCM: Part Catalog--Multi Extrusion PPS
 #PCT: Part Catalog--Tapered Extrusion PPS
 
-ui<-navbarPage("Extrusion Application",
+ui<-navbarPage("SIBYL - Extrusion Application",
                navbarMenu("Part Catalog",   #Create a dropdown list named as Part Catalog containing of Single, Multi,and Tapered
                           #Single Extrusion PPS Data
                           tabPanel("Single Layer Extrusion PPS Data",
@@ -1800,10 +1800,10 @@ ui<-navbarPage("Extrusion Application",
                                             textInput("mspostan","Post-Annealing")
                                      ),
                                      column(3,
-                                            textInput("msoff","Offline after some Time")  
+                                            textInput("msoff","Offline After Some Time")  
                                      ),
                                      column(3,
-                                            textInput("mspostirr","Post-Irradiated")  
+                                            textInput("mspostirr","Post Irradiated")  
                                      )
                                    ),
                                    fluidRow(
