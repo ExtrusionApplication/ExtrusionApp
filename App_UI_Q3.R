@@ -11,6 +11,7 @@ require(shinyjs)
 require(shinyBS)
 
 
+
 #_s:name of the checkbox
 #_d:id of the output of checkbox
 #_input: the name of the searchbox
