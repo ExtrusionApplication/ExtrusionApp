@@ -1080,7 +1080,7 @@ server<-function(input,output,session){
     #downlaod the single PPS data from the shopping cart
     filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcart$data$'Part'),2:ncol(single_pps_data)], 
+      write.csv(single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcartparts$data$'Part'),2:ncol(single_pps_data)], 
                 file, row.names = FALSE)
     }
   )
