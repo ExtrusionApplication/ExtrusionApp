@@ -84,7 +84,7 @@ ui<-dashboardPage(
               #Part Resin
               fluidRow(
                 box(title = "Part, Resin, and PPS - Numbers and Descriptions", 
-                    solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                    solidHeader = TRUE, status = "info", collapsible = TRUE, width = 12,
                     #Part Number
                     column(2, align = "center", style='padding-left: 20px; padding-right:20px;',
                            
@@ -183,8 +183,12 @@ ui<-dashboardPage(
                     ),#end Resin Information
                 fluidRow(
                   #fluid row for showing or deleting buttons
-                  actionButton("checksingleresininfo", "Show All Resin Information"),
-                  actionButton("unchecksingleresininfo", "Hide All Resin Information")
+                  column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                         actionButton("checksingleresininfo", "Show All Resin Information")
+                  ),
+                  column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                         actionButton("unchecksingleresininfo", "Hide All Resin Information")
+                  )
                 )
                 )
               ),
@@ -193,7 +197,7 @@ ui<-dashboardPage(
               #Tooling
               fluidRow(
                 box(title = "Tooling Parameters", 
-                    solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                    solidHeader = TRUE, status = "info", collapsible = TRUE, width = 12,
                     
                     fluidRow(
                       #Die Size
@@ -246,8 +250,12 @@ ui<-dashboardPage(
                     ),#end Tooling
                 fluidRow(
                   #fluid row for showing or deleting buttons
-                  actionButton("checksingletooling", "Show All Tooling"),
-                  actionButton("unchecksingletooling", "Hide All Tooling")
+                  column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                         actionButton("checksingletooling", "Show All Tooling")
+                  ),
+                  column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                         actionButton("unchecksingletooling", "Hide All Tooling")
+                  )
                 )
                 )
                 ),
@@ -351,8 +359,12 @@ ui<-dashboardPage(
                 ), #end Processing Attribute 
                 fluidRow(
                   #fluid row for showing or deleting buttons
-                  actionButton("checksingleparameters", "Show All Processing Parameters"),
-                  actionButton("unchecksingleparameters", "Hide All Processing Parameters")
+                  column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                         actionButton("checksingleparameters", "Show All Processing Parameters")
+                  ),
+                  column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                         actionButton("unchecksingleparameters", "Hide All Processing Parameters")
+                  )
                 )
                 )
                 ),
@@ -360,7 +372,7 @@ ui<-dashboardPage(
               #Dimentional Attribute
               fluidRow(
                 box(title = "Dimensional Attributes", 
-                    solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                    solidHeader = TRUE, status = "info", collapsible = TRUE, width = 12,
                     
                     fluidRow(
                       #Inner Diameter
@@ -442,8 +454,12 @@ ui<-dashboardPage(
                            )))), #End Dimentional Attribute
                 fluidRow(
                   #fluid row for showing or deleting buttons
-                  actionButton("checksingledimensions", "Show All Dimensional Attributes"),
-                  actionButton("unchecksingledimensions", "Hide All Dimensional Attributes")
+                  column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                         actionButton("checksingledimensions", "Show All Dimensional Attributes")
+                  ),
+                  column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                         actionButton("unchecksingledimensions", "Hide All Dimensional Attributes")
+                  )
                 )
                 )
               ),
@@ -541,31 +557,50 @@ ui<-dashboardPage(
                     ), #end Special Operation
                     fluidRow(
                       #fluid row for showing or deleting buttons
-                      actionButton("checksinglespecial", "Show All Special Operations"),
-                      actionButton("unchecksinglespecial", "Hide All Special Operations")
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("checksinglespecial", "Show All Special Operations")
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("unchecksinglespecial", "Hide All Special Operations")
+                      )
                     )
                 )
               ),
               
               # Show Table
               fluidRow(
-                DT::dataTableOutput("mytable1")
+                box(title = "Part Listings", 
+                    solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                    DT::dataTableOutput("mytable1")
+                )
               ),
               fluidRow(
-                downloadButton('singledownloadSPPSData','Download Single PPS Data'),
-                downloadButton('singledownloadSPPSDataAll','Download Single PPS Data with All Parameters'),
-                actionButton('resetsingleinputs', "Reset Single Input Parameters")
+                box(title = "Special Operations", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('singledownloadSPPSData','Download Single PPS Data')
+                      ),
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('singledownloadSPPSDataAll','Download Single PPS Data with All Parameters')
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton('resetsingleinputs', "Reset Single Input Parameters")
+                      )
+                    )
+                )
               )
+              
       ),#end tabItem
       tabItem(tabName = "multippstab",
               #Part Resin
               fluidRow(
                 box(title = "Part, Resin, and PPS - Numbers and Descriptions", 
-                    solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                    solidHeader = TRUE, status = "info", collapsible = TRUE, width = 12,
                     
                     fluidRow(
                       #Part Number
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMPN_d","Part Number",value=TRUE)),
                              fluidRow(
                                conditionalPanel(
@@ -576,7 +611,7 @@ ui<-dashboardPage(
                                  
                                ))),
                       # Part Description
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMPD_d","Part Description",value=TRUE)),
                              fluidRow(
                                conditionalPanel(
@@ -585,7 +620,7 @@ ui<-dashboardPage(
                                              c("All",unique(as.character(multi_pps_data$`Part Description`))))
                                ))), 
                       # Resin Number
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRN_d","Resin Number",value=TRUE)),
                              fluidRow(
                                conditionalPanel(
@@ -594,7 +629,7 @@ ui<-dashboardPage(
                                              c("All",unique(as.character(multi_pps_data$`Resin Number`))))
                                ))),
                       #Resin Description
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRD_d","Resin Description",value=TRUE)),
                              fluidRow(
                                conditionalPanel(
@@ -605,7 +640,7 @@ ui<-dashboardPage(
                                  
                                ))),
                       #PPS Number
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMPPSN_d","PPS Number",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -627,69 +662,73 @@ ui<-dashboardPage(
                     fluidRow(
                       tags$h1(strong("Resin Information"),style="font-size:25px;",align="left"),
                       #Resin Families
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRF_d","Resin Families",value=F))
                       ), 
                       #Is Resin Blended with Anything?
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRBQ_d","Is Resin Blended with Anything?",value=F))
                       ), 
                       #Is Resin a Polymer Blend?
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRPBQ_d","Is Resin a Polymer Blend?",value=F))
                       ),
                       #Is Resin Filled?
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRFQ_d","Is Resin Filled?",value=F))
                       ),
                       #Resin Fillers
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRFi_d","Resin Fillers",value=F))
                       ),
                       #Is Resin Colored?
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRCQ_d","Is Resin Colored?",value=F))
                       ),
                       #Resin Color
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRC_d","Resin Color",value=F))
                       ),
                       #Is Resin Radiopaque?
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRRQ_d","Is Resin Radiopaque?",value=F))
                       ),
                       #Resin Durometer
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRDu_d","Resin Durometer (D)",value=F))
                       ),
                       #Average Resin Durometer
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRADu_d","Average Durometer (D)",value=F))
                       )
                     ),#end Resin Information
                     fluidRow(
                       #fluid row for showing or deleting buttons
-                      actionButton("checkmultiresininfo", "Show All Resin Information"),
-                      actionButton("uncheckmultiresininfo", "Hide All Resin Information")
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("checkmultiresininfo", "Show All Resin Information")
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("uncheckmultiresininfo", "Hide All Resin Information")
+                      )
                     )
                 )
               ),
               #Tooling
               fluidRow(
                 box(title = "Tooling Parameters", 
-                    solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                    solidHeader = TRUE, status = "info", collapsible = TRUE, width = 12,
                     
                     fluidRow(
                       #Extrusion Type
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMET_d","Extrusion Type",value=T))
                       ),
                       #Barrel
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMB_d","Barrel",value=F))
                       ),
                       #Die Size
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMDS_d","Die Size (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -704,7 +743,7 @@ ui<-dashboardPage(
                                         numericInput("PCMDS_max",label = NULL,value=PCMDSmax,step=0.001)
                                       )))),
                       #Die Land Length
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMDLL_d","Die Land Length (in)",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -712,7 +751,7 @@ ui<-dashboardPage(
                                  selectInput("PCMDLL",label = NULL,c("All",unique(as.character(multi_pps_data$`Die Land Length (in)`))))
                                ))),
                       #Tip Size
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMTS_d","Tip Size (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -728,7 +767,7 @@ ui<-dashboardPage(
                                       )
                                ))),
                       #Tip Land Length
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMTLL_d","Tip Land Length (in)",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -736,7 +775,7 @@ ui<-dashboardPage(
                                  selectInput("PCMTLL",label = NULL,c("All",unique(as.character(multi_pps_data$`Tip Land Length (in)`))))
                                ))),
                       #Screw Print
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMSP_d","Screw Print",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -747,8 +786,12 @@ ui<-dashboardPage(
                     ),
                     fluidRow(
                       #fluid row for showing or deleting buttons
-                      actionButton("checkmultitooling", "Show All Tooling"),
-                      actionButton("uncheckmultitooling", "Hide All Tooling")
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("checkmultitooling", "Show All Tooling")   
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("uncheckmultitooling", "Hide All Tooling")
+                      )
                     )
                     
                 )
@@ -762,7 +805,7 @@ ui<-dashboardPage(
                     
                     fluidRow(
                       #Feedthroat
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMFT_d","Feedthroat Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -778,7 +821,7 @@ ui<-dashboardPage(
                                       )
                                ))),
                       #Barrel Zone 1
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMBZT1_d","Barrel Zone 1 Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -794,7 +837,7 @@ ui<-dashboardPage(
                                       )
                                ))),
                       #Barrel ZOne2
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMBZT2_d","Barrel Zone 2 Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -810,7 +853,7 @@ ui<-dashboardPage(
                                       )
                                ))),
                       #Barrel Zone3
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMBZT3_d","Barrel Zone 3 Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -827,7 +870,7 @@ ui<-dashboardPage(
                                )))
                     ),#end Processing Attribute 1
                     fluidRow(
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMCT_d","Clamp Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -842,7 +885,7 @@ ui<-dashboardPage(
                                         numericInput("PCMCT_max",label = NULL,value=PCMCTmax,step=5)
                                       )
                                ))),
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMAT_d","Adapter Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -857,7 +900,7 @@ ui<-dashboardPage(
                                         numericInput("PCMAT_max",label = NULL,value=PCMATmax,step=5)
                                       )
                                ))),
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMDT1_d","Die 1 Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -872,7 +915,7 @@ ui<-dashboardPage(
                                         numericInput("PCMDT1_max",label = NULL,value=PCMDT1max,step=5)
                                       )
                                ))),
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMDT2_d","Die 2 Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -889,8 +932,12 @@ ui<-dashboardPage(
                                )))), 
                     fluidRow(
                       #fluid row for showing or deleting buttons
-                      actionButton("checkmultiparameters", "Show All Processing Parameters"),
-                      actionButton("uncheckmultiparameters", "Hide All Processing Parameters")
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("checkmultiparameters", "Show All Processing Parameters")
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("uncheckmultiparameters", "Hide All Processing Parameters")
+                      )
                     )
                 )
               ),#end Processing Attribute 2
@@ -899,15 +946,15 @@ ui<-dashboardPage(
               #Dimentional Attribute
               fluidRow(
                 box(title = "Dimensional Attributes", 
-                    solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                    solidHeader = TRUE, status = "info", collapsible = TRUE, width = 12,
                     
                     fluidRow(
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              
                              fluidRow(checkboxInput("PCMTE_d","Tapered End",value=FALSE))
                       ),
                       
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              
                              fluidRow(checkboxInput("PCMIDI_d","Inner Diameter (in)",value=TRUE)),
                              fluidRow(
@@ -921,7 +968,7 @@ ui<-dashboardPage(
                                         condition = "input.PCMIDI_d",
                                         numericInput("PCMIDI_max",label = NULL,value=PCMIDImax,step=0.001)
                                       )))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMODI_d","Outer Diameter (in)",value=TRUE)),
                              fluidRow(
                                column(6,
@@ -934,7 +981,7 @@ ui<-dashboardPage(
                                         condition = "input.PCMODI_d",
                                         numericInput("PCMODI_max",label = NULL,value=PCMODImax,step=0.001)
                                       )))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMIWT_d","Inner Wall Thickness (in)",value=TRUE)),
                              fluidRow(
                                column(6,
@@ -947,7 +994,7 @@ ui<-dashboardPage(
                                         condition = "input.PCMIWT_d",
                                         numericInput("PCMIWT_max",label = NULL,value=PCMIWTmax,step=0.001)
                                       )))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMMWT_d","Middle Wall Thickness (in)",value=TRUE)),
                              fluidRow(
                                column(6,
@@ -960,7 +1007,7 @@ ui<-dashboardPage(
                                         condition = "input.PCMMWT_d",
                                         numericInput("PCMMWT_max",label = NULL,value=PCMMWTmax,step=0.001)
                                       )))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMOWT_d","Outer Wall Thickness (in)",value=TRUE)),
                              fluidRow(
                                column(6,
@@ -973,7 +1020,7 @@ ui<-dashboardPage(
                                         condition = "input.PCMOWT_d",
                                         numericInput("PCMOWT_max",label = NULL,value=PCMOWTmax,step=0.001)
                                       )))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMTWT_d","Total Wall Thickness (in)",value=TRUE)),
                              fluidRow(
                                column(6,
@@ -988,7 +1035,7 @@ ui<-dashboardPage(
                                       ))))),
                     
                     fluidRow(
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMOR_d","Out of Roundness (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1001,7 +1048,7 @@ ui<-dashboardPage(
                                         condition = "input.PCMOR_d",
                                         numericInput("PCMOR_max",label = NULL,value=PCMORmax,step=0.001)
                                       )))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMCCT_d","Concentricity",value=F)),
                              fluidRow(
                                column(6,
@@ -1014,7 +1061,7 @@ ui<-dashboardPage(
                                         condition = "input.PCMCCT_d",
                                         numericInput("PCMCCT_max",label = NULL,value=PCMCCTmax,step=0.0001)
                                       )))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMLength_d","Length (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1027,7 +1074,7 @@ ui<-dashboardPage(
                                         condition = "input.PCMLength_d",
                                         numericInput("PCMLength_max",label = NULL,value=PCMLengthmax,step=1)
                                       )))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMToLength_d","Total Length (in)",value=T)),
                              fluidRow(
                                column(6,
@@ -1041,7 +1088,7 @@ ui<-dashboardPage(
                                         numericInput("PCMToLength_max",label = NULL,value=PCMToLengthmax,step=1)
                                       )))),
                       
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMPPD_d","Perpendicularity (in)",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -1051,8 +1098,12 @@ ui<-dashboardPage(
                                )))), 
                     fluidRow(
                       #fluid row for showing or deleting buttons
-                      actionButton("checkmultidimensions", "Show All Dimensional Attributes"),
-                      actionButton("uncheckmultidimensions", "Hide All Dimensional Attributes")
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("checkmultidimensions", "Show All Dimensional Attributes")
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("uncheckmultidimensions", "Hide All Dimensional Attributes")
+                      )
                     )
                 )
               ), #End Dimentional Attribute
@@ -1062,84 +1113,84 @@ ui<-dashboardPage(
                     solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
                     
                     fluidRow(
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMNEXIV_d","NEXIV",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMNEXIV_d",
                                  selectInput("PCMNEXIV",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMAnnealed_d","Annealed",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMAnnealed_d",
                                  selectInput("PCMAnnealed",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMCaliper_d","Caliper",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMCaliper_d",
                                  selectInput("PCMCaliper",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMOS_d","OD Sort",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMOS_d",
                                  selectInput("PCMOS",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMMP_d","Melt Pump",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMMP_d",
                                  selectInput("PCMMP",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMHT_d","Hypo Tip",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMHT_d",
                                  selectInput("PCMHT",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMSPD_d","Sparker Die",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMSPD_d",
                                  selectInput("PCMSPD",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMSLD_d","Slicking Die",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMSLD_d",
                                  selectInput("PCMSLD",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMDLN_d","Delamination",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMDLN_d",
                                  selectInput("PCMDLN",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMULT_d","Ultrasonic",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMULT_d",
                                  selectInput("PCMULT",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMVC_d","Vacuum Calibration",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMVC_d",
                                  selectInput("PCMVC",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMIRD_d","Irradiated",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -1149,8 +1200,12 @@ ui<-dashboardPage(
                     ), 
                     fluidRow(
                       #fluid row for showing or deleting buttons
-                      actionButton("checkmultispecial", "Show All Special Operations"),
-                      actionButton("uncheckmultispecial", "Hide All Special Operations")
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("checkmultispecial", "Show All Special Operations")
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("uncheckmultispecial", "Hide All Special Operations")
+                      )
                     )
                 )
               ), #end Special Operation
@@ -1158,13 +1213,30 @@ ui<-dashboardPage(
               
               
               fluidRow(
-                DT::dataTableOutput("mytable2")
+                box(title = "Part Listings", 
+                    solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                    DT::dataTableOutput("mytable2")
+                )
+                
               ),
               fluidRow(
-                downloadButton('multidownloadSPPSData','Download Multi-Layer PPS Data'),
-                downloadButton('multidownloadSPPSDataAll','Download Multi-Layer PPS Data with All Parameters'),
-                actionButton('resetmultiinputs', "Reset Multi-Layer Input Parameters")
+                box(title = "Download and Reset Buttons", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('multidownloadSPPSData','Download Multi-Layer PPS Data')
+                      ),
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('multidownloadSPPSDataAll','Download Multi-Layer PPS Data with All Parameters')
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton('resetmultiinputs', "Reset Multi-Layer Input Parameters")
+                      )
+                    )
+                )
               )
+              
+              
       ),
       tabItem(tabName = "taperedppstab",
               
@@ -1174,7 +1246,7 @@ ui<-dashboardPage(
                     
                     fluidRow(
                       #Part Number
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTPN_d","Part Number",value=TRUE)),
                              fluidRow(
                                conditionalPanel(
@@ -1185,7 +1257,7 @@ ui<-dashboardPage(
                                  
                                ))),
                       # Part Description
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTPD_d","Part Description",value=TRUE)),
                              fluidRow(
                                conditionalPanel(
@@ -1194,7 +1266,7 @@ ui<-dashboardPage(
                                              c("All",unique(as.character(single_pps_data$`Part Description`))))
                                ))), 
                       # Resin Number
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRN_d","Resin Number",value=TRUE)),
                              fluidRow(
                                conditionalPanel(
@@ -1203,7 +1275,7 @@ ui<-dashboardPage(
                                              c("All",unique(as.character(single_pps_data$`Resin Number`))))
                                ))),
                       #Resin Description
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRD_d","Resin Description",value=TRUE)),
                              fluidRow(
                                conditionalPanel(
@@ -1212,7 +1284,7 @@ ui<-dashboardPage(
                                              c("All",unique(as.character(single_pps_data$`Resin Description`))))
                                ))),
                       #PPS Number
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTPPSN_d","PPS Number",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -1231,60 +1303,67 @@ ui<-dashboardPage(
                     
                     fluidRow(
                       #Resin Families
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRF_d","Resin Families",value=F))
                       ), 
                       #Is Resin Blended with Anything?
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRBQ_d","Is Resin Blended with Anything?",value=F))
                       ), 
                       #Is Resin a Polymer Blend?
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRPBQ_d","Is Resin a Polymer Blend?",value=F))
                       ),
                       #Is Resin Filled?
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRFQ_d","Is Resin Filled?",value=F))
                       ),
                       #Resin Fillers
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRFi_d","Resin Fillers",value=F))
                       ),
                       #Is Resin Colored?
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRCQ_d","Is Resin Colored?",value=F))
                       ),
                       #Resin Color
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRC_d","Resin Color",value=F))
                       ),
                       #Is Resin Radiopaque?
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRRQ_d","Is Resin Radiopaque?",value=F))
                       ),
                       #Resin Durometer
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRDu_d","Resin Durometer (D)",value=F))
                       ),
                       #Average Resin Durometer
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTRADu_d","Average Durometer (D)",value=F))
                       )
                     ),#end Resin Information
                     fluidRow(
                       #fluid row for showing or deleting buttons
-                      actionButton("checktaperedresininfo", "Show All Resin Information"),
-                      actionButton("unchecktaperedresininfo", "Hide All Resin Information")
-                    ),
-                    #Tooling
-                    fluidRow(
-                      box(title = "Tooling Parameters", 
-                          solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("checktaperedresininfo", "Show All Resin Information")
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("unchecktaperedresininfo", "Hide All Resin Information")
                       )
                     )
+                    
+                )
+              ),#end Resin Info
+              
+              #Tooling
+              fluidRow(
+                box(title = "Tooling Parameters", 
+                    solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                    
                     fluidRow(
                       #Die Size
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTDS_d","Die Size (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1299,7 +1378,7 @@ ui<-dashboardPage(
                                         numericInput("PCTDS_max",label = NULL,value=PCTDSmax,step=0.001)
                                       )))),
                       #Die Land Length
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTDLL_d","Die Land Length (in)",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -1307,7 +1386,7 @@ ui<-dashboardPage(
                                  selectInput("PCTDLL",label = NULL,c("All",unique(as.character(single_pps_data$`Die Land Length (in)`))))
                                ))),
                       #Tip Size
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTTS_d","Tip Size (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1323,7 +1402,7 @@ ui<-dashboardPage(
                                       )
                                ))),
                       #Tip Land Length
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTTLL_d","Tip Land Length (in)",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -1331,7 +1410,7 @@ ui<-dashboardPage(
                                  selectInput("PCTTLL",label = NULL,c("All",unique(as.character(single_pps_data$`Tip Land Length (in)`))))
                                ))),
                       #Screw Print
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTSP_d","Screw Print",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -1342,11 +1421,16 @@ ui<-dashboardPage(
                     ),
                     fluidRow(
                       #fluid row for showing or deleting buttons
-                      actionButton("checktaperedtooling", "Show All Tooling"),
-                      actionButton("unchecktaperedtooling", "Hide All Tooling")
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("checktaperedtooling", "Show All Tooling")
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("unchecktaperedtooling", "Hide All Tooling")
+                      )
                     )
                 )
-              ),#end Tooling
+              ), #end Tooling
+              
               
               #Processing Attributes
               fluidRow(
@@ -1356,7 +1440,7 @@ ui<-dashboardPage(
                     fluidRow(
                       
                       #Feedthroat
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTFT_d","Feedthroat Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -1372,7 +1456,7 @@ ui<-dashboardPage(
                                       )
                                ))),
                       #Barrel Zone 1
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTBZT1_d","Barrel Zone 1 Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -1388,7 +1472,7 @@ ui<-dashboardPage(
                                       )
                                ))),
                       #Barrel ZOne2
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTBZT2_d","Barrel Zone 2 Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -1404,7 +1488,7 @@ ui<-dashboardPage(
                                       )
                                ))),
                       #Barrel Zone3
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTBZT3_d","Barrel Zone 3 Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -1421,7 +1505,7 @@ ui<-dashboardPage(
                                )))
                     ),#end Processing Attribute 1
                     fluidRow(
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTCT_d","Clamp Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -1436,7 +1520,7 @@ ui<-dashboardPage(
                                         numericInput("PCTCT_max",label = NULL,value=PCTCTmax,step=5)
                                       )
                                ))),
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTAT_d","Adapter Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -1451,7 +1535,7 @@ ui<-dashboardPage(
                                         numericInput("PCTAT_max",label = NULL,value=PCTATmax,step=5)
                                       )
                                ))),
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTDT1_d","Die 1 Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -1466,7 +1550,7 @@ ui<-dashboardPage(
                                         numericInput("PCTDT1_max",label = NULL,value=PCTDT1max,step=5)
                                       )
                                ))),
-                      column(3,
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTDT2_d","Die 2 Temperature F",value=F)),
                              fluidRow(
                                column(6,
@@ -1483,8 +1567,12 @@ ui<-dashboardPage(
                                )))), #end Processing Attribute 2
                     fluidRow(
                       #fluid row for showing or deleting buttons
-                      actionButton("checktaperedparameters", "Show All Tooling"),
-                      actionButton("unchecktaperedparameters", "Hide All Tooling")
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("checktaperedparameters", "Show All Tooling")
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("unchecktaperedparameters", "Hide All Tooling")
+                      ) 
                     )
                 )
               ), #end Processing Attribute
@@ -1495,7 +1583,7 @@ ui<-dashboardPage(
                     solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
                     
                     fluidRow(
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTPIDI_d","Proximal Inner Diameter (in)",value=TRUE)),
                              fluidRow(
                                column(6,
@@ -1510,7 +1598,7 @@ ui<-dashboardPage(
                                         numericInput("PCTPIDI_max",label = NULL,value=PCTPIDImax,step=0.001)
                                       )
                                ))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTPODI_d","Proximal Outer Diameter (in)",value=TRUE)),
                              fluidRow(
                                column(6,
@@ -1525,7 +1613,7 @@ ui<-dashboardPage(
                                         numericInput("PCTPODI_max",label = NULL,value=PCTPODImax,step=0.001)
                                       )
                                ))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTPWT_d","Proximal Wall Thickness (in)",value=TRUE)),
                              fluidRow(
                                column(6,
@@ -1540,7 +1628,7 @@ ui<-dashboardPage(
                                         numericInput("PCTPWT_max",label = NULL,value=PCTPWTmax,step=0.001)
                                       )
                                ))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTPOR_d","Proximal Out of Roundness (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1555,7 +1643,7 @@ ui<-dashboardPage(
                                         numericInput("PCTPOR_max",label = NULL,value=PCTPORmax,step=0.001)
                                       )
                                ))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTPCCT_d","Proximal Concentricity (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1573,7 +1661,7 @@ ui<-dashboardPage(
                       
                     ), #end Dimentional Attribute 1
                     fluidRow(
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTDIDI_d","Distal Inner Diameter (in)",value=TRUE)),
                              fluidRow(
                                column(6,
@@ -1588,7 +1676,7 @@ ui<-dashboardPage(
                                         numericInput("PCTDIDI_max",label = NULL,value=PCTDIDImax,step=0.001)
                                       )
                                ))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTDODI_d","Distal Outer Diameter (in)",value=TRUE)),
                              fluidRow(
                                column(6,
@@ -1603,7 +1691,7 @@ ui<-dashboardPage(
                                         numericInput("PCTDODI_max",label = NULL,value=PCTDODImax,step=0.001)
                                       )
                                ))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTDWT_d","Distal Wall Thickness (in)",value=TRUE)),
                              fluidRow(
                                column(6,
@@ -1618,7 +1706,7 @@ ui<-dashboardPage(
                                         numericInput("PCTDWT_max",label = NULL,value=PCTDWTmax,step=0.001)
                                       )
                                ))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTDOR_d","Distal Out of Roundness (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1633,7 +1721,7 @@ ui<-dashboardPage(
                                         numericInput("PCTDOR_max",label = NULL,value=PCTDORmax,step=0.001)
                                       )
                                ))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTDCCT_d","Distal Concentricity (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1652,7 +1740,7 @@ ui<-dashboardPage(
                     ), #end Dimentional Attribute 2
                     fluidRow(
                       
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTPLength_d","Proximal Length (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1667,7 +1755,7 @@ ui<-dashboardPage(
                                         numericInput("PCTPLength_max",label = NULL,value=PCTPLengthmax,step=1)
                                       )
                                ))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTTLength_d","Transition Length (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1683,7 +1771,7 @@ ui<-dashboardPage(
                                       )
                                ))),
                       
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTDLength_d","Distal Length (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1698,7 +1786,7 @@ ui<-dashboardPage(
                                         numericInput("PCTDLength_max",label = NULL,value=PCTDLengthmax,step=1)
                                       )
                                ))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTToLength_d","Total Length (in)",value=F)),
                              fluidRow(
                                column(6,
@@ -1713,7 +1801,7 @@ ui<-dashboardPage(
                                         numericInput("PCTToLength_max",label = NULL,value=PCTToLengthmax,step=1)
                                       )
                                ))),
-                      column(2,
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTPPD_d","Perpendicularity (in)",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -1725,8 +1813,12 @@ ui<-dashboardPage(
                     ),#end of attribute 3
                     fluidRow(
                       #fluid row for showing or deleting buttons
-                      actionButton("checktapereddimensions", "Show All Tooling"),
-                      actionButton("unchecktapereddimensions", "Hide All Tooling")
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("checktapereddimensions", "Show All Tooling")   
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("unchecktapereddimensions", "Hide All Tooling")
+                      )
                     )
                 )
               ),#end of attribute
@@ -1736,84 +1828,84 @@ ui<-dashboardPage(
                 box(title = "Special Operations", 
                     solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
                     fluidRow(
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTNEXIV_d","NEXIV",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTNEXIV_d",
                                  selectInput("PCTNEXIV",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTAnnealed_d","Annealed",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTAnnealed_d",
                                  selectInput("PCTAnnealed",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTCaliper_d","Caliper",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTCaliper_d",
                                  selectInput("PCTCaliper",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTOS_d","OD Sort",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTOS_d",
                                  selectInput("PCTOS",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTMP_d","Melt Pump",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTMP_d",
                                  selectInput("PCTMP",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTHT_d","Hypo Tip",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTHT_d",
                                  selectInput("PCTHT",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTSPD_d","Sparker Die",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTSPD_d",
                                  selectInput("PCTSPD",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTSLD_d","Slicking Die",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTSLD_d",
                                  selectInput("PCTSLD",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTDLN_d","Delamination",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTDLN_d",
                                  selectInput("PCTDLN",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTULT_d","Ultrasonic",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTULT_d",
                                  selectInput("PCTULT",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTVC_d","Vacuum Calibration",value=F)),
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTVC_d",
                                  selectInput("PCTVC",label = NULL,choices=c("All","yes","NA"))
                                ))),
-                      column(1,
+                      column(1,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCTIRD_d","Irradiated",value=F)),
                              fluidRow(
                                conditionalPanel(
@@ -1823,19 +1915,38 @@ ui<-dashboardPage(
                     ), #end Special Operation
                     fluidRow(
                       #fluid row for showing or deleting buttons
-                      actionButton("checktaperedspecial", "Show All Tooling"),
-                      actionButton("unchecktaperedspecial", "Hide All Tooling")
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("checktaperedspecial", "Show All Tooling")
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton("unchecktaperedspecial", "Hide All Tooling")
+                      )
                     )
                 )
               ),
               fluidRow(
-                DT::dataTableOutput("mytable3")
+                box(title = "Part Listings", 
+                    solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                    DT::dataTableOutput("mytable3")
+                )
               ),
               fluidRow(
-                downloadButton('tapereddownloadSPPSData','Download Tapered PPS Data'),
-                downloadButton('tapereddownloadSPPSDataAll','Download Tapered PPS Data with All Parameters'),
-                actionButton('resettaperedinputs', "Reset Tapered Input Parameters")
+                box(title = "Download and Reset Buttons", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('tapereddownloadSPPSData','Download Tapered PPS Data')
+                      ),
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('tapereddownloadSPPSDataAll','Download Tapered PPS Data with All Parameters')
+                      ),
+                      column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton('resettaperedinputs', "Reset Tapered Input Parameters")
+                      )
+                    )
+                )
               )
+              
       ),#end tabItem
       tabItem(tabName = "singlesamplingtab",
               fluidRow(
