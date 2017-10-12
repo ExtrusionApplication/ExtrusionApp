@@ -1064,7 +1064,7 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcartparts$data$'Part'),]
+    data <- single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcartparts$data$'Part'),2:ncol(single_pps_data)]
     return(data)
     
   },
@@ -1080,7 +1080,7 @@ server<-function(input,output,session){
     #downlaod the single PPS data from the shopping cart
     filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcart$data$'Part'),], 
+      write.csv(single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcart$data$'Part'),2:ncol(single_pps_data)], 
                 file, row.names = FALSE)
     }
   )
@@ -2333,7 +2333,7 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcartparts$data$'Part'),]
+    data <- multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcartparts$data$'Part'),2:ncol(multi_pps_data)]
     return(data)
     
   },
@@ -2349,7 +2349,7 @@ server<-function(input,output,session){
     #downlaod the multi PPS data from the shopping cart
     filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcart$data$'Part'),], 
+      write.csv(multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcart$data$'Part'),2:ncol(multi_pps_data)], 
                 file, row.names = FALSE)
     }
   )
@@ -3547,7 +3547,7 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcartparts$data$'Part'),]
+    data <- tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcartparts$data$'Part'),2:ncol(tapered_pps_data)]
     return(data)
     
   },
@@ -3561,9 +3561,9 @@ server<-function(input,output,session){
   
   output$taperedcartdownloadpps <- downloadHandler(
     #downlaod the tapered PPS data from the shopping cart
-    filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
+    filename = function() { paste("Tapered PPS Shopping Cart Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcart$data$'Part'),], 
+      write.csv(tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcart$data$'Part'),2:ncol(tapered_pps_data)], 
                 file, row.names = FALSE)
     }
   )
