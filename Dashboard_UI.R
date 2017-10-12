@@ -20,9 +20,12 @@ library(shinydashboard)
 #PCT: Part Catalog--Tapered Extrusion PPS
 
 ui<-dashboardPage(
-  dashboardHeader(title = "SIBYL"),
+  dashboardHeader(title = "SIBYL - Extrusion Application",
+                  titleWidth = 350
+                  ),
   
   dashboardSidebar(
+    width = 350,
     sidebarMenu(
       menuItem("Part Catalog - PPS Data", tabName = "partcatalog", icon = icon("list"),
                menuSubItem("Single Layer Extrusion", tabName = "singleppstab"),
@@ -2054,91 +2057,125 @@ ui<-dashboardPage(
       ), #end tabItem
       tabItem(tabName = "singlemesparameterstab",
               fluidRow(
-                DT::dataTableOutput("singleMESparameters")
+                column(12,
+                       DT::dataTableOutput("singleMESparameters")
+                       )
               )
       ), #end tabItem
       tabItem(tabName = "singlemestimetab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("singleMEStime")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "singlemessubmitterstab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("singleMESsubmitter")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "singlemestotaltab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("singleMEStotal")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "multimesparameterstab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("multiMESparameters")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "multimestimetab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("multiMEStime")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "multimessubmitterstab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("multiMESsubmitter")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "multimestotaltab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("multiMEStotal")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "taperedmesparameterstab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("taperedMESparameters")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "taperedmestimetab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("taperedMEStime")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "taperedmessubmitterstab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("taperedMESsubmitter")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "taperedmestotaltab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("taperedMEStotal")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "singlescrapcodestab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("singlescrapcodes")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "mutliscrapcodestab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("multiscrapcodes")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "taperedscrapcodestab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("taperedscrapcodes")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "resininfotab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("resin_data_ui")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "screwinfotab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("screw_data_ui")
+                )
               )
       ), #end tabItem
       tabItem(tabName = "singleshoppingcarttab",
-              fluidRow(
+              box(title = "Data Table",
                 DT::dataTableOutput("singleshoppingcartpps"),
                 fluidRow(
                   downloadButton('singlecartdownloadpps',
@@ -2148,20 +2185,24 @@ ui<-dashboardPage(
       ), #end tabItem
       tabItem(tabName = "multishoppingcarttab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("multishoppingcartpps"),
                 fluidRow(
                   downloadButton('multicartdownloadpps',
                                  'Download Multi-Layer Shopping Cart PPS Data')
                 )
               )
+              )
       ), #end tabItem
       tabItem(tabName = "taperedshoppingcarttab",
               fluidRow(
+                column(12,
                 DT::dataTableOutput("taperedshoppingcartpps"),
                 fluidRow(
                   downloadButton('taperedcartdownloadpps',
                                  'Download Tapered Shopping Cart PPS Data')
                 )
+              )
               )
       ) #end tabItem
       

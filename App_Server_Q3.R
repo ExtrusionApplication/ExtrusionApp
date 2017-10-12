@@ -1026,7 +1026,12 @@ server<-function(input,output,session){
     rownames = FALSE,
     escape = FALSE,
     server = FALSE,
-    options=list(pageLength=5)   # make the shopping cart page shorter
+    options = list(orderClasses = TRUE,
+                   columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                   scrollX=TRUE,
+                   scrollY=500,
+                   autoWidth=TRUE,
+                   pageLength=5)  # make the shopping cart page shorter
   ) #for the shoppingcart
   
   
@@ -1038,7 +1043,12 @@ server<-function(input,output,session){
   rownames = FALSE,
   escape = FALSE,
   server = FALSE,
-  options=list(pageLength=5)   # make the shopping cart page shorter
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE,
+                 pageLength=5)   # make the shopping cart page shorter
   ) #for the shoppingcart
   
   
@@ -1071,7 +1081,12 @@ server<-function(input,output,session){
   filter = "top",
   rownames = FALSE,
   escape = FALSE,
-  server = FALSE
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
   )
   
   
@@ -2296,7 +2311,14 @@ server<-function(input,output,session){
     filter = "top",
     rownames = FALSE,
     escape = FALSE,
-    server = FALSE) #for the shoppingcart
+    server = FALSE,
+    options = list(orderClasses = TRUE,
+                   columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                   scrollX=TRUE,
+                   scrollY=500,
+                   autoWidth=TRUE,
+                   pageLength = 5)
+    ) #for the shoppingcart
   
   output$multishoppingcartparts <- renderDataTable({
     #'this is a table that only lists the parts for quick viewing
@@ -2306,7 +2328,12 @@ server<-function(input,output,session){
   rownames = FALSE,
   escape = FALSE,
   server = FALSE,
-  options=list(pageLength=5)   # make the shopping cart page shorter
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE,
+                 pageLength=5) # make the shopping cart page shorter
   ) #for the shoppingcart
   
   
@@ -2340,7 +2367,12 @@ server<-function(input,output,session){
   filter = "top",
   rownames = FALSE,
   escape = FALSE,
-  server = FALSE
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
   )
   
   
@@ -3508,7 +3540,14 @@ server<-function(input,output,session){
     filter = "top",
     rownames = FALSE,
     escape = FALSE,
-    server = FALSE) #for the shoppingcart
+    server = FALSE,
+    options = list(orderClasses = TRUE,
+                   columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                   scrollX=TRUE,
+                   scrollY=500,
+                   autoWidth=TRUE,
+                   pageLength = 5)
+    ) #for the shoppingcart
   
   output$taperedshoppingcartparts <- renderDataTable({
     #'this is a table that only lists the parts for quick viewing
@@ -3518,7 +3557,12 @@ server<-function(input,output,session){
   rownames = FALSE,
   escape = FALSE,
   server = FALSE,
-  options=list(pageLength=5)   # make the shopping cart page shorter
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE,
+                 pageLength = 5)  # make the shopping cart page shorter
   ) #for the shoppingcart
   
 
@@ -3554,7 +3598,12 @@ server<-function(input,output,session){
   filter = "top",
   rownames = FALSE,
   escape = FALSE,
-  server = FALSE
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
   )
   
   
@@ -3766,7 +3815,12 @@ server<-function(input,output,session){
     data <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   output$singleMEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
@@ -3774,7 +3828,12 @@ server<-function(input,output,session){
     data <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   output$singleMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
@@ -3782,7 +3841,12 @@ server<-function(input,output,session){
     data <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   output$singleMEStotal <- renderDataTable({
     #This returns the table of all MES inputs based on the SAP batch numbers in the
@@ -3790,7 +3854,12 @@ server<-function(input,output,session){
     data <- single_tari_total_data[single_tari_total_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   output$singlescrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
@@ -3798,7 +3867,12 @@ server<-function(input,output,session){
     data <- scrapcodes_data[scrapcodes_data$Order %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   
   output$multiMESparameters <- renderDataTable({
@@ -3807,7 +3881,12 @@ server<-function(input,output,session){
     data <- multi_tari_parameter_data[multi_tari_parameter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   output$multiMEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
@@ -3815,7 +3894,12 @@ server<-function(input,output,session){
     data <- multi_tari_time_data[multi_tari_time_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   output$multiMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
@@ -3823,7 +3907,12 @@ server<-function(input,output,session){
     data <- multi_tari_submitter_data[multi_tari_submitter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   output$multiMEStotal <- renderDataTable({
     #This returns the table of all MES inputs based on the SAP batch numbers in the
@@ -3831,7 +3920,12 @@ server<-function(input,output,session){
     data <- multi_tari_total_data[multi_tari_total_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   
   output$multiscrapcodes <- renderDataTable({
@@ -3840,7 +3934,13 @@ server<-function(input,output,session){
     data <- scrapcodes_data[scrapcodes_data$Order %in% multishoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
   
   output$taperedMESparameters <- renderDataTable({
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
@@ -3848,7 +3948,13 @@ server<-function(input,output,session){
     data <- tapered_tari_parameter_data[tapered_tari_parameter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
   
   output$taperedMEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
@@ -3856,7 +3962,13 @@ server<-function(input,output,session){
     data <- tapered_tari_time_data[tapered_tari_time_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
   
   output$taperedMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
@@ -3864,7 +3976,13 @@ server<-function(input,output,session){
     data <- tapered_tari_submitter_data[tapered_tari_submitter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
   
   
   
@@ -3874,7 +3992,13 @@ server<-function(input,output,session){
     data <- tapered_tari_total_data[tapered_tari_total_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
   
   
   output$taperedscrapcodes <- renderDataTable({
@@ -3883,7 +4007,13 @@ server<-function(input,output,session){
     data <- scrapcodes_data[scrapcodes_data$Order %in% taperedshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
   
   
   
@@ -3894,7 +4024,12 @@ server<-function(input,output,session){
     data <- nexiv[nexiv$`Batch #` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",options = list(orderClasses = TRUE,
+                                columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                scrollX=TRUE,
+                                scrollY=500,
+                                autoWidth=TRUE)
+  )
   
   output$laserlinc <- renderDataTable({
     #This returns the table of the Applied Stats laserlinc data based on the SAP batch numbers in the
@@ -3902,7 +4037,13 @@ server<-function(input,output,session){
     data <- laserlinc[laserlinc$`Lot Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
   # end Single Extrusion PPS Data Server part and Shopping cart
   
   
@@ -4347,7 +4488,12 @@ server<-function(input,output,session){
   output$single_sampling_ui <- renderDataTable(single_sampling_data_test$data,
                                           rownames = FALSE,
                                           escape = FALSE,
-                                          server = FALSE)
+                                          server = FALSE,
+                                          options = list(orderClasses = TRUE,
+                                                         columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                         scrollX=TRUE,
+                                                         scrollY=500,
+                                                         autoWidth=TRUE))
   
   
   
@@ -4379,7 +4525,12 @@ server<-function(input,output,session){
   output$multi_sampling_ui <- renderDataTable(multi_sampling_data_test$data,
                                                rownames = FALSE,
                                                escape = FALSE,
-                                               server = FALSE)
+                                               server = FALSE,
+                                              options = list(orderClasses = TRUE,
+                                                             columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                             scrollX=TRUE,
+                                                             scrollY=500,
+                                                             autoWidth=TRUE))
   
   
   
@@ -4413,7 +4564,12 @@ server<-function(input,output,session){
   output$tapered_sampling_ui <- renderDataTable(tapered_sampling_data_test$data,
                                                rownames = FALSE,
                                                escape = FALSE,
-                                               server = FALSE)
+                                               server = FALSE,
+                                               options = list(orderClasses = TRUE,
+                                                              columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                              scrollX=TRUE,
+                                                              scrollY=500,
+                                                              autoWidth=TRUE))
   
   
   
@@ -4447,7 +4603,12 @@ server<-function(input,output,session){
   output$extra_sampling_ui <- renderDataTable(extra_sampling_data_test$data,
                                                rownames = FALSE,
                                                escape = FALSE,
-                                               server = FALSE)
+                                               server = FALSE,
+                                              options = list(orderClasses = TRUE,
+                                                             columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                             scrollX=TRUE,
+                                                             scrollY=500,
+                                                             autoWidth=TRUE))
   
   
   
@@ -4482,7 +4643,12 @@ server<-function(input,output,session){
   output$all_sampling_ui <- renderDataTable(all_sampling_data_test$data,
                                                rownames = FALSE,
                                                escape = FALSE,
-                                               server = FALSE)
+                                               server = FALSE,
+                                            options = list(orderClasses = TRUE,
+                                                           columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                           scrollX=TRUE,
+                                                           scrollY=500,
+                                                           autoWidth=TRUE))
   
   
   
@@ -4494,14 +4660,24 @@ server<-function(input,output,session){
                                           filter = "top",
                                           rownames = FALSE,
                                           escape = FALSE,
-                                          server = FALSE)
+                                          server = FALSE,
+                                          options = list(orderClasses = TRUE,
+                                                         columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                         scrollX=TRUE,
+                                                         scrollY=500,
+                                                         autoWidth=TRUE))
   
   #The screw information
   output$screw_data_ui <- renderDataTable(screw_data,
                                           filter = "top",
                                           rownames = FALSE,
                                           escape = FALSE,
-                                          server = FALSE)
+                                          server = FALSE,
+                                          options = list(orderClasses = TRUE,
+                                                         columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                         scrollX=TRUE,
+                                                         scrollY=500,
+                                                         autoWidth=TRUE))
   
   
   
