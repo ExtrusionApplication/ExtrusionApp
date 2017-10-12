@@ -83,54 +83,56 @@ ui<-dashboardPage(
       tabItem(tabName = "singleppstab",
               #Part Resin
               fluidRow(
-                tags$h1(strong("Part Resin"),style="font-size:25px;",align="left"), #Use tag to add a hearder 
-                #Part Number
-                column(2,
-                       
-                       fluidRow(checkboxInput("PCSPN_d", "Part Number", value = TRUE)),  #Show the checkbox for Part number. it will return a True/False value
-                       fluidRow(
-                         conditionalPanel(
-                           condition="input.PCSPN_d",   #If it were Ture, then there will have a search box for Part Number under checkbox
-                           selectInput("PCSPN",label = NULL,
-                                       c("All",unique(as.character(single_pps_data$`Part Number`))))
+                box(title = "Part, Resin, and PPS Numbers and Descriptions", 
+                    solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                    #Part Number
+                    column(2, align = "center", style='padding-left: 20px; padding-right:20px;',
                            
-                         ))),
-                # Part Description
-                column(2,
-                       fluidRow(checkboxInput("PCSPD_d", "Part Description", value = TRUE)),
-                       fluidRow(
-                         conditionalPanel(
-                           condition = "input.PCSPD_d",
-                           selectInput("PCSPD",label = NULL,
-                                       c("All",unique(as.character(single_pps_data$`Part Description`))))
-                         ))), 
-                # Resin Number
-                column(2,
-                       fluidRow(checkboxInput("PCSRN_d","Resin Number",value=TRUE)),
-                       fluidRow(
-                         conditionalPanel(
-                           condition = "input.PCSRN_d",
-                           selectInput("PCSRN",label = NULL,
-                                       c("All",unique(as.character(single_pps_data$`Resin Number`))))
-                         ))),
-                #Resin Description
-                column(2,
-                       fluidRow(checkboxInput("PCSRD_d","Resin Description",value=TRUE)),
-                       fluidRow(
-                         conditionalPanel(
-                           condition = "input.PCSRD_d",
-                           selectInput("PCSRD",label = NULL,
-                                       c("All",unique(as.character(single_pps_data$`Resin Description`))))
-                         ))),
-                #PPS Number
-                column(2,
-                       fluidRow(checkboxInput("PCSPPSN_d","PPS Number",value=F)),
-                       fluidRow(
-                         conditionalPanel(
-                           condition = "input.PCSPPSN_d",
-                           selectInput("PCSPPSN",label = NULL,
-                                       c("All",unique(as.character(single_pps_data$`PPS Number`))))
-                         )))
+                           fluidRow(checkboxInput("PCSPN_d", "Part Number", value = TRUE)),  #Show the checkbox for Part number. it will return a True/False value
+                           fluidRow(
+                             conditionalPanel(
+                               condition="input.PCSPN_d",   #If it were Ture, then there will have a search box for Part Number under checkbox
+                               selectInput("PCSPN",label = NULL,
+                                           c("All",unique(as.character(single_pps_data$`Part Number`))))
+                               
+                             ))),
+                    # Part Description
+                    column(2, align = "center", style='padding-left: 20px; padding-right:20px;',
+                           fluidRow(checkboxInput("PCSPD_d", "Part Description", value = TRUE)),
+                           fluidRow(
+                             conditionalPanel(
+                               condition = "input.PCSPD_d",
+                               selectInput("PCSPD",label = NULL,
+                                           c("All",unique(as.character(single_pps_data$`Part Description`))))
+                             ))), 
+                    # Resin Number
+                    column(2, align = "center", style='padding-left: 20px; padding-right:20px;',
+                           fluidRow(checkboxInput("PCSRN_d","Resin Number",value=TRUE)),
+                           fluidRow(
+                             conditionalPanel(
+                               condition = "input.PCSRN_d",
+                               selectInput("PCSRN",label = NULL,
+                                           c("All",unique(as.character(single_pps_data$`Resin Number`))))
+                             ))),
+                    #Resin Description
+                    column(2, align = "center", style='padding-left: 20px; padding-right:20px;',
+                           fluidRow(checkboxInput("PCSRD_d","Resin Description",value=TRUE)),
+                           fluidRow(
+                             conditionalPanel(
+                               condition = "input.PCSRD_d",
+                               selectInput("PCSRD",label = NULL,
+                                           c("All",unique(as.character(single_pps_data$`Resin Description`))))
+                             ))),
+                    #PPS Number
+                    column(2, align = "center", style='padding-left: 20px; padding-right:20px;',
+                           fluidRow(checkboxInput("PCSPPSN_d","PPS Number",value=F)),
+                           fluidRow(
+                             conditionalPanel(
+                               condition = "input.PCSPPSN_d",
+                               selectInput("PCSPPSN",label = NULL,
+                                           c("All",unique(as.character(single_pps_data$`PPS Number`))))
+                             )))
+                    )
               ),
               #Resin Information
               fluidRow(
@@ -2175,13 +2177,16 @@ ui<-dashboardPage(
               )
       ), #end tabItem
       tabItem(tabName = "singleshoppingcarttab",
-              box(title = "Data Table",
-                DT::dataTableOutput("singleshoppingcartpps"),
-                fluidRow(
-                  downloadButton('singlecartdownloadpps',
-                                 'Download Single Shopping Cart PPS Data')
+              fluidRow(
+                box(title = "Data Table",
+                    width = 12,
+                    DT::dataTableOutput("singleshoppingcartpps"),
+                    fluidRow(
+                      downloadButton('singlecartdownloadpps',
+                                     'Download Single Shopping Cart PPS Data')
+                    )
                 )
-              )
+              ) #end fluidRow
       ), #end tabItem
       tabItem(tabName = "multishoppingcarttab",
               fluidRow(
