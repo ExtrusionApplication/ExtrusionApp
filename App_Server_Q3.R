@@ -1029,7 +1029,7 @@ server<-function(input,output,session){
     options = list(orderClasses = TRUE,
                    columnDefs = list(list(className = 'dt-center',targets = "_all")),
                    scrollX=TRUE,
-                   scrollY=500,
+                   scrollY=250,
                    autoWidth=TRUE,
                    pageLength=5)  # make the shopping cart page shorter
   ) #for the shoppingcart
@@ -1046,7 +1046,7 @@ server<-function(input,output,session){
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
-                 scrollY=500,
+                 scrollY=250,
                  autoWidth=TRUE,
                  pageLength=5)   # make the shopping cart page shorter
   ) #for the shoppingcart
@@ -2315,7 +2315,7 @@ server<-function(input,output,session){
     options = list(orderClasses = TRUE,
                    columnDefs = list(list(className = 'dt-center',targets = "_all")),
                    scrollX=TRUE,
-                   scrollY=500,
+                   scrollY=250,
                    autoWidth=TRUE,
                    pageLength = 5)
     ) #for the shoppingcart
@@ -2331,7 +2331,7 @@ server<-function(input,output,session){
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
-                 scrollY=500,
+                 scrollY=250,
                  autoWidth=TRUE,
                  pageLength=5) # make the shopping cart page shorter
   ) #for the shoppingcart
@@ -3544,7 +3544,7 @@ server<-function(input,output,session){
     options = list(orderClasses = TRUE,
                    columnDefs = list(list(className = 'dt-center',targets = "_all")),
                    scrollX=TRUE,
-                   scrollY=500,
+                   scrollY=250,
                    autoWidth=TRUE,
                    pageLength = 5)
     ) #for the shoppingcart
@@ -3560,7 +3560,7 @@ server<-function(input,output,session){
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
-                 scrollY=500,
+                 scrollY=250,
                  autoWidth=TRUE,
                  pageLength = 5)  # make the shopping cart page shorter
   ) #for the shoppingcart
@@ -3806,9 +3806,117 @@ server<-function(input,output,session){
   
   
   
-  #### EXTRA ####
+  #### Total ShoppingCart ####
+  
+  ### Shoppingcart
+  
+  observeEvent(c(singleshoppingcartparts$data,multishoppingcart$data, taperedshoppingcart$data), {
+    #this is a shopping cart to hold all the total extrusion parts and SAP batches that a user wants.
+    #this is linked to the output data, so only the output data located of the associated batches 
+    #in the shopping cart is displayed
+    totalshoppingcart$data = rbind(singleshoppingcart$data, multishoppingcart$data, taperedshoppingcart$data)
+  }) #end singleshoppingcart
+  
+  observeEvent(c(singleshoppingcartparts$data,multishoppingcart$data, taperedshoppingcart$data),{
+    #'this will hold only a list of parts, this way it is easier for users to look at all the parts
+    #'when there are two many batches in the shopping cart.
+    totalshoppingcartparts$data = rbind(singleshoppingcartparts$data, multishoppingcartparts$data, taperedshoppingcartparts$data)
+  })
+  
+  totalshoppingcart <- reactiveValues(
+    #this is a shopping cart to hold all the total extrusion parts and SAP batches that a user wants.
+    #this is linked to the output data, so only the output data located of the associated batches 
+    #in the shopping cart is displayed
+    data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
+                      "SAP Batch" = numeric(0), "Delete Batch" = numeric(0),
+                      stringsAsFactors = FALSE,
+                      check.names = FALSE)
+  ) #end singleshoppingcart
+  
+  totalshoppingcartparts <- reactiveValues(
+    #this is a shopping cart to hold all the singl extrusion parts and SAP batches that a user wants.
+    #this is linked to the output data, so only the output data located of the associated batches 
+    #in the shopping cart is displayed
+    data = data.frame("Part" = numeric(0), "Batches?" = numeric(0), "Delete Part" = numeric(0),
+                      stringsAsFactors = FALSE,
+                      check.names = FALSE)
+  ) #end singleshoppingcart
   
 
+  
+  output$totalshoppingcart <- renderDataTable({
+    #'this shopping cart allows a user to select parts and batches they want to examine. Once added
+    #'to the cart, they can view all the MES, SAP, and AppStats data
+    return(totalshoppingcart$data)
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=250,
+                 autoWidth=TRUE,
+                 pageLength = 5)
+  ) #for the shoppingcart
+  
+  output$totalshoppingcartparts <- renderDataTable({
+    #'this is a table that only lists the parts for quick viewing
+    return(totalshoppingcartparts$data)
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=250,
+                 autoWidth=TRUE,
+                 pageLength = 5)  # make the shopping cart page shorter
+  ) #for the shoppingcart
+  
+  
+  
+  ### PPS Tab
+  
+  output$totalshoppingcartpps <- renderDataTable({
+    #this is to render a datatable that has all the PPS information of parts that have been saved
+    #to the shopping cart
+    
+    data <- total_pps_data[which(total_pps_data$`Part Number` %in% totalshoppingcartparts$data$'Part'),]
+    return(data)
+    
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 autoWidth=TRUE)
+  )
+  
+  
+  
+  output$totalcartdownloadpps <- downloadHandler(
+    #downlaod the tapered PPS data from the shopping cart
+    filename = function() { paste("Tapered PPS Shopping Cart Data", '.csv', sep='') },
+    content = function(file) {
+      write.csv(total_pps_data[which(total_pps_data$`Part Number` %in% totalshoppingcartparts$data$'Part'),], 
+                file, row.names = FALSE)
+    }
+  )
+  
+  
+  
+  
+  
+  #### EXTRA ####
+  
+  
   output$singleMESparameters <- renderDataTable({
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart

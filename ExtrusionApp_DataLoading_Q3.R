@@ -479,3 +479,8 @@ while (count < nrow(tapered_pps_data) + 1){
 #this then adds the html to the table
 tapered_pps_data$"" <- tapered_buttons_vector
 tapered_pps_data <- tapered_pps_data[,c(ncol(tapered_pps_data), 1:(ncol(tapered_pps_data)-1))]
+
+
+
+### Total PPS Data
+total_pps_data <- rbind.fill(single_pps_data[,2:ncol(single_pps_data)], multi_pps_data[,2:ncol(multi_pps_data)], tapered_pps_data[,2:ncol(tapered_pps_data)])
