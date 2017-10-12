@@ -872,7 +872,7 @@ server<-function(input,output,session){
                  )
                  ),
                  scrollX=TRUE,
-                 scrollY=590,
+                 scrollY=600,
                  autoWidth=TRUE),
   filter = "top",
   rownames = FALSE, 
