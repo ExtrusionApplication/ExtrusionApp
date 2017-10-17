@@ -65,6 +65,10 @@ server<-function(input,output,session){
         #if 'All' is selected
         new_df <- df
       }
+      else if (value == "NA"){
+        #ashow blanks
+        new_df <- df[df[,column_index] == "",]
+      }
       else{
         #a specific value was selected
         new_df <- df[df[,column_index] == value,]
@@ -86,7 +90,9 @@ server<-function(input,output,session){
   
   #the assign will initialize the siidvector
   assign("siidvector", 
-         c("Placeholder", "PCSPN", "PCSPD", "PCSRN", "PCSRD", "PCSPPSN", 
+         c("Placeholder", "PCSPN", "PCSPD", "PCSRN", "PCSRD", "PCSPPSN",
+           "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+           "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
            "PCSDS_min", "PCSDS_max", "PCSDLL", "PCSTS_min", "PCSTS_max",
            "PCSTLL", "PCSSP", 
            "PCSFT_min", "PCSFT_max", "PCSBZT1_min", "PCSBZT1_max",
@@ -764,13 +770,24 @@ server<-function(input,output,session){
   # obtain the output of checkbox from functions and make a list to store them----Single Extrusion PPS Data
   show_vars1 <- reactive({
     #'Placholder' is for the action buttons. It is fiven a value of true so it is always displayed
-    checkboxes <- as.numeric(c(TRUE, input$PCSPN_d,input$PCSPD_d,input$PCSRN_d,input$PCSRD_d,input$PCSPPSN_d,input$PCSDS_d,input$PCSDLL_d,input$PCSTS_d,input$PCSTLL_d,input$PCSSP_d,input$PCSFT_d,
-                 input$PCSBZT1_d,input$PCSBZT2_d,input$PCSBZT3_d,input$PCSCT_d,input$PCSAT_d,input$PCSDT1_d,input$PCSDT2_d,input$PCSIDI_d,input$PCSODI_d,input$PCSWT_d,
-                 input$PCSOR_d,input$PCSCCT_d,input$PCSLength_d,input$PCSPPD_d,input$PCSNEXIV_d,input$PCSAnnealed_d,input$PCSCaliper_d,input$PCSOS_d,input$PCSMP_d,input$PCSHT_d,
-                 input$PCSSPD_d,input$PCSSLD_d,input$PCSDLN_d,input$PCSULT_d,input$PCSVC_d,input$PCSIRD_d))
+    checkboxes <- as.numeric(c(TRUE, input$PCSPN_d,input$PCSPD_d,input$PCSRN_d,input$PCSRD_d,input$PCSPPSN_d,
+                               input$PCSRF_d, input$PCSRBQ_d, input$PCSRPBQ_d, input$PCSRFQ_d, 
+                               input$PCSRFi_d, input$PCSRCQ_d, input$PCSRC_d, input$PCSRRQ_d,
+                               input$PCSRDu_d, input$PCSRADu_d,
+                               input$PCSDS_d,input$PCSDLL_d,input$PCSTS_d,input$PCSTLL_d,input$PCSSP_d,
+                               input$PCSFT_d,input$PCSBZT1_d,input$PCSBZT2_d,input$PCSBZT3_d,
+                               input$PCSCT_d,input$PCSAT_d,input$PCSDT1_d,input$PCSDT2_d,
+                               input$PCSIDI_d,input$PCSODI_d,input$PCSWT_d,input$PCSOR_d,
+                               input$PCSCCT_d,input$PCSLength_d,input$PCSPPD_d,input$PCSNEXIV_d,
+                               input$PCSAnnealed_d,input$PCSCaliper_d,input$PCSOS_d,input$PCSMP_d,
+                               input$PCSHT_d,input$PCSSPD_d,input$PCSSLD_d,input$PCSDLN_d,
+                               input$PCSULT_d,input$PCSVC_d,input$PCSIRD_d))
 
     names(checkboxes) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
                            "PPS Number",
+                           "Is Resin Filled?", "Resin Fillers", "Is Resin Colored?", 
+                           "Resin Color", "Is Resin Radiopaque?", "Resin Durometer (D)", 
+                           "Average Resin Durometer (D)",
                            "Die Size (in)", "Die Land Length (in)",
                            "Tip Size (in)", "Tip Land Length (in)", "Screw Print",
                            "Feedthroat Temperature  F",
@@ -791,8 +808,10 @@ server<-function(input,output,session){
   #this variable will store all the inputs of the single extrusions
   single_inputs <- reactive({
     #this variable will store all the inputs of of the single extrusions
-    #'Placholder' is for the action buttons.
-    inputs <- c("Placeholder", input$PCSPN, input$PCSPD, input$PCSRN, input$PCSRD, input$PCSPPSN, 
+    #'Placholder' is for the action buttons and resin information
+    inputs <- c("Placeholder", input$PCSPN, input$PCSPD, input$PCSRN, input$PCSRD, input$PCSPPSN,
+                "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+                "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
                    input$PCSDS_min, input$PCSDS_max, input$PCSDLL, input$PCSTS_min, input$PCSTS_max,
                    input$PCSTLL, input$PCSSP, 
                    input$PCSFT_min, input$PCSFT_max, input$PCSBZT1_min, input$PCSBZT1_max,
@@ -809,6 +828,8 @@ server<-function(input,output,session){
                    )
     names(inputs) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
                        "PPS Number",
+                       "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+                       "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
                        "Die Size (in) Min", "Die Size (in) Max", "Die Land Length (in)", 
                        "Tip Size (in) Min","Tip Size (in) Max", "Tip Land Length (in)", "Screw Print",
                        "Feedthroat Temperature  F Min", "Feedthroat Temperature  F Max",
@@ -851,7 +872,7 @@ server<-function(input,output,session){
                  )
                  ),
                  scrollX=TRUE,
-                 scrollY=500,
+                 scrollY=600,
                  autoWidth=TRUE),
   filter = "top",
   rownames = FALSE, 
@@ -1005,7 +1026,12 @@ server<-function(input,output,session){
     rownames = FALSE,
     escape = FALSE,
     server = FALSE,
-    options=list(pageLength=5)   # make the shopping cart page shorter
+    options = list(orderClasses = TRUE,
+                   columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                   scrollX=TRUE,
+                   scrollY=250,
+                   autoWidth=TRUE,
+                   pageLength=5)  # make the shopping cart page shorter
   ) #for the shoppingcart
   
   
@@ -1017,7 +1043,12 @@ server<-function(input,output,session){
   rownames = FALSE,
   escape = FALSE,
   server = FALSE,
-  options=list(pageLength=5)   # make the shopping cart page shorter
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=250,
+                 autoWidth=TRUE,
+                 pageLength=5)   # make the shopping cart page shorter
   ) #for the shoppingcart
   
   
@@ -1026,7 +1057,7 @@ server<-function(input,output,session){
     filename = function() { paste("Single PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(clean_single_pps_data$data[2:ncol(clean_single_pps_data$data)], file)
+      write.csv(clean_single_pps_data$data[2:ncol(clean_single_pps_data$data)], file, row.names = FALSE)
     }
   )
   
@@ -1035,7 +1066,7 @@ server<-function(input,output,session){
     filename = function() { paste("Single PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(single_df_output$data[2:ncol(single_df_output$data)], file)
+      write.csv(single_df_output$data[2:ncol(single_df_output$data)], file, row.names = FALSE)
     }
   )
   
@@ -1043,14 +1074,19 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcartparts$data$'Part'),]
+    data <- single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcartparts$data$'Part'),2:ncol(single_pps_data)]
     return(data)
     
   },
   filter = "top",
   rownames = FALSE,
   escape = FALSE,
-  server = FALSE
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
   )
   
   
@@ -1059,9 +1095,40 @@ server<-function(input,output,session){
     #downlaod the single PPS data from the shopping cart
     filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcart$data$'Part'),], file)
+      write.csv(single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcartparts$data$'Part'),2:ncol(single_pps_data)], 
+                file, row.names = FALSE)
     }
   )
+  
+  observeEvent(input$checksingleresininfo,{
+    #this checks all the checkboxes associated with single tooling inputs
+    updateCheckboxInput(session, inputId = "PCSRF_d", label = "Resin Families",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSRBQ_d", label = "Is Resin Blended with Anything?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSRPBQ_d", label = "Is Resin a Polymer Blend?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSRFQ_d", label = "Is Resin Filled?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSRFi_d", label = "Resin Fillers",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSRCQ_d", label = "Is Resin Colored?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSRC_d", label = "Resin Color",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSRRQ_d", label = "Is Resin Radiopaque?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSRDu_d", label = "Resin Durometer (D)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCSRADu_d", label = "Average Durometer (D)",value = TRUE)
+    
+  }) #end obserEvent for input$checksingletooling
+  
+  observeEvent(input$unchecksingleresininfo,{
+    #this unchecks all the checkboxes associated with single tooling inputs
+    updateCheckboxInput(session, inputId = "PCSRF_d", label = "Resin Families",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSRBQ_d", label = "Is Resin Blended with Anything?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSRPBQ_d", label = "Is Resin a Polymer Blend?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSRFQ_d", label = "Is Resin Filled?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSRFi_d", label = "Resin Fillers",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSRCQ_d", label = "Is Resin Colored?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSRC_d", label = "Resin Color",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSRRQ_d", label = "Is Resin Radiopaque?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSRDu_d", label = "Resin Durometer (D)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCSRADu_d", label = "Average Durometer (D)",value = FALSE)
+    
+  }) #end obserEvent for input$unchecksingletooling
   
   observeEvent(input$checksingletooling,{
     #this checks all the checkboxes associated with single tooling inputs
@@ -1288,7 +1355,10 @@ server<-function(input,output,session){
   
   #the assign will initialize the miidvector
   assign("miidvector", 
-         c("Placeholder", "PCMPN", "PCMPD", "PCMRN", "PCMRD", "PCMPPSN", 
+         c("Placeholder", "PCMPN", "PCMPD", "PCMRN", "PCMRD", "PCMPPSN", "Placeholder",
+           "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+           "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+           "Placeholder",
            "PCMDS_min", "PCMDS_max", "PCMDLL", "PCMTS_min", "PCMTS_max",
            "PCMTLL", "PCMSP", 
            "PCMFT_min", "PCMFT_max", "PCMBZT1_min", "PCMBZT1_max",
@@ -1971,7 +2041,11 @@ server<-function(input,output,session){
   show_vars2<-reactive({
     
     checkboxes2 <- as.numeric(c(TRUE, input$PCMPN_d,input$PCMPD_d,input$PCMRN_d,input$PCMRD_d,
-                               input$PCMPPSN_d, input$PCMET_d, input$PCMB_d,
+                               input$PCMPPSN_d,
+                               input$PCMRF_d, input$PCMRBQ_d, input$PCMRPBQ_d, input$PCMRFQ_d, 
+                               input$PCMRFi_d, input$PCMRCQ_d, input$PCMRC_d, input$PCMRRQ_d,
+                               input$PCMRDu_d, input$PCMRADu_d,
+                               input$PCMET_d, input$PCMB_d,
                                input$PCMDS_d,input$PCMDLL_d,input$PCMTS_d,
                                input$PCMTLL_d,input$PCMSP_d,input$PCMFT_d,
                                input$PCMBZT1_d,input$PCMBZT2_d,input$PCMBZT3_d,
@@ -1984,7 +2058,12 @@ server<-function(input,output,session){
                                input$PCMULT_d,input$PCMVC_d,input$PCMIRD_d))
     
     names(checkboxes2) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
-                           "PPS Number", "Extrusion Type", "Barrel",
+                           "PPS Number", "Extrusion Type", 
+                           "Resin Families", "Is Resin Blended with Anything?", "Is Resin a Polymer Blend?",
+                           "Is Resin Filled?", "Resin Fillers", "Is Resin Colored?", 
+                           "Resin Color", "Is Resin Radiopaque?", "Resin Durometer (D)", 
+                           "Average Resin Durometer (D)",
+                           "Barrel",
                            "Die Size (in)", "Die Land Length (in)",
                            "Tip Size (in)", "Tip Land Length (in)", "Screw Print",
                            "Feedthroat Temperature  F",
@@ -2009,7 +2088,11 @@ server<-function(input,output,session){
   #this variable will store all the inputs of the multi extrusions
   multi_inputs <- reactive({
     #this variable will store all the inputs of of the multi extrusions
-    inputs2 <- c("Placeholder", input$PCMPN, input$PCMPD, input$PCMRN, input$PCMRD, input$PCMPPSN, 
+    inputs2 <- c("Placeholder", input$PCMPN, input$PCMPD, input$PCMRN, input$PCMRD, input$PCMPPSN,
+                 "Placeholder",
+                 "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+                 "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+                 "Placeholder",
                 input$PCMDS_min, input$PCMDS_max, input$PCMDLL, input$PCMTS_min, input$PCMTS_max,
                 input$PCMTLL, input$PCMSP, 
                 input$PCMFT_min, input$PCMFT_max, input$PCMBZT1_min, input$PCMBZT1_max,
@@ -2029,7 +2112,10 @@ server<-function(input,output,session){
                 input$PCMVC, input$PCMIRD)
     
     names(inputs2) <- c("Placeholder", "Part Number", "Part Description", "Resin Number", "Resin Description",
-                       "PPS Number",
+                       "PPS Number", "Placeholder",
+                       "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+                       "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+                       "Placeholder",
                        "Die Size (in) Min", "Die Size (in) Max", "Die Land Length (in)", 
                        "Tip Size (in) Min","Tip Size (in) Max", "Tip Land Length(in)", "Screw Print",
                        "Feedthroat Temperature  F Min", "Feedthroat Temperature  F Max",
@@ -2225,7 +2311,14 @@ server<-function(input,output,session){
     filter = "top",
     rownames = FALSE,
     escape = FALSE,
-    server = FALSE) #for the shoppingcart
+    server = FALSE,
+    options = list(orderClasses = TRUE,
+                   columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                   scrollX=TRUE,
+                   scrollY=250,
+                   autoWidth=TRUE,
+                   pageLength = 5)
+    ) #for the shoppingcart
   
   output$multishoppingcartparts <- renderDataTable({
     #'this is a table that only lists the parts for quick viewing
@@ -2235,7 +2328,12 @@ server<-function(input,output,session){
   rownames = FALSE,
   escape = FALSE,
   server = FALSE,
-  options=list(pageLength=5)   # make the shopping cart page shorter
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=250,
+                 autoWidth=TRUE,
+                 pageLength=5) # make the shopping cart page shorter
   ) #for the shoppingcart
   
   
@@ -2244,7 +2342,7 @@ server<-function(input,output,session){
     filename = function() { paste("Multi-Layer PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(clean_multi_pps_data$data[2:ncol(clean_multi_pps_data$data)], file)
+      write.csv(clean_multi_pps_data$data[2:ncol(clean_multi_pps_data$data)], file, row.names = FALSE)
     }
   )
 
@@ -2254,7 +2352,7 @@ server<-function(input,output,session){
     filename = function() { paste("Multi PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(multi_df_output$data[2:ncol(multi_df_output$data)], file)
+      write.csv(multi_df_output$data[2:ncol(multi_df_output$data)], file, row.names = FALSE)
     }
   )
   
@@ -2262,14 +2360,19 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcartparts$data$'Part'),]
+    data <- multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcartparts$data$'Part'),2:ncol(multi_pps_data)]
     return(data)
     
   },
   filter = "top",
   rownames = FALSE,
   escape = FALSE,
-  server = FALSE
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
   )
   
   
@@ -2278,12 +2381,14 @@ server<-function(input,output,session){
     #downlaod the multi PPS data from the shopping cart
     filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcart$data$'Part'),], file)
+      write.csv(multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcart$data$'Part'),2:ncol(multi_pps_data)], 
+                file, row.names = FALSE)
     }
   )
   
   observeEvent(input$checkmultitooling,{
     #this checks all the checkboxes associated with multi tooling inputs
+    
     updateCheckboxInput(session, inputId = "PCMB_d", label = "Barrel",value = TRUE)
     updateCheckboxInput(session, inputId = "PCMDS_d", label = "Die Size (in)",value = TRUE)
     updateCheckboxInput(session, inputId = "PCMDLL_d", label = "Die Land Length (in)",value = TRUE)
@@ -2293,9 +2398,40 @@ server<-function(input,output,session){
     
   }) #end obserEvent for input$checkmultitooling
   
+  observeEvent(input$checkmultiresininfo,{
+    #this checks all the checkboxes associated with multi tooling inputs
+    updateCheckboxInput(session, inputId = "PCMRF_d", label = "Resin Families",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMRBQ_d", label = "Is Resin Blended with Anything?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMRPBQ_d", label = "Is Resin a Polymer Blend?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMRFQ_d", label = "Is Resin Filled?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMRFi_d", label = "Resin Fillers",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMRCQ_d", label = "Is Resin Colored?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMRC_d", label = "Resin Color",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMRRQ_d", label = "Is Resin Radiopaque?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMRDu_d", label = "Resin Durometer (D)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCMRADu_d", label = "Average Durometer (D)",value = TRUE)
+    
+  }) #end obserEvent for input$checkmultitooling
+  
+  observeEvent(input$uncheckmultiresininfo,{
+    #this unchecks all the checkboxes associated with multi tooling inputs
+    updateCheckboxInput(session, inputId = "PCMRF_d", label = "Resin Families",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMRBQ_d", label = "Is Resin Blended with Anything?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMRPBQ_d", label = "Is Resin a Polymer Blend?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMRFQ_d", label = "Is Resin Filled?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMRFi_d", label = "Resin Fillers",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMRCQ_d", label = "Is Resin Colored?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMRC_d", label = "Resin Color",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMRRQ_d", label = "Is Resin Radiopaque?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMRDu_d", label = "Resin Durometer (D)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCMRADu_d", label = "Average Durometer (D)",value = FALSE)
+    
+  }) #end obserEvent for input$uncheckmultitooling
+  
   
   observeEvent(input$uncheckmultitooling,{
     #this unchecks all the checkboxes associated with multi tooling inputs
+    updateCheckboxInput(session, inputId = "PCMET_d", label = "Extrusion Type",value = FALSE)
     updateCheckboxInput(session, inputId = "PCMB_d", label = "Barrel",value = FALSE)
     updateCheckboxInput(session, inputId = "PCMDS_d", label = "Die Size (in)",value = FALSE)
     updateCheckboxInput(session, inputId = "PCMDLL_d", label = "Die Land Length (in)",value = FALSE)
@@ -2446,23 +2582,25 @@ server<-function(input,output,session){
   #the assign will initialize the tiidvector
   assign("tiidvector", 
          c("Placeholoder", 
-           "PCSPN", "PCSPD", "PCSRN", "PCSRD", "PCSPPSN", 
-           "PCSDS_min", "PCSDS_max", "PCSDLL", "PCSTS_min", "PCSTS_max",
-           "PCSTLL", "PCSSP", 
-           "PCSFT_min", "PCSFT_max", "PCSBZT1_min", "PCSBZT1_max",
-           "PCSBZT2_min", "PCSBZT2_max", "PCSBZT3_min", "PCSBZT3_max",
-           "PCSCT_min", "PCSCT_max", "PCSAT_min", "PCSAT_max",
-           "PCSDT1_min", "PCSDT1_max", "PCSDT2_min", "PCSDT2_max",
+           "PCTPN", "PCTPD", "PCTRN", "PCTRD", "PCTPPSN", 
+           "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+           "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+           "PCTDS_min", "PCTDS_max", "PCTDLL", "PCTTS_min", "PCTTS_max",
+           "PCTTLL", "PCTSP", 
+           "PCTFT_min", "PCTFT_max", "PCTBZT1_min", "PCTBZT1_max",
+           "PCTBZT2_min", "PCTBZT2_max", "PCTBZT3_min", "PCTBZT3_max",
+           "PCTCT_min", "PCTCT_max", "PCTAT_min", "PCTAT_max",
+           "PCTDT1_min", "PCTDT1_max", "PCTDT2_min", "PCTDT2_max",
            "PCTPIDI_min", "PCTPIDI_max", "PCTPODI_min", "PCTPODI_max", "PCTPWT_min", 
            "PCTPWT_max","PCTPOR_min", "PCTPOR_max", "PCTPCCT_min", "PCTPCCT_max",
            "PCTDIDI_min", "PCTDIDI_max", "PCTDODI_min", "PCTDODI_max", "PCTDWT_min",
            "PCTDWT_max", "PCTDOR_min", "PCTDOR_max", "PCTDCCT_min", "PCTDCCT_max",
            "PCTPLength_min", "PCTPLength_max", "PCTTLength_min", "PCTTLength_max",
            "PCTDLength_min", "PCTDLength_max", "PCTToLength_min", "PCTToLength_max",
-           "PCSPPD",
-           "PCSNEXIV", "PCSAnnealed", "PCSCaliper", "PCSOS",
-           "PCSMP", "PCSHT", "PCSSPD", "PCSSLD", "PCSDLN", "PCSULT",
-           "PCSVC", "PCSIRD"), 
+           "PCTPPD",
+           "PCTNEXIV", "PCTAnnealed", "PCTCaliper", "PCTOS",
+           "PCTMP", "PCTHT", "PCTSPD", "PCTSLD", "PCTDLN", "PCTULT",
+           "PCTVC", "PCTIRD"), 
          envir = e3)
   
   
@@ -3122,8 +3260,11 @@ server<-function(input,output,session){
 
   
   show_vars3<-reactive({
-    checkboxes <- as.numeric(c(TRUE,input$PCTPN_d,input$PCTPD_d,input$PCTRN_d,input$PCTRD_d,
-                               input$PCTPPSN_d,input$PCTDS_d,input$PCTDLL_d,input$PCTTS_d,
+    checkboxes <- as.numeric(c(TRUE,input$PCTPN_d,input$PCTPD_d,input$PCTRN_d,input$PCTRD_d, input$PCTPPSN_d,
+                               input$PCTRF_d, input$PCTRBQ_d, input$PCTRPBQ_d, input$PCTRFQ_d, 
+                               input$PCTRFi_d, input$PCTRCQ_d, input$PCTRC_d, input$PCTRRQ_d,
+                               input$PCTRDu_d, input$PCTRADu_d,
+                               input$PCTDS_d,input$PCTDLL_d,input$PCTTS_d,
                                input$PCTTLL_d,input$PCTSP_d,input$PCTFT_d,
                  input$PCTBZT1_d,input$PCTBZT2_d,input$PCTBZT3_d,input$PCTCT_d,input$PCTAT_d,
                  input$PCTDT1_d,input$PCTDT2_d,
@@ -3139,6 +3280,9 @@ server<-function(input,output,session){
     names(checkboxes) <- c("Placeholder",
                            "Part Number", "Part Description", "Resin Number", "Resin Description",
                            "PPS Number",
+                           "Is Resin Filled?", "Resin Fillers", "Is Resin Colored?", 
+                           "Resin Color", "Is Resin Radiopaque?", "Resin Durometer (D)", 
+                           "Average Resin Durometer (D)",
                            "Die Size (in)", "Die Land Length (in)",
                            "Tip Size (in)", "Tip Land Length (in)", "Screw Print",
                            "Feedthroat Temperature  F",
@@ -3164,7 +3308,9 @@ server<-function(input,output,session){
   #this variable will store all the inputs of the tapered extrusions
   tapered_inputs <- reactive({
     #this variable will store all the inputs of of the tapered extrusions
-    inputs3 <- c("Placeholder", input$PCTPN, input$PCTPD, input$PCTRN, input$PCTRD, input$PCTPPSN, 
+    inputs3 <- c("Placeholder", input$PCTPN, input$PCTPD, input$PCTRN, input$PCTRD, input$PCTPPSN,
+                 "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+                 "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
                 input$PCTDS_min, input$PCTDS_max, input$PCTDLL, input$PCTTS_min, input$PCTTS_max,
                 input$PCTTLL, input$PCTSP, 
                 input$PCTFT_min, input$PCTFT_max, input$PCTBZT1_min, input$PCTBZT1_max,
@@ -3185,6 +3331,8 @@ server<-function(input,output,session){
     names(inputs3) <- c("Placeholder",
                         "Part Number", "Part Description", "Resin Number", "Resin Description",
                        "PPS Number",
+                       "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
+                       "Placeholder", "Placeholder", "Placeholder", "Placeholder", "Placeholder",
                        "Die Size (in) Min", "Die Size (in) Max", "Die Land Length (in)", 
                        "Tip Size (in) Min","Tip Size (in) Max", "Tip Land Length (in)", "Screw Print",
                        "Feedthroat Temperature  F Min", "Feedthroat Temperature  F Max",
@@ -3392,7 +3540,14 @@ server<-function(input,output,session){
     filter = "top",
     rownames = FALSE,
     escape = FALSE,
-    server = FALSE) #for the shoppingcart
+    server = FALSE,
+    options = list(orderClasses = TRUE,
+                   columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                   scrollX=TRUE,
+                   scrollY=250,
+                   autoWidth=TRUE,
+                   pageLength = 5)
+    ) #for the shoppingcart
   
 
   output$taperedshoppingcartparts <- renderDataTable({
@@ -3403,7 +3558,12 @@ server<-function(input,output,session){
   rownames = FALSE,
   escape = FALSE,
   server = FALSE,
-  options=list(pageLength=5)   # make the shopping cart page shorter
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=250,
+                 autoWidth=TRUE,
+                 pageLength = 5)  # make the shopping cart page shorter
   ) #for the shoppingcart
 
   
@@ -3415,7 +3575,7 @@ server<-function(input,output,session){
     filename = function() { paste("tapered-Layer PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(clean_tapered_pps_data$data[2:ncol(clean_tapered_pps_data$data)], file)
+      write.csv(clean_tapered_pps_data$data[2:ncol(clean_tapered_pps_data$data)], file, row.names = FALSE)
     }
   )
   
@@ -3425,7 +3585,7 @@ server<-function(input,output,session){
     filename = function() { paste("tapered PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(tapered_df_output$data[2:ncol(tapered_df_output$data)], file)
+      write.csv(tapered_df_output$data[2:ncol(tapered_df_output$data)], file, row.names = FALSE)
     }
   )
   
@@ -3434,7 +3594,7 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcartparts$data$'Part'),]
+    data <- tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcartparts$data$'Part'),2:ncol(tapered_pps_data)]
     return(data)
     
   },
@@ -3448,23 +3608,58 @@ server<-function(input,output,session){
                  scrollY=500,
                  autoWidth=TRUE),
   filter = "top",
-  rownames = FALSE, 
-  escape = FALSE, #escape allows for html elements to be rendered in the table
-  server = FALSE) 
-  
-  
-  
- 
+
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
+
   
   
   
   output$taperedcartdownloadpps <- downloadHandler(
     #downlaod the tapered PPS data from the shopping cart
-    filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
+    filename = function() { paste("Tapered PPS Shopping Cart Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcart$data$'Part'),], file)
+      write.csv(tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcart$data$'Part'),2:ncol(tapered_pps_data)], 
+                file, row.names = FALSE)
     }
   )
+  
+  observeEvent(input$checktaperedresininfo,{
+    #this checks all the checkboxes associated with tapered tooling inputs
+    updateCheckboxInput(session, inputId = "PCTRF_d", label = "Resin Families",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTRBQ_d", label = "Is Resin Blended with Anything?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTRPBQ_d", label = "Is Resin a Polymer Blend?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTRFQ_d", label = "Is Resin Filled?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTRFi_d", label = "Resin Fillers",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTRCQ_d", label = "Is Resin Colored?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTRC_d", label = "Resin Color",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTRRQ_d", label = "Is Resin Radiopaque?",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTRDu_d", label = "Resin Durometer (D)",value = TRUE)
+    updateCheckboxInput(session, inputId = "PCTRADu_d", label = "Average Durometer (D)",value = TRUE)
+    
+  }) #end obserEvent for input$checktaperedtooling
+  
+  observeEvent(input$unchecktaperedresininfo,{
+    #this unchecks all the checkboxes associated with tapered tooling inputs
+    updateCheckboxInput(session, inputId = "PCTRF_d", label = "Resin Families",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTRBQ_d", label = "Is Resin Blended with Anything?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTRPBQ_d", label = "Is Resin a Polymer Blend?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTRFQ_d", label = "Is Resin Filled?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTRFi_d", label = "Resin Fillers",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTRCQ_d", label = "Is Resin Colored?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTRC_d", label = "Resin Color",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTRRQ_d", label = "Is Resin Radiopaque?",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTRDu_d", label = "Resin Durometer (D)",value = FALSE)
+    updateCheckboxInput(session, inputId = "PCTRADu_d", label = "Average Durometer (D)",value = FALSE)
+    
+  }) #end obserEvent for input$unchecktaperedtooling
   
   observeEvent(input$checktaperedtooling,{
     #this checks all the checkboxes associated with tapered tooling inputs
@@ -3625,32 +3820,132 @@ server<-function(input,output,session){
   
   
   
+  #### Total ShoppingCart ####
+  
+  ### Shoppingcart
+  
+  observeEvent(c(singleshoppingcartparts$data,multishoppingcart$data, taperedshoppingcart$data), {
+    #this is a shopping cart to hold all the total extrusion parts and SAP batches that a user wants.
+    #this is linked to the output data, so only the output data located of the associated batches 
+    #in the shopping cart is displayed
+    totalshoppingcart$data = rbind(singleshoppingcart$data, multishoppingcart$data, taperedshoppingcart$data)
+  }) #end singleshoppingcart
+  
+  observeEvent(c(singleshoppingcartparts$data,multishoppingcart$data, taperedshoppingcart$data),{
+    #'this will hold only a list of parts, this way it is easier for users to look at all the parts
+    #'when there are two many batches in the shopping cart.
+    totalshoppingcartparts$data = rbind(singleshoppingcartparts$data, multishoppingcartparts$data, taperedshoppingcartparts$data)
+  })
+  
+  totalshoppingcart <- reactiveValues(
+    #this is a shopping cart to hold all the total extrusion parts and SAP batches that a user wants.
+    #this is linked to the output data, so only the output data located of the associated batches 
+    #in the shopping cart is displayed
+    data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
+                      "SAP Batch" = numeric(0), "Delete Batch" = numeric(0),
+                      stringsAsFactors = FALSE,
+                      check.names = FALSE)
+  ) #end singleshoppingcart
+  
+  totalshoppingcartparts <- reactiveValues(
+    #this is a shopping cart to hold all the singl extrusion parts and SAP batches that a user wants.
+    #this is linked to the output data, so only the output data located of the associated batches 
+    #in the shopping cart is displayed
+    data = data.frame("Part" = numeric(0), "Batches?" = numeric(0), "Delete Part" = numeric(0),
+                      stringsAsFactors = FALSE,
+                      check.names = FALSE)
+  ) #end singleshoppingcart
+  
+  
+  output$totalshoppingcart <- renderDataTable({
+    #'this shopping cart allows a user to select parts and batches they want to examine. Once added
+    #'to the cart, they can view all the MES, SAP, and AppStats data
+    return(totalshoppingcart$data)
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=250,
+                 autoWidth=TRUE,
+                 pageLength = 5)
+  ) #for the shoppingcart
+  
+  output$totalshoppingcartparts <- renderDataTable({
+    #'this is a table that only lists the parts for quick viewing
+    return(totalshoppingcartparts$data)
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=250,
+                 autoWidth=TRUE,
+                 pageLength = 5)  # make the shopping cart page shorter
+  ) #for the shoppingcart
+  
+  
+  
+  ### PPS Tab
+  
+  output$totalshoppingcartpps <- renderDataTable({
+    #this is to render a datatable that has all the PPS information of parts that have been saved
+    #to the shopping cart
+    
+    data <- total_pps_data[which(total_pps_data$`Part Number` %in% totalshoppingcartparts$data$'Part'),]
+    return(data)
+    
+  },
+  filter = "top",
+  rownames = FALSE,
+  escape = FALSE,
+  server = FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 autoWidth=TRUE)
+  )
+  
+  
+  
+  output$totalcartdownloadpps <- downloadHandler(
+    #downlaod the tapered PPS data from the shopping cart
+    filename = function() { paste("Tapered PPS Shopping Cart Data", '.csv', sep='') },
+    content = function(file) {
+      write.csv(total_pps_data[which(total_pps_data$`Part Number` %in% totalshoppingcartparts$data$'Part'),], 
+                file, row.names = FALSE)
+    }
+  )
+  
+  
+  
+  
+  
   #### EXTRA ####
   
-  SingleMESparametersData<-reactive({
+  
+  output$singleMESparameters <- renderDataTable({
+
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
     data <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return (data)
   })
-    
-   output$singleMESparameters <- renderDataTable({
-  #This will display the chosen part number on the Single MES Parameters tab
-  data <- SingleMESparametersData()
-    return(data)
-  },
-    options = list(orderClasses = TRUE,
-                 columnDefs = list(list(className = 'dt-center',
-                                        targets = "_all"
-                 )
-                 ),
+
+
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE),
-  filter = "top",
-  rownames = FALSE, 
-  escape = FALSE, #escape allows for html elements to be rendered in the table
-  server = FALSE) 
+                 autoWidth=TRUE))
+
   
  
     output$singleMEStime <- renderDataTable({
@@ -3659,18 +3954,13 @@ server<-function(input,output,session){
     data <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
+  filter = "top",
   options = list(orderClasses = TRUE,
-                 columnDefs = list(list(className = 'dt-center',
-                                        targets = "_all"
-                 )
-                 ),
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE),
-  filter = "top",
-  rownames = FALSE, 
-  escape = FALSE, #escape allows for html elements to be rendered in the table
-  server = FALSE) #end Single Extrusion PPS Data
+                 autoWidth=TRUE))
+
   
   output$singleMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
@@ -3678,18 +3968,13 @@ server<-function(input,output,session){
     data <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
+  filter = "top",
   options = list(orderClasses = TRUE,
-                 columnDefs = list(list(className = 'dt-center',
-                                        targets = "_all"
-                 )
-                 ),
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE),
-  filter = "top",
-  rownames = FALSE, 
-  escape = FALSE, #escape allows for html elements to be rendered in the table
-  server = FALSE) #end Single Extrusion PPS Data
+                 autoWidth=TRUE))
+
   
     
   output$singleMEStotal <- renderDataTable({
@@ -3698,18 +3983,13 @@ server<-function(input,output,session){
     data <- single_tari_total_data[single_tari_total_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
+  filter = "top",
   options = list(orderClasses = TRUE,
-                 columnDefs = list(list(className = 'dt-center',
-                                        targets = "_all"
-                 )
-                 ),
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE),
-  filter = "top",
-  rownames = FALSE, 
-  escape = FALSE, #escape allows for html elements to be rendered in the table
-  server = FALSE) #end Single Extrusion PPS Data
+                 autoWidth=TRUE))
+
   
   output$singlescrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
@@ -3717,18 +3997,13 @@ server<-function(input,output,session){
     data <- scrapcodes_data[scrapcodes_data$Order %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
+  filter = "top",
   options = list(orderClasses = TRUE,
-                 columnDefs = list(list(className = 'dt-center',
-                                        targets = "_all"
-                 )
-                 ),
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE),
-  filter = "top",
-  rownames = FALSE, 
-  escape = FALSE, #escape allows for html elements to be rendered in the table
-  server = FALSE) #end Single Extrusion PPS Data
+                 autoWidth=TRUE))
+
   
   
   output$multiMESparameters <- renderDataTable({
@@ -3737,7 +4012,12 @@ server<-function(input,output,session){
     data <- multi_tari_parameter_data[multi_tari_parameter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   output$multiMEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
@@ -3745,7 +4025,12 @@ server<-function(input,output,session){
     data <- multi_tari_time_data[multi_tari_time_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   output$multiMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
@@ -3753,7 +4038,12 @@ server<-function(input,output,session){
     data <- multi_tari_submitter_data[multi_tari_submitter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
   
   output$multiMEStotal <- renderDataTable({
     #This returns the table of all MES inputs based on the SAP batch numbers in the
@@ -3761,7 +4051,13 @@ server<-function(input,output,session){
     data <- multi_tari_total_data[multi_tari_total_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
+  
   
   output$multiscrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
@@ -3769,7 +4065,86 @@ server<-function(input,output,session){
     data <- scrapcodes_data[scrapcodes_data$Order %in% multishoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
+  
+  output$taperedMESparameters <- renderDataTable({
+    #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
+    #in the shopping cart
+    data <- tapered_tari_parameter_data[tapered_tari_parameter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
+  
+  output$taperedMEStime <- renderDataTable({
+    #This returns the table of the MES input times based on the SAP batch numbers in the
+    #shopping cart
+    data <- tapered_tari_time_data[tapered_tari_time_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
+  
+  output$taperedMESsubmitter <- renderDataTable({
+    #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
+    #shopping cart
+    data <- tapered_tari_submitter_data[tapered_tari_submitter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
+  
+  
+  
+  output$taperedMEStotal <- renderDataTable({
+    #This returns the table of all MES inputs based on the SAP batch numbers in the
+    #shopping cart
+    data <- tapered_tari_total_data[tapered_tari_total_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
+  
+  
+  output$taperedscrapcodes <- renderDataTable({
+    #This returns the table of SAP scrap codes based on the SAP batch numbers in the
+    #shopping cart
+    data <- scrapcodes_data[scrapcodes_data$Order %in% taperedshoppingcart$data$'SAP Batch',]
+    return(data)
+  },
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
   
   
   
@@ -3780,7 +4155,12 @@ server<-function(input,output,session){
     data <- nexiv[nexiv$`Batch #` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",options = list(orderClasses = TRUE,
+                                columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                scrollX=TRUE,
+                                scrollY=500,
+                                autoWidth=TRUE)
+  )
   
   output$laserlinc <- renderDataTable({
     #This returns the table of the Applied Stats laserlinc data based on the SAP batch numbers in the
@@ -3788,7 +4168,13 @@ server<-function(input,output,session){
     data <- laserlinc[laserlinc$`Lot Number` %in% singleshoppingcart$data$'SAP Batch',]
     return(data)
   },
-  filter = "top")
+  filter = "top",
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE)
+  )
   # end Single Extrusion PPS Data Server part and Shopping cart
   
   
@@ -4199,6 +4585,228 @@ server<-function(input,output,session){
   
   #***************Data Analysis Tab******************************
   
+  #### Sampling and Test Method Information ####
+  
+  single_sampling_data_test <- reactiveValues(data = single_sampling_data)
+  
+  observeEvent(input$search_single_sampling,{
+    search <- c(input$sspn, input$ssppsn, input$ssatt, input$ssmm, input$sssam, input$sslsl,
+                input$sslcl, input$sstar, input$ssucl, input$ssusl, input$ssprean, input$sspostan,
+                input$ssoff, input$sspostirr)
+    columns <- ncol(single_sampling_data)
+    count <- 1
+    placeholder <- single_sampling_data
+    
+    while (count < columns + 1){
+      placeholder <- placeholder[grep(search[count], placeholder[,count], ignore.case = TRUE),]
+      count <- count + 1
+    }#end while
+    
+    
+    single_sampling_data_test$data <- placeholder
+    
+  })
+  
+  observeEvent(input$reset_single_sampling,{
+    single_sampling_data_test$data <- single_sampling_data
+  })
+  
+  
+  output$single_sampling_ui <- renderDataTable(single_sampling_data_test$data,
+                                          rownames = FALSE,
+                                          escape = FALSE,
+                                          server = FALSE,
+                                          options = list(orderClasses = TRUE,
+                                                         columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                         scrollX=TRUE,
+                                                         scrollY=500,
+                                                         autoWidth=TRUE))
+  
+  
+  
+  #Multi
+  multi_sampling_data_test <- reactiveValues(data = multi_sampling_data)
+  
+  observeEvent(input$search_multi_sampling,{
+    search <- c(input$mspn, input$msppsn, input$msatt, input$msmm, input$mssam, input$mslsl,
+                input$mslcl, input$mstar, input$msucl, input$msusl, input$msprean, input$mspostan,
+                input$msoff, input$mspostirr)
+    columns <- ncol(multi_sampling_data)
+    count <- 1
+    placeholder <- multi_sampling_data
+    
+    while (count < columns + 1){
+      placeholder <- placeholder[grep(search[count], placeholder[,count], ignore.case = TRUE),]
+      count <- count + 1
+    }#end while
+    
+    
+    multi_sampling_data_test$data <- placeholder
+    
+  })
+  
+  observeEvent(input$reset_multi_sampling,{
+    multi_sampling_data_test$data <- multi_sampling_data
+  })
+  
+  output$multi_sampling_ui <- renderDataTable(multi_sampling_data_test$data,
+                                               rownames = FALSE,
+                                               escape = FALSE,
+                                               server = FALSE,
+                                              options = list(orderClasses = TRUE,
+                                                             columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                             scrollX=TRUE,
+                                                             scrollY=500,
+                                                             autoWidth=TRUE))
+  
+  
+  
+  
+  
+  #Tapered
+  tapered_sampling_data_test <- reactiveValues(data = tapered_sampling_data)
+  
+  observeEvent(input$search_tapered_sampling,{
+    search <- c(input$tspn, input$tsppsn, input$tsatt, input$tsmm, input$tssam, input$tslsl,
+                input$tslcl, input$tstar, input$tsucl, input$tsusl, input$tsprean, input$tspostan,
+                input$tsoff, input$tspostirr)
+    columns <- ncol(tapered_sampling_data)
+    count <- 1
+    placeholder <- tapered_sampling_data
+    
+    while (count < columns + 1){
+      placeholder <- placeholder[grep(search[count], placeholder[,count], ignore.case = TRUE),]
+      count <- count + 1
+    }#end while
+    
+    
+    tapered_sampling_data_test$data <- placeholder
+    
+  })
+  
+  observeEvent(input$reset_tapered_sampling,{
+    tapered_sampling_data_test$data <- tapered_sampling_data
+  })
+  
+  output$tapered_sampling_ui <- renderDataTable(tapered_sampling_data_test$data,
+                                               rownames = FALSE,
+                                               escape = FALSE,
+                                               server = FALSE,
+                                               options = list(orderClasses = TRUE,
+                                                              columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                              scrollX=TRUE,
+                                                              scrollY=500,
+                                                              autoWidth=TRUE))
+  
+  
+  
+  
+  
+  #Extra
+  extra_sampling_data_test <- reactiveValues(data = extra_sampling_data)
+  
+  observeEvent(input$search_extra_sampling,{
+    search <- c(input$espn, input$esppsn, input$esatt, input$esmm, input$essam, input$eslsl,
+                input$eslcl, input$estar, input$esucl, input$esusl, input$esprean, input$espostan,
+                input$esoff, input$espostirr)
+    columns <- ncol(extra_sampling_data)
+    count <- 1
+    placeholder <- extra_sampling_data
+    
+    while (count < columns + 1){
+      placeholder <- placeholder[grep(search[count], placeholder[,count], ignore.case = TRUE),]
+      count <- count + 1
+    }#end while
+    
+    
+    extra_sampling_data_test$data <- placeholder
+    
+  })
+  
+  observeEvent(input$reset_extra_sampling,{
+    extra_sampling_data_test$data <- extra_sampling_data
+  })
+  
+  output$extra_sampling_ui <- renderDataTable(extra_sampling_data_test$data,
+                                               rownames = FALSE,
+                                               escape = FALSE,
+                                               server = FALSE,
+                                              options = list(orderClasses = TRUE,
+                                                             columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                             scrollX=TRUE,
+                                                             scrollY=500,
+                                                             autoWidth=TRUE))
+  
+  
+  
+  
+  
+  
+  #All
+  all_sampling_data_test <- reactiveValues(data = all_sampling_data)
+  
+  observeEvent(input$search_all_sampling,{
+    search <- c(input$aspn, input$asppsn, input$asatt, input$asmm, input$assam, input$aslsl,
+                input$aslcl, input$astar, input$asucl, input$asusl, input$asprean, input$aspostan,
+                input$asoff, input$aspostirr)
+    columns <- ncol(all_sampling_data)
+    count <- 1
+    placeholder <- all_sampling_data
+    
+    while (count < columns + 1){
+      placeholder <- placeholder[grep(search[count], placeholder[,count], ignore.case = TRUE),]
+      count <- count + 1
+    }#end while
+    
+    
+    all_sampling_data_test$data <- placeholder
+    
+  })
+  
+  observeEvent(input$reset_all_sampling,{
+    all_sampling_data_test$data <- all_sampling_data
+  })
+  
+  output$all_sampling_ui <- renderDataTable(all_sampling_data_test$data,
+                                               rownames = FALSE,
+                                               escape = FALSE,
+                                               server = FALSE,
+                                            options = list(orderClasses = TRUE,
+                                                           columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                           scrollX=TRUE,
+                                                           scrollY=500,
+                                                           autoWidth=TRUE))
+  
+  
+  
+  
+  #### Extra Information ####
+  
+  #The resin data
+  output$resin_data_ui <- renderDataTable(resin_data,
+                                          filter = "top",
+                                          rownames = FALSE,
+                                          escape = FALSE,
+                                          server = FALSE,
+                                          options = list(orderClasses = TRUE,
+                                                         columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                         scrollX=TRUE,
+                                                         scrollY=500,
+                                                         autoWidth=TRUE))
+  
+  #The screw information
+  output$screw_data_ui <- renderDataTable(screw_data,
+                                          filter = "top",
+                                          rownames = FALSE,
+                                          escape = FALSE,
+                                          server = FALSE,
+                                          options = list(orderClasses = TRUE,
+                                                         columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                                                         scrollX=TRUE,
+                                                         scrollY=500,
+                                                         autoWidth=TRUE))
+  
+  
   
   Single<-reactive({
     data<-SingleMESparametersData()
@@ -4328,7 +4936,6 @@ server<-function(input,output,session){
   
 
 } #end server
-  
 
 # Run the application 
 shinyApp(ui = ui, server = server)

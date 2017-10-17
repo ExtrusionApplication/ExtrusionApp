@@ -1,14 +1,15 @@
-library(shiny)
-library(bootstrap)
-library(jpeg)
-library(ggplot2)
-library(DT)
-library(stringr)
-library(gsubfn)
-library(proto)
-library(sqldf)
-library(shinyjs)
-library(shinyBS)
+require(shiny)
+require(bootstrap)
+require(jpeg)
+require(ggplot2)
+require(DT)
+require(stringr)
+require(gsubfn)
+require(proto)
+require(sqldf)
+require(shinyjs)
+require(shinyBS)
+
 
 
 #_s:name of the checkbox
@@ -18,10 +19,10 @@ library(shinyBS)
 #PCM: Part Catalog--Multi Extrusion PPS
 #PCT: Part Catalog--Tapered Extrusion PPS
 
-ui<-navbarPage("Extrusion Application",
+ui<-navbarPage("SIBYL - Extrusion Application",
                navbarMenu("Part Catalog",   #Create a dropdown list named as Part Catalog containing of Single, Multi,and Tapered
                           #Single Extrusion PPS Data
-                          tabPanel("Single Extrusion PPS Data",
+                          tabPanel("Single Layer Extrusion PPS Data",
                                    #Part Resin
                                    fluidRow(
                                      tags$h1(strong("Part Resin"),style="font-size:25px;",align="left"), #Use tag to add a hearder 
@@ -72,6 +73,55 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCSPPSN",label = NULL,
                                                             c("All",unique(as.character(single_pps_data$`PPS Number`))))
                                               )))
+                                   ),
+                                   #Resin Information
+                                   fluidRow(
+                                     tags$h1(strong("Resin Information"),style="font-size:25px;",align="left"),
+                                     #Resin Families
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRF_d","Resin Families",value=F))
+                                     ), 
+                                     #Is Resin Blended with Anything?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRBQ_d","Is Resin Blended with Anything?",value=F))
+                                            ), 
+                                     #Is Resin a Polymer Blend?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRPBQ_d","Is Resin a Polymer Blend?",value=F))
+                                            ),
+                                     #Is Resin Filled?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRFQ_d","Is Resin Filled?",value=F))
+                                            ),
+                                     #Resin Fillers
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRFi_d","Resin Fillers",value=F))
+                                            ),
+                                     #Is Resin Colored?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRCQ_d","Is Resin Colored?",value=F))
+                                            ),
+                                     #Resin Color
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRC_d","Resin Color",value=F))
+                                            ),
+                                     #Is Resin Radiopaque?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRRQ_d","Is Resin Radiopaque?",value=F))
+                                            ),
+                                     #Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRDu_d","Resin Durometer (D)",value=F))
+                                            ),
+                                     #Average Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCSRADu_d","Average Durometer (D)",value=F))
+                                            )
+                                   ),#end Resin Information
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checksingleresininfo", "Show All Resin Information"),
+                                     actionButton("unchecksingleresininfo", "Hide All Resin Information")
                                    ),
                                    #Tooling
                                    fluidRow(
@@ -420,7 +470,7 @@ ui<-navbarPage("Extrusion Application",
                                    )
                           ),#end Single Extrusion PPS Data
                           #Multi Extrusion PPS Data---UI
-                          tabPanel("Multi Extrusion PPS Data",
+                          tabPanel("Multi-Layer Extrusion PPS Data",
                                    #Part Resin
                                    fluidRow(
                                      tags$h1(strong("Part Resin"),style="font-size:25px;",align="left"),
@@ -473,16 +523,66 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCMPPSN",label = NULL,
                                                             c("All",unique(as.character(multi_pps_data$`PPS Number`))))
 
-                                              ))),
-                                     #Extrusion Type
-                                     column(2,
-                                            fluidRow(checkboxInput("PCMET_d","Extrusion Type",value=T))
-                                            )
+                                              )))
 
+                                   ),
+                                   
+                                   #Resin Information
+                                   fluidRow(
+                                     tags$h1(strong("Resin Information"),style="font-size:25px;",align="left"),
+                                     #Resin Families
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRF_d","Resin Families",value=F))
+                                     ), 
+                                     #Is Resin Blended with Anything?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRBQ_d","Is Resin Blended with Anything?",value=F))
+                                     ), 
+                                     #Is Resin a Polymer Blend?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRPBQ_d","Is Resin a Polymer Blend?",value=F))
+                                     ),
+                                     #Is Resin Filled?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRFQ_d","Is Resin Filled?",value=F))
+                                     ),
+                                     #Resin Fillers
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRFi_d","Resin Fillers",value=F))
+                                     ),
+                                     #Is Resin Colored?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRCQ_d","Is Resin Colored?",value=F))
+                                     ),
+                                     #Resin Color
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRC_d","Resin Color",value=F))
+                                     ),
+                                     #Is Resin Radiopaque?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRRQ_d","Is Resin Radiopaque?",value=F))
+                                     ),
+                                     #Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRDu_d","Resin Durometer (D)",value=F))
+                                     ),
+                                     #Average Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMRADu_d","Average Durometer (D)",value=F))
+                                     )
+                                   ),#end Resin Information
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checkmultiresininfo", "Show All Resin Information"),
+                                     actionButton("uncheckmultiresininfo", "Hide All Resin Information")
                                    ),
                                    #Tooling
                                    fluidRow(
                                      tags$h1(strong("Tooling"),style="font-size:25px;",align="left"),
+                                     #Extrusion Type
+                                     column(2,
+                                            fluidRow(checkboxInput("PCMET_d","Extrusion Type",value=T))
+                                     ),
                                      #Barrel
                                      column(2,
                                             fluidRow(checkboxInput("PCMB_d","Barrel",value=F))
@@ -998,6 +1098,56 @@ ui<-navbarPage("Extrusion Application",
                                                 selectInput("PCTPPSN",label = NULL,
                                                             c("All",unique(as.character(single_pps_data$`PPS Number`))))
                                               )))
+                                   ),
+                                   
+                                   #Resin Information
+                                   fluidRow(
+                                     tags$h1(strong("Resin Information"),style="font-size:25px;",align="left"),
+                                     #Resin Families
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRF_d","Resin Families",value=F))
+                                     ), 
+                                     #Is Resin Blended with Anything?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRBQ_d","Is Resin Blended with Anything?",value=F))
+                                     ), 
+                                     #Is Resin a Polymer Blend?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRPBQ_d","Is Resin a Polymer Blend?",value=F))
+                                     ),
+                                     #Is Resin Filled?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRFQ_d","Is Resin Filled?",value=F))
+                                     ),
+                                     #Resin Fillers
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRFi_d","Resin Fillers",value=F))
+                                     ),
+                                     #Is Resin Colored?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRCQ_d","Is Resin Colored?",value=F))
+                                     ),
+                                     #Resin Color
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRC_d","Resin Color",value=F))
+                                     ),
+                                     #Is Resin Radiopaque?
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRRQ_d","Is Resin Radiopaque?",value=F))
+                                     ),
+                                     #Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRDu_d","Resin Durometer (D)",value=F))
+                                     ),
+                                     #Average Resin Durometer
+                                     column(2,
+                                            fluidRow(checkboxInput("PCTRADu_d","Average Durometer (D)",value=F))
+                                     )
+                                   ),#end Resin Information
+                                   fluidRow(
+                                     #fluid row for showing or deleting buttons
+                                     actionButton("checktaperedresininfo", "Show All Resin Information"),
+                                     actionButton("unchecktaperedresininfo", "Hide All Resin Information")
                                    ),
                                    #Tooling
                                    fluidRow(
@@ -1541,6 +1691,325 @@ ui<-navbarPage("Extrusion Application",
                ),
                
                
+               #Sampling and Test method information
+               navbarMenu("Sampling and Test Method Information",
+                          tabPanel("Single Extrusion",
+                                   fluidRow(
+                                     column(3,
+                                            textInput("sspn","Part Number")
+                                     ),
+                                     column(3,
+                                            textInput("ssppsn","PPS Number")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("ssatt","Attribute")
+                                     ),
+                                     column(3,
+                                            textInput("ssmm","Measurement Method")  
+                                     ),
+                                     column(3,
+                                            textInput("sssam","Sampling")    
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("sslsl","Lower Specification Limit (LSL)")
+                                     ),
+                                     column(3,
+                                            textInput("sslcl","Lower Control Limit (LCL)") 
+                                     ),
+                                     column(3,
+                                            textInput("sstar","Target")
+                                     ),
+                                     column(3,
+                                            textInput("ssucl","Upper Control Limit (UCL)")
+                                     ),
+                                     column(3,
+                                            textInput("ssusl","Upper Specification Limit (USL)")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("ssprean","Pre-Annealing")
+                                     ),
+                                     column(3,
+                                            textInput("sspostan","Post-Annealing")
+                                     ),
+                                     column(3,
+                                            textInput("ssoff","Offline after some Time")  
+                                     ),
+                                     column(3,
+                                            textInput("sspostirr","Post-Irradiated")  
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(2,
+                                            actionButton("search_single_sampling","Search Table")
+                                     ),
+                                     column(2,
+                                            actionButton("reset_single_sampling","Reset Table")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     DT::dataTableOutput("single_sampling_ui")
+                                   )
+                          ),
+                          tabPanel("Multi-Layer Extrusion",
+                                   fluidRow(
+                                     column(3,
+                                            textInput("mspn","Part Number")
+                                     ),
+                                     column(3,
+                                            textInput("msppsn","PPS Number")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("msatt","Attribute")
+                                     ),
+                                     column(3,
+                                            textInput("msmm","Measurement Method")  
+                                     ),
+                                     column(3,
+                                            textInput("mssam","Sampling")    
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("mslsl","Lower Specification Limit (LSL)")
+                                     ),
+                                     column(3,
+                                            textInput("mslcl","Lower Control Limit (LCL)") 
+                                     ),
+                                     column(3,
+                                            textInput("mstar","Target")
+                                     ),
+                                     column(3,
+                                            textInput("msucl","Upper Control Limit (UCL)")
+                                     ),
+                                     column(3,
+                                            textInput("msusl","Upper Specification Limit (USL)")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("msprean","Pre-Annealing")
+                                     ),
+                                     column(3,
+                                            textInput("mspostan","Post-Annealing")
+                                     ),
+                                     column(3,
+                                            textInput("msoff","Offline After Some Time")  
+                                     ),
+                                     column(3,
+                                            textInput("mspostirr","Post Irradiated")  
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(2,
+                                            actionButton("search_multi_sampling","Search Table")
+                                     ),
+                                     column(2,
+                                            actionButton("reset_multi_sampling","Reset Table")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     DT::dataTableOutput("multi_sampling_ui")
+                                   )
+                          ),
+                          tabPanel("Tapered Extrusion",
+                                   fluidRow(
+                                     column(3,
+                                            textInput("tspn","Part Number")
+                                     ),
+                                     column(3,
+                                            textInput("tsppsn","PPS Number")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("tsatt","Attribute")
+                                     ),
+                                     column(3,
+                                            textInput("tsmm","Measurement Method")  
+                                     ),
+                                     column(3,
+                                            textInput("tssam","Sampling")    
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("tslsl","Lower Specification Limit (LSL)")
+                                     ),
+                                     column(3,
+                                            textInput("tslcl","Lower Control Limit (LCL)") 
+                                     ),
+                                     column(3,
+                                            textInput("tstar","Target")
+                                     ),
+                                     column(3,
+                                            textInput("tsucl","Upper Control Limit (UCL)")
+                                     ),
+                                     column(3,
+                                            textInput("tsusl","Upper Specification Limit (USL)")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("tsprean","Pre-Annealing")
+                                     ),
+                                     column(3,
+                                            textInput("tspostan","Post-Annealing")
+                                     ),
+                                     column(3,
+                                            textInput("tsoff","Offline after some Time")  
+                                     ),
+                                     column(3,
+                                            textInput("tspostirr","Post-Irradiated")  
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(2,
+                                            actionButton("search_tapered_sampling","Search Table")
+                                     ),
+                                     column(2,
+                                            actionButton("reset_tapered_sampling","Reset Table")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     DT::dataTableOutput("tapered_sampling_ui")
+                                   )
+                          ),
+                          tabPanel("Extra Extrusion",
+                                   fluidRow(
+                                     column(3,
+                                            textInput("espn","Part Number")
+                                     ),
+                                     column(3,
+                                            textInput("esppsn","PPS Number")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("esatt","Attribute")
+                                     ),
+                                     column(3,
+                                            textInput("esmm","Measurement Method")  
+                                     ),
+                                     column(3,
+                                            textInput("essam","Sampling")    
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("eslsl","Lower Specification Limit (LSL)")
+                                     ),
+                                     column(3,
+                                            textInput("eslcl","Lower Control Limit (LCL)") 
+                                     ),
+                                     column(3,
+                                            textInput("estar","Target")
+                                     ),
+                                     column(3,
+                                            textInput("esucl","Upper Control Limit (UCL)")
+                                     ),
+                                     column(3,
+                                            textInput("esusl","Upper Specification Limit (USL)")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("esprean","Pre-Annealing")
+                                     ),
+                                     column(3,
+                                            textInput("espostan","Post-Annealing")
+                                     ),
+                                     column(3,
+                                            textInput("esoff","Offline after some Time")  
+                                     ),
+                                     column(3,
+                                            textInput("espostirr","Post-Irradiated")  
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(2,
+                                            actionButton("search_extra_sampling","Search Table")
+                                     ),
+                                     column(2,
+                                            actionButton("reset_extra_sampling","Reset Table")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     DT::dataTableOutput("extra_sampling_ui")
+                                   )
+                          ),
+                          tabPanel("All Extrusion",
+                                   fluidRow(
+                                     column(3,
+                                            textInput("aspn","Part Number")
+                                     ),
+                                     column(3,
+                                            textInput("asppsn","PPS Number")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("asatt","Attribute")
+                                     ),
+                                     column(3,
+                                            textInput("asmm","Measurement Method")  
+                                     ),
+                                     column(3,
+                                            textInput("assam","Sampling")    
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("aslsl","Lower Specification Limit (LSL)")
+                                     ),
+                                     column(3,
+                                            textInput("aslcl","Lower Control Limit (LCL)") 
+                                     ),
+                                     column(3,
+                                            textInput("astar","Target")
+                                     ),
+                                     column(3,
+                                            textInput("asucl","Upper Control Limit (UCL)")
+                                     ),
+                                     column(3,
+                                            textInput("asusl","Upper Specification Limit (USL)")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(3,
+                                            textInput("asprean","Pre-Annealing")
+                                     ),
+                                     column(3,
+                                            textInput("aspostan","Post-Annealing")
+                                     ),
+                                     column(3,
+                                            textInput("asoff","Offline after some Time")  
+                                     ),
+                                     column(3,
+                                            textInput("aspostirr","Post-Irradiated")  
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(2,
+                                            actionButton("search_all_sampling","Search Table")
+                                     ),
+                                     column(2,
+                                            actionButton("reset_all_sampling","Reset Table")
+                                     )
+                                   ),
+                                   fluidRow(
+                                     DT::dataTableOutput("all_sampling_ui")
+                                   )
+                          )
+               ), #End sampling and test method navbar
+               
                #Single Extrusion MES Data table rendering
                navbarMenu("Single Extrusion MES Data",
                           tabPanel("MES Parameters and Yield",
@@ -1593,18 +2062,22 @@ ui<-navbarPage("Extrusion Application",
                navbarMenu("Tapered Extrusion MES Data",
                           tabPanel("Tapered Parameters and Yield",
                                    fluidRow(
+                                     DT::dataTableOutput("taperedMESparameters")
                                    )
                           ),
                           tabPanel("Tapered Time Stamps",
                                    fluidRow(
+                                     DT::dataTableOutput("taperedMEStime")
                                    )
                           ),
                           tabPanel("Tapered Submitters",
                                    fluidRow(
+                                     DT::dataTableOutput("taperedMESsubmitter")
                                    )
                           ),
                           tabPanel("Tapered Total",
                                    fluidRow(
+                                     DT::dataTableOutput("taperedMEStotal")
                                    )
                           )
                ),
@@ -1625,6 +2098,7 @@ ui<-navbarPage("Extrusion Application",
                           ),
                           tabPanel("Tapered Extrusion",
                                    fluidRow(
+                                     DT::dataTableOutput("taperedscrapcodes")
                                    )
                           )
                ),
@@ -1641,6 +2115,21 @@ ui<-navbarPage("Extrusion Application",
                           tabPanel("Laserlinc",
                                    fluidRow(
                                      DT::dataTableOutput("laserlinc")
+                                   )
+                          )
+               ), #end the NavbarMenu
+               
+               #Extra Features
+               navbarMenu("Extra Information",
+                          #Single Extrusion PPS Data
+                          tabPanel("Resin Information",
+                                   fluidRow(
+                                     DT::dataTableOutput("resin_data_ui")
+                                   )
+                          ),
+                          tabPanel("Screw Print Information",
+                                   fluidRow(
+                                     DT::dataTableOutput("screw_data_ui")
                                    )
                           )
                ), #end the NavbarMenu
@@ -1678,6 +2167,7 @@ ui<-navbarPage("Extrusion Application",
                           )
                ),
                
+
                # A new tab for Analysis 
                # some plots with choices for the plots
                tabPanel("Analysis",
@@ -1737,8 +2227,7 @@ ui<-navbarPage("Extrusion Application",
                                     )
                         )
                         ),
-               
-        
+              
                #create a pop up window for the shopping cart
                absolutePanel(
                  actionButton("ShoppingCart","",icon=icon("shopping-cart","fa-2x"),width = 80 ),
@@ -1774,24 +2263,10 @@ ui<-navbarPage("Extrusion Application",
                          
                          
                  ),
-                 draggable = F,right = 20,top = 50, fixed = F,
-                 style = "z-index = 1000"
+                 draggable = F,right = 10,top = 10, fixed = F,
+                 style = "z-index: 999999"
                  
                )
-
-               
-               
-               
-               
-               #Shopping Cart
-               #'This renders the shopping cart in an absolute panels that is always visible and
-               #'allows for a user to select the output data with associated batches
-               #'
-              
-              
-               #### Extra HTML ####
-
-               
                
                
 )#end ui
