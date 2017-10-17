@@ -67,10 +67,6 @@ scrapcode_file <- "Scrap Codes.csv"
 resin_file <- "Total Resin Information.csv"
 screw_file <- "Screw Properties.csv"
 
-
-###
-
-
 single_pps_pathfile <- paste(path, single_pps_file, sep = "/")
 multi_pps_pathfile <- paste(path, multi_pps_file, sep = "/")
 tapered_pps_pathfile <- paste(path, tapered_pps_file, sep = "/")
@@ -391,8 +387,20 @@ Time_Start=sqldf("select Min([Start Date]) from tapered_tari_parameter_data")
 Time_Start<-as.numeric(Time_Start)
 Time_Start<-as.Date(Time_Start,origin="1970-01-01")
 Time_End<-sqldf("select Max([Start Date]) from tapered_tari_parameter_data")
+
 Time_End<-as.numeric(Time_End)
 Time_End<-as.Date(Time_End,origin="1970-01-01")
+
+
+#MES-Multi--get the start date and time from Start Time
+
+#Get the date range for Multi MES
+
+#MES-Tapered--get the start date and time from Start Time
+#Get the date range for tapered MES
+
+
+
 
 
 

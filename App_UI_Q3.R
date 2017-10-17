@@ -2167,6 +2167,67 @@ ui<-navbarPage("SIBYL - Extrusion Application",
                           )
                ),
                
+
+               # A new tab for Analysis 
+               # some plots with choices for the plots
+               tabPanel("Analysis",
+                        sidebarLayout(
+                          sidebarPanel(
+                            #Choice of Database:MES, Scrap code
+                            radioButtons("dataset", "Data set",
+                                         choices = c("MES", "Scrap code"), inline = TRUE),
+                            conditionalPanel("input.dataset === 'MES'",
+                                             radioButtons("MESType", "Type",
+                                                          choices = c("Single", "Multi", "Tapered"), inline = TRUE)
+                                             ),
+                            
+                            textInput("plottitle","Plot Title",placeholder = NULL),
+                            
+                            conditionalPanel("input.dataset ==='MES'",
+                                             selectInput("Xais","x-axis",
+                                                         c("Start Time"),
+                                                         selectize = F),
+                                             selectInput("Yais","y-axis",
+                                                         c( "Yied Qty" ,"Start Qty" ,"Yield Rate"),
+                                                         selectize = F)
+                                             # this input will be potentially used to filter the existing plot
+                                             # selectInput("PlotFilter", "Plot Filter",
+                                             #             c(
+                                             #               
+                                             #             ),
+                                             #             selectize = F)
+                                              ),
+                            
+                            # the code below is used by downloading plot to local
+                            
+                            radioButtons("var3",  "Select the file type", 
+                                         choices = c("png", "pdf"),inline=T),
+                            downloadButton("plotdownload", "Dowload the plot")
+                            
+                      
+                            #Conditional Panel, if MES were chosen, then choices of Sinlge, Multi, Tapered
+                              # Filter: a dropdown list
+                              #
+                            #
+                            #Download the plot || brushed data point's table
+                          ),
+                          mainPanel("Data Analysis",
+                                    #fluidRow(plotOutput("plot")),
+                                    fluidRow(
+                                      wellPanel(
+                                        h4("Points selected by clicking, with nearPoints():"),
+                                        DT::dataTableOutput("test_display")
+                                        ),
+                                      wellPanel(
+                                        h4("Points selected by brushing, with brushedPoints():"),
+                                        #DT::dataTableOutput("plot_brushed_points"),
+                                        downloadButton("Brushed_Point_Download","Download Brushed Points")
+                                        )
+                                      )
+                                    )
+                        )
+                        ),
+              
                #create a pop up window for the shopping cart
                absolutePanel(
                  actionButton("ShoppingCart","",icon=icon("shopping-cart","fa-2x"),width = 80 ),
