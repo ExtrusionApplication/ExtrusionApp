@@ -3936,15 +3936,16 @@ server<-function(input,output,session){
     #in the shopping cart
     data <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     return (data)
-  })
-
-
+  },
   filter = "top",
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
                  autoWidth=TRUE))
+
+
+  
 
   
  
