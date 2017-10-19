@@ -3928,49 +3928,50 @@ server<-function(input,output,session){
   
   
   #### EXTRA ####
-  
-  
-  output$singleMESparameters <- renderDataTable({
 
+  
+  
+  SingleMESparametersData<- reactive({
+    #This data table will be used by both MES Batch Data Tab and Analysis Tab
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
-    data <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
+    data = single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
+    return(data)
+    })
+
+  
+  output$singleMESparameters <- renderDataTable({
+    data <- SingleMESparametersData()
     return (data)
-  },
-  filter = "top",
-  options = list(orderClasses = TRUE,
+    },
+    filter = "top",
+    options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
                  autoWidth=TRUE))
 
-
-  
-
-  
- 
     output$singleMEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
     #shopping cart
-    data <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
-    return(data)
-  },
-  filter = "top",
-  options = list(orderClasses = TRUE,
+      data <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
+      return(data)
+    },
+    filter = "top",
+    options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
                  autoWidth=TRUE))
-
-  
-  output$singleMESsubmitter <- renderDataTable({
+    
+    output$singleMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
     #shopping cart
-    data <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
-    return(data)
-  },
-  filter = "top",
-  options = list(orderClasses = TRUE,
+      data <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
+      return(data)
+      },
+    filter = "top",
+    options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
@@ -3992,10 +3993,16 @@ server<-function(input,output,session){
                  autoWidth=TRUE))
 
   
-  output$singlescrapcodes <- renderDataTable({
+  
+  SinglescrapcodesData<-reactive({
+    #This data table will be used by both Single Scrap Code Tab and Analysis Tab
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
     #shopping cart
     data <- scrapcodes_data[scrapcodes_data$Order %in% singleshoppingcart$data$'SAP Batch',]
+    return(data)
+  })
+  output$singlescrapcodes <- renderDataTable({
+    data <- SinglescrapcodesData()
     return(data)
   },
   filter = "top",
@@ -4007,10 +4014,16 @@ server<-function(input,output,session){
 
   
   
-  output$multiMESparameters <- renderDataTable({
+  MultiMESparametersData<-reactive({
+    #This data table will be used by both Multi MES Batch Data Tab and Analysis Tab
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
     data <- multi_tari_parameter_data[multi_tari_parameter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
+    return(data)
+  })
+  
+  output$multiMESparameters <- renderDataTable({
+    data<-MultiMESparametersData()
     return(data)
   },
   filter = "top",
@@ -4060,10 +4073,14 @@ server<-function(input,output,session){
                  autoWidth=TRUE))
   
   
-  output$multiscrapcodes <- renderDataTable({
+  MultiscrapcodesData<-reactive({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
     #shopping cart
     data <- scrapcodes_data[scrapcodes_data$Order %in% multishoppingcart$data$'SAP Batch',]
+    return(data)
+  })
+  output$multiscrapcodes <- renderDataTable({
+    data<-MultiscrapcodesData()
     return(data)
   },
   filter = "top",
@@ -4074,10 +4091,15 @@ server<-function(input,output,session){
                  autoWidth=TRUE)
   )
   
-  output$taperedMESparameters <- renderDataTable({
+  
+  TaperedMESparametersData<-reactive({
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
     data <- tapered_tari_parameter_data[tapered_tari_parameter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
+    return(data)
+  })
+  output$taperedMESparameters <- renderDataTable({
+    data<-TaperedMESparametersData()
     return(data)
   },
   filter = "top",
@@ -4132,11 +4154,15 @@ server<-function(input,output,session){
                  autoWidth=TRUE)
   )
   
-  
-  output$taperedscrapcodes <- renderDataTable({
+  TaperedscrapcodesData<-reactive({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
     #shopping cart
     data <- scrapcodes_data[scrapcodes_data$Order %in% taperedshoppingcart$data$'SAP Batch',]
+    return(data)
+    
+  })
+  output$taperedscrapcodes <- renderDataTable({
+    data<-TaperedscrapcodesData()
     return(data)
   },
   filter = "top",
@@ -4146,6 +4172,9 @@ server<-function(input,output,session){
                  scrollY=500,
                  autoWidth=TRUE)
   )
+  
+  
+  
   
   
   
@@ -4177,22 +4206,11 @@ server<-function(input,output,session){
                  autoWidth=TRUE)
   )
   # end Single Extrusion PPS Data Server part and Shopping cart
-  
-  
 
   
   
-# Test--SHow The numbe of part number that have been added to shopping cart
-  #output$ShoppingCart_Count<-renderText({
-   # Count<-count(singleshoppingcartparts$data)
-    #Count
-  #})
   
-  
-  
-  
-  
-  
+
 # Add Manually part number input button
   
   observeEvent(input$singleMadd_button,{
@@ -4584,9 +4602,8 @@ server<-function(input,output,session){
     
   }) #end observeEvent for add tapered manual
   
-  #***************Data Analysis Tab******************************
   
-  #### Sampling and Test Method Information ####
+  #***************Sampling and Test Method Information *********************#
   
   single_sampling_data_test <- reactiveValues(data = single_sampling_data)
   
@@ -4698,11 +4715,7 @@ server<-function(input,output,session){
                                                               scrollX=TRUE,
                                                               scrollY=500,
                                                               autoWidth=TRUE))
-  
-  
-  
-  
-  
+
   #Extra
   extra_sampling_data_test <- reactiveValues(data = extra_sampling_data)
   
@@ -4737,11 +4750,7 @@ server<-function(input,output,session){
                                                              scrollX=TRUE,
                                                              scrollY=500,
                                                              autoWidth=TRUE))
-  
-  
-  
-  
-  
+
   
   #All
   all_sampling_data_test <- reactiveValues(data = all_sampling_data)
@@ -4777,11 +4786,10 @@ server<-function(input,output,session){
                                                            scrollX=TRUE,
                                                            scrollY=500,
                                                            autoWidth=TRUE))
+  # End Sampling and Test Method Information
   
   
-  
-  
-  #### Extra Information ####
+  #*************************Extra Information *********************************#
   
   #The resin data
   output$resin_data_ui <- renderDataTable(resin_data,
@@ -4807,19 +4815,20 @@ server<-function(input,output,session){
                                                          scrollY=500,
                                                          autoWidth=TRUE))
   
+  #End Extra Information
   
   
-  Single<-reactive({
+  Single_MES_Parameters<-reactive({
     data<-SingleMESparametersData()
     return(data)
   })
   
   
-  # Multi<-reactive({
+  # Multi_MES_Parameters<-reactive({
   #   data<-MultiMESparametersData()
   #   return(data)
   # })
-  # Tapered<-({
+  # Tapered_MES_Parameters<-({
   #   data<-TaperedMESparametersData()
   #   return(data)
   # })
@@ -4854,7 +4863,139 @@ server<-function(input,output,session){
   
   
   
-  #***********Plot Part**********************
+  #***********Analysis Tools*********************
+  
+  
+  
+  #MES Data Analysis
+  
+  
+  Text1<-reactive({
+    #Filter1<-input$Filter1
+    Group<-input$Groupby
+    return(Group)
+  })
+
+  
+  # Groupby<-reactive({
+  #   swith(input$Groupby,"vs"=mtcars[,"vs"],"am"=mtcars[,"am"])
+  #   data<-mtcars[,input$Groupby]
+  #   data<-factor(data)
+  #   return(data)
+  # })
+  
+  ranges2 <- reactiveValues(x = NULL, y = NULL)
+  # output$plot2 <- renderPlot({
+  #   Groupby<-factor(mtcars[,input$Groupby]) #factorize the variables
+  #   p<-ggplot(mtcars, aes(wt, mpg)) +geom_point(aes(colour=Groupby,shape=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))#+geom_line(aes(colour=Groupby))
+  #   p<-p+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
+  #              plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))
+  #   p
+  # })
+  
+  #get the x-value
+  xvar<-reactive({
+    data<-input$Xvar
+    return(data)
+  })
+  
+  #get the y-value
+  yvar<-reactive({
+    data<-input$Yvar
+    return(data)
+  })
+  output$plot2 <- renderPlot({
+    #Assign x, y values
+    print(paste(Text1(),xvar(),yvar()))
+    Groupby<-factor(mtcars[,input$Groupby]) #factorize the variables
+    # Plot Type will depends on the chosen plot type by user
+    if(length(input$PlotType)==1){
+      if(input$PlotType=="Scatter"){
+        p<-ggplot(mtcars, aes(xvar(), yvar())) +geom_point(aes(colour=Groupby,shape=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))#+geom_line(aes(colour=Groupby))
+      } else if (input$PlotType=="Line"){
+        p<-ggplot(mtcars, aes(xvar(), yvar())) +geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+geom_line(aes(colour=Groupby))
+      }
+    } 
+    else if (length(input$PlotType)==2){
+      p<-ggplot(mtcars, aes(xvar(), yvar())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))
+    }
+    p<-p+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
+               plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))+labs(caption=paste("The plot is group by:\n",Text1())
+                                                                                                   #htmltools::tags$caption(
+                                                                                                   #style='caption-side:bottom;text-align:right;',
+                                                                                                   )
+    p
+    })
+ 
+  output$plotui<-renderUI({
+    plotOutput("plot2",height = 400,
+               hover = hoverOpts(id = "plot_hover", delay = 0),
+               brush = brushOpts(
+                 id = "plot2_brush",
+                 # delay = 0,
+                 # delayType = input$brush_policy,
+                 # direction = input$brush_dir,
+                 resetOnNew = TRUE))}) #end plotui
+  
+  observe({
+    brush <- input$plot2_brush
+    if (!is.null(brush)) {
+      ranges2$x <- c(brush$xmin, brush$xmax)
+      ranges2$y <- c(brush$ymin, brush$ymax)
+      
+    } else {
+      ranges2$x <- NULL
+      ranges2$y <- NULL
+    }
+  })
+
+  output$plot3 <- renderPlot({
+    Groupby<-factor(mtcars[,input$Groupby])
+    p<-ggplot(mtcars, aes(xvar(), yvar())) +geom_point(aes(colour=Groupby,shape=Groupby))+coord_cartesian(xlim = ranges2$x, ylim = ranges2$y, expand = FALSE)
+    p
+  })
+  
+  
+  
+  #display brushed points
+  brushed_data<-reactive({
+    brushed_data <- brushedPoints(mtcars, input$plot2_brush)
+    data<-datatable(brushed_data)
+    return(data)
+  })
+  output$plot_brushed_points <- DT::renderDataTable({
+    data<-brushed_data()
+    return(data)
+  })
+  
+  
+  
+  #Preview the manually uploaded data set
+  # output$UploadDataPreview <-DT ::renderDataTable({
+  #   data<-uploadfile[1:5,]
+  #   return(data)
+  # },
+  # options = list(orderClasses = TRUE,
+  #                columnDefs = list(list(className = 'dt-center',
+  #                                       targets = "_all"
+  #                )
+  #                ),
+  #                scrollX=TRUE,
+  #                scrollY=500,
+  #                autoWidth=TRUE),
+  # rownames = FALSE,
+  # escape = FALSE, 
+  # server = FALSE) 
+  
+  
+  # When a double-click happens, check if there's a brush on the plot.
+  # If so, zoom to the brush bounds; if not, reset the zoom.
+  
+
+  
+  
+  
+  
   #Create a function to generate the plot
   
   
@@ -4878,25 +5019,7 @@ server<-function(input,output,session){
   
   
   
-  # myPlot<-function(){
-  #   dat <- plotdata()
-  #   pc <- ggplot(plotdata(), aes_string(xvar(), yvar())) +
-  #     geom_point() +
-  #     theme_bw()
-  #   return(pc)
-  # }
-  # 
-  
-  
-  #Display the plot on the Analysis Tab
-  
-  
-  # 
-  # output$plot<-renderPlot({
-  #   myPlot()
-  # })
-  # 
-  
+
   
   #Download the plot to local
   
@@ -4919,20 +5042,6 @@ server<-function(input,output,session){
   #     
   #   } 
   # )
-  
-  
-#**********Data Table Part***************
-  
-  
-  # output$plot_brushed_points <- DT::renderDataTable({
-  #   dat <- plotdata()
-  #   
-  #   res <- brushedPoints(dat, input$plot_brush)
-  #   
-  #   datatable(res)
-  # })
-  
-  
   
   
 
