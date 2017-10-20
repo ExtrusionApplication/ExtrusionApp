@@ -2749,7 +2749,7 @@ ui<-dashboardPage(
                            div(style="display: inline-block;vertical-align:top;width: 150px;",
                                selectInput("Yvar","Y-value",c("mpg"),selected="mpg")),
                            conditionalPanel(
-                             "input.Data_set ==='Mtcars'",
+                             condition = "input.Data_set !='Upload'",
                              checkboxGroupInput("PlotType","Plot Type",
                                                 choiceNames = 
                                                   list("Scatter","Line"),

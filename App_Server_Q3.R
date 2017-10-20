@@ -4898,12 +4898,19 @@ server<-function(input,output,session){
     data<-input$Xvar
     return(data)
   })
-  
+  xvals<-reactive({
+    data<-mtcars[[xvar()]]
+  })
   #get the y-value
   yvar<-reactive({
     data<-input$Yvar
     return(data)
   })
+  yvals<-reactive({
+    data<-mtcars[[yvar()]]
+  })
+  
+  
   output$plot2 <- renderPlot({
     #Assign x, y values
     print(paste(Text1(),xvar(),yvar()))
@@ -4911,13 +4918,13 @@ server<-function(input,output,session){
     # Plot Type will depends on the chosen plot type by user
     if(length(input$PlotType)==1){
       if(input$PlotType=="Scatter"){
-        p<-ggplot(mtcars, aes(xvar(), yvar())) +geom_point(aes(colour=Groupby,shape=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))#+geom_line(aes(colour=Groupby))
+        p<-ggplot(mtcars, aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))#+geom_line(aes(colour=Groupby))
       } else if (input$PlotType=="Line"){
-        p<-ggplot(mtcars, aes(xvar(), yvar())) +geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+geom_line(aes(colour=Groupby))
+        p<-ggplot(mtcars, aes(xvals, yvals)) +geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+geom_line(aes(colour=Groupby))
       }
     } 
     else if (length(input$PlotType)==2){
-      p<-ggplot(mtcars, aes(xvar(), yvar())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))
+      p<-ggplot(mtcars, aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))
     }
     p<-p+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
                plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))+labs(caption=paste("The plot is group by:\n",Text1())
@@ -4951,15 +4958,13 @@ server<-function(input,output,session){
 
   output$plot3 <- renderPlot({
     Groupby<-factor(mtcars[,input$Groupby])
-    p<-ggplot(mtcars, aes(xvar(), yvar())) +geom_point(aes(colour=Groupby,shape=Groupby))+coord_cartesian(xlim = ranges2$x, ylim = ranges2$y, expand = FALSE)
+    p<-ggplot(mtcars, aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+coord_cartesian(xlim = ranges2$x, ylim = ranges2$y, expand = FALSE)
     p
   })
   
-  
-  
   #display brushed points
   brushed_data<-reactive({
-    brushed_data <- brushedPoints(mtcars, input$plot2_brush)
+    brushed_data <- brushedPoints(mtcars, input$plot2_brush,xvar=xvar(),yvar=yvar())
     data<-datatable(brushed_data)
     return(data)
   })
@@ -4967,7 +4972,6 @@ server<-function(input,output,session){
     data<-brushed_data()
     return(data)
   })
-  
   
   
   #Preview the manually uploaded data set
