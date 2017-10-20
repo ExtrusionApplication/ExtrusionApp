@@ -4818,30 +4818,16 @@ server<-function(input,output,session){
   #End Extra Information
   
   
-  Single_MES_Parameters<-reactive({
-    data<-SingleMESparametersData()
-    return(data)
-  })
-  
-  
-  # Multi_MES_Parameters<-reactive({
-  #   data<-MultiMESparametersData()
-  #   return(data)
-  # })
-  # Tapered_MES_Parameters<-({
-  #   data<-TaperedMESparametersData()
-  #   return(data)
-  # })
-  
   # Swith the data set
   plotdata <- reactive({
-    switch(input$MESType, "Single" = Single(), "Multi"=Multi(),"Tapered"=Tapered())
+    switch(input$Data_set, "Single" = SingleMESparametersData(), "Multi"=MultiMESparametersData(),"Tapered"=TaperedMESparametersData())
   })
 
 
   output$test_display <- renderDataTable({
     #This will display the chosen part number on the Single MES Parameters tab
     data <- plotdata()
+    print(data)
     return(data)
   },
   options = list(orderClasses = TRUE,
@@ -4865,9 +4851,41 @@ server<-function(input,output,session){
   
   #***********Analysis Tools*********************
   
-  
-  
   #MES Data Analysis
+  #X-variable& Y-variable
+  output$Xvar_ui<-renderUI({
+    selectInput("Xvar","X-value",choices=names(plotdata()),selected = "Start-Time")
+  })
+
+  output$Yvar_ui<-renderUI({
+    selectInput("Yvar","Y-value",choices=names(plotdata()),selected="Yield Qty")
+  })
+  
+  #get the x-value
+  xvar<-reactive({
+    data<-input$Xvar
+    return(data)
+  })
+  xvals<-reactive({
+    data<-plotdata()[[xvar()]]
+  })
+  #get the y-value
+  yvar<-reactive({
+    data<-input$Yvar
+    return(data)
+  })
+  yvals<-reactive({
+    data<-plotdata()[[yvar()]]
+  })
+
+
+  #Group by
+  output$Groupby_ui<-renderUI({
+  selectInput(
+    "Groupby","Group by:",
+    choices=names(plotdata()),selected = "Material Number"
+  )
+  })
   
   
   Text1<-reactive({
@@ -4893,38 +4911,23 @@ server<-function(input,output,session){
   #   p
   # })
   
-  #get the x-value
-  xvar<-reactive({
-    data<-input$Xvar
-    return(data)
-  })
-  xvals<-reactive({
-    data<-mtcars[[xvar()]]
-  })
-  #get the y-value
-  yvar<-reactive({
-    data<-input$Yvar
-    return(data)
-  })
-  yvals<-reactive({
-    data<-mtcars[[yvar()]]
-  })
+
   
   
   output$plot2 <- renderPlot({
     #Assign x, y values
     print(paste(Text1(),xvar(),yvar()))
-    Groupby<-factor(mtcars[,input$Groupby]) #factorize the variables
+    Groupby<-factor(plotdata()[,input$Groupby]) #factorize the variables
     # Plot Type will depends on the chosen plot type by user
     if(length(input$PlotType)==1){
       if(input$PlotType=="Scatter"){
-        p<-ggplot(mtcars, aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))#+geom_line(aes(colour=Groupby))
+        p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))#+geom_line(aes(colour=Groupby))
       } else if (input$PlotType=="Line"){
-        p<-ggplot(mtcars, aes(xvals, yvals)) +geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+geom_line(aes(colour=Groupby))
+        p<-ggplot(plotdata(), aes(xvals, yvals)) +geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+geom_line(aes(colour=Groupby))
       }
     } 
     else if (length(input$PlotType)==2){
-      p<-ggplot(mtcars, aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))
+      p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))
     }
     p<-p+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
                plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))+labs(caption=paste("The plot is group by:\n",Text1())
@@ -4957,14 +4960,14 @@ server<-function(input,output,session){
   })
 
   output$plot3 <- renderPlot({
-    Groupby<-factor(mtcars[,input$Groupby])
-    p<-ggplot(mtcars, aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+coord_cartesian(xlim = ranges2$x, ylim = ranges2$y, expand = FALSE)
+    Groupby<-factor(plotdata()[,input$Groupby])
+    p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+coord_cartesian(xlim = ranges2$x, ylim = ranges2$y, expand = FALSE)
     p
   })
   
   #display brushed points
   brushed_data<-reactive({
-    brushed_data <- brushedPoints(mtcars, input$plot2_brush,xvar=xvar(),yvar=yvar())
+    brushed_data <- brushedPoints(plotdata(), input$plot2_brush,xvar=xvar(),yvar=yvar())
     data<-datatable(brushed_data)
     return(data)
   })

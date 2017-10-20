@@ -2745,9 +2745,10 @@ ui<-dashboardPage(
                            
                            
                            div(style="display: inline-block;vertical-align:top;width: 150px;",
-                               selectInput("Xvar","X-value",c("wt"),selected = "wt")),
+                               uiOutput("Xvar_ui")),
                            div(style="display: inline-block;vertical-align:top;width: 150px;",
-                               selectInput("Yvar","Y-value",c("mpg"),selected="mpg")),
+                               uiOutput("Yvar_ui")),
+                           
                            conditionalPanel(
                              condition = "input.Data_set !='Upload'",
                              checkboxGroupInput("PlotType","Plot Type",
@@ -2757,10 +2758,7 @@ ui<-dashboardPage(
                                                   list("Scatter","Line"),
                                                 selected = "Scatter",inline = T
                              ),
-                             selectInput(
-                               "Groupby","Group by:",
-                               c("vs","am","gear","carb")
-                             )
+                             uiOutput("Groupby_ui")
                            ) # End conditionalpanel for Mtcars
                        ),#end Plot section
                        
