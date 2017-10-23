@@ -4818,40 +4818,20 @@ server<-function(input,output,session){
   #End Extra Information
   
   
-  # Swith the data set
-  plotdata <- reactive({
-    switch(input$Data_set, "Single" = SingleMESparametersData(), "Multi"=MultiMESparametersData(),"Tapered"=TaperedMESparametersData())
-  })
 
-
-  output$test_display <- renderDataTable({
-    #This will display the chosen part number on the Single MES Parameters tab
-    data <- plotdata()
-    print(data)
-    return(data)
-  },
-  options = list(orderClasses = TRUE,
-                 columnDefs = list(list(className = 'dt-center',
-                                        targets = "_all"
-                 )
-                 ),
-                 scrollX=TRUE,
-                 scrollY=500,
-                 autoWidth=TRUE),
-  filter = "top",
-  rownames = FALSE,
-  escape = FALSE, #escape allows for html elements to be rendered in the table
-  server = FALSE) #end Single Extrusion PPS Data
-  
-  
-  
-  
-  
   
   
   #***********Analysis Tools*********************
   
+  
   #MES Data Analysis
+  
+  # Swith the data set
+  plotdata <- reactive({
+    switch(input$Data_set, "Single" = SingleMESparametersData(), "Multi"=MultiMESparametersData(),"Tapered"=TaperedMESparametersData())
+  })
+  
+  
   #X-variable& Y-variable
   output$Xvar_ui<-renderUI({
     selectInput("Xvar","X-value",choices=names(plotdata()),selected = "Start-Time")
@@ -4895,60 +4875,38 @@ server<-function(input,output,session){
   })
 
   
-  # Groupby<-reactive({
-  #   swith(input$Groupby,"vs"=mtcars[,"vs"],"am"=mtcars[,"am"])
-  #   data<-mtcars[,input$Groupby]
-  #   data<-factor(data)
-  #   return(data)
-  # })
-  
   ranges2 <- reactiveValues(x = NULL, y = NULL)
-  # output$plot2 <- renderPlot({
-  #   Groupby<-factor(mtcars[,input$Groupby]) #factorize the variables
-  #   p<-ggplot(mtcars, aes(wt, mpg)) +geom_point(aes(colour=Groupby,shape=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))#+geom_line(aes(colour=Groupby))
-  #   p<-p+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
-  #              plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))
-  #   p
-  # })
   
-
-  
-  
-  output$plot2 <- renderPlot({
-    #Assign x, y values
-    print(paste(Text1(),xvar(),yvar()))
+  output$MES_plot1 <- renderPlot({
     Groupby<-factor(plotdata()[,input$Groupby]) #factorize the variables
     # Plot Type will depends on the chosen plot type by user
     if(length(input$PlotType)==1){
       if(input$PlotType=="Scatter"){
-        p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))#+geom_line(aes(colour=Groupby))
+        p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))#+geom_line(aes(colour=Groupby))
       } else if (input$PlotType=="Line"){
-        p<-ggplot(plotdata(), aes(xvals, yvals)) +geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+geom_line(aes(colour=Groupby))
+        p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_line(aes(colour=Groupby))+geom_line(aes(colour=Groupby))
       }
     } 
     else if (length(input$PlotType)==2){
-      p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))+labs(title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))
+      p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))
     }
-    p<-p+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
-               plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))+labs(caption=paste("The plot is group by:\n",Text1())
-                                                                                                   #htmltools::tags$caption(
-                                                                                                   #style='caption-side:bottom;text-align:right;',
-                                                                                                   )
+    p<-p+labs(x=xvar(),y=yvar(),title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
+               plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))+labs(caption=paste("The plot is group by:\n",Text1()))
     p
     })
  
   output$plotui<-renderUI({
-    plotOutput("plot2",height = 400,
+    plotOutput("MES_plot1",height = 400,
                hover = hoverOpts(id = "plot_hover", delay = 0),
                brush = brushOpts(
-                 id = "plot2_brush",
+                 id = "MES_plot1_brush",
                  # delay = 0,
                  # delayType = input$brush_policy,
                  # direction = input$brush_dir,
                  resetOnNew = TRUE))}) #end plotui
   
   observe({
-    brush <- input$plot2_brush
+    brush <- input$MES_plot1_brush
     if (!is.null(brush)) {
       ranges2$x <- c(brush$xmin, brush$xmax)
       ranges2$y <- c(brush$ymin, brush$ymax)
@@ -4959,22 +4917,59 @@ server<-function(input,output,session){
     }
   })
 
-  output$plot3 <- renderPlot({
+  output$MES_plot2 <- renderPlot({
     Groupby<-factor(plotdata()[,input$Groupby])
     p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+coord_cartesian(xlim = ranges2$x, ylim = ranges2$y, expand = FALSE)
-    p
+    p+labs(x=xvar(),y=yvar())
   })
   
   #display brushed points
   brushed_data<-reactive({
-    brushed_data <- brushedPoints(plotdata(), input$plot2_brush,xvar=xvar(),yvar=yvar())
+    brushed_data <- brushedPoints(plotdata(), input$MES_plot1_brush,xvar=xvar(),yvar=yvar())
     data<-datatable(brushed_data)
     return(data)
   })
-  output$plot_brushed_points <- DT::renderDataTable({
-    data<-brushed_data()
-    return(data)
-  })
+  
+  
+  output$plot_brushed_points <-DT::renderDataTable(
+    {brushed_data()},
+    options = list(orderClasses = TRUE,
+                   columnDefs = list(list(className = 'dt-center',
+                                          targets = "_all"
+                   )
+                   ),
+                   scrollX=TRUE,
+                   scrollY=500,
+                   autoWidth=TRUE),
+  filter = "top",
+  rownames = FALSE, 
+  escape = FALSE, #escape allows for html elements to be rendered in the table
+  server = FALSE
+  )
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   #Preview the manually uploaded data set
@@ -4997,33 +4992,7 @@ server<-function(input,output,session){
   
   # When a double-click happens, check if there's a brush on the plot.
   # If so, zoom to the brush bounds; if not, reset the zoom.
-  
 
-  
-  
-  
-  
-  #Create a function to generate the plot
-  
-  
-  
-  # output$plotui <- renderUI({
-  #   plotOutput("myplot", height=300,
-  #              click = "plot_click",
-  #              dblclick = dblclickOpts(
-  #                id = "plot_dblclick",
-  #                delay = input$dblclick_delay
-  #              ),
-  #              brush = brushOpts(
-  #                id = "plot_brush",
-  #                delay = input$brush_delay,
-  #                delayType = input$brush_policy,
-  #                direction = input$brush_dir,
-  #                resetOnNew = input$brush_reset
-  #              )
-  #   )
-  # })
-  
   
   
 

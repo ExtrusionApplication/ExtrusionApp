@@ -2714,7 +2714,7 @@ ui<-dashboardPage(
               
               fluidRow(
                 column(width = 3,
-                       box(title = "Plotting",
+                       box(title = "Explorer",
                            solidHeader = TRUE, status = "info", collapsible = TRUE, width = 12,
                        div(class = "option-group",
                            radioButtons("Data_set", "Data Set",
@@ -2764,23 +2764,22 @@ ui<-dashboardPage(
                        
                        div(class="option-group",
                            div(class="option-header","Filters"),
-                           conditionalPanel(
-                             "input.Data_set ==='Mtcars'",
-                             dropdownButton(
-                               label = "Filter",status = "default", width = 80,
-                               #actionButton(inputId = "de", label = "Sort A to Z", icon = icon("sort-alpha-asc")),# filter  (filter icon)
-                               #actionButton(inputId = "as", label = "Sort Z to A", icon = icon("sort-alpha-desc")),
-                               
-                               tags$div(
-                                 class = "container",
-                                 uiOutput("filter_ui")   # to have reactive dropdown list 
-                               ),
-                               
-                               actionButton(inputId = "filter_select", label = "(un)select all")  #an action button to select or unselect all
-                             ) #end Filter
+                           
+                           dateRangeInput("daterange6", "Date range:",
+                                          startview = "decade")
+                           
+                           # dropdownButton(
+                           #     label = "Filter",status = "default", width = 80,
+                           #     #actionButton(inputId = "de", label = "Sort A to Z", icon = icon("sort-alpha-asc")),# filter  (filter icon)
+                           #     #actionButton(inputId = "as", label = "Sort Z to A", icon = icon("sort-alpha-desc")),
+                           # 
+                           #     tags$div(
+                           #       class = "container",
+                           #       uiOutput("filter_ui")   # to have reactive dropdown list
+                           #     ),
+                           #     actionButton(inputId = "filter_select", label = "(un)select all")  #an action button to select or unselect all
+                           #   ) #end Filter
                              
-                             
-                           )
                        ),#End Filter section
                        div(class = "option-group",
                            div(class = "option-header", "Download"),
@@ -2793,35 +2792,27 @@ ui<-dashboardPage(
                 ), #end plot managing section
                 
                 column(width = 9, class = "well",
-                       fluidRow(
-                         h4("Plot"),
+                       box(title = "Plot", solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
                          column(width = 6,
                                 uiOutput("plotui")
-                         ),
+                                ),
                          column(width = 6,
-                                plotOutput("plot3")
-                         )),#end plot section
+                                plotOutput("MES_plot2")
+                                )),#end plot section
+                
+                
                        fluidRow(
                          h4("Points selected by brushing"),
                          DT::dataTableOutput("plot_brushed_points")
-                       ), #end brushed points section
+                         ), #end brushed points section
                        
                        fluidRow(
                          downloadButton("SelectedDataDownload_DataAnalysis","Download Selected Data")
-                       )# end download dataset section
+                         )# end download dataset section
+                       )
                 )
-              )
-              
-              
-              
-              
-              
-              
-              
-              
-              )
-      
-    ),#end tabItems
+              )# end MES Data Analysis Tab
+      ),#end tabItems
     
     #create a pop up window for the shopping cart
     absolutePanel(
