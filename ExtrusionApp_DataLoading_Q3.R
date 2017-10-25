@@ -46,17 +46,20 @@ tapered_sampling_file <- "Tapered Sampling.csv"
 extra_sampling_file <- "Extra Sampling.csv"
 all_sampling_file <- "All Sampling.csv"
 
-single_parameter_file <- "Single Parameters and Yield.csv"
+single_parameterandyield_file <- "Single Parameters and Yield.csv"
+single_parameter_file <- "Single Parameters.csv"
 single_time_file <- "Single Tari Time.csv"
 single_submitter_file <- "Single Tari Submitter.csv"
 single_total_file <- "Single Tari Total.csv"
 
-multi_parameter_file <- "Multi Parameters and Yield.csv"
+multi_parameterandyield_file <- "Multi Parameters and Yield.csv"
+multi_parameter_file <- "Multi Parameters.csv"
 multi_time_file <- "Multi Tari Time.csv"
 multi_submitter_file <- "Multi Tari Submitter.csv"
 multi_total_file <- "Multi Tari Total.csv"
 
-tapered_parameter_file <- "Tapered Parameters and Yield.csv"
+tapered_parameterandyield_file <- "Tapered Parameters and Yield.csv"
+tapered_parameter_file <- "Tapered Parameters.csv"
 tapered_time_file <- "Tapered Tari Time.csv"
 tapered_submitter_file <- "Tapered Tari Submitter.csv"
 tapered_total_file <- "Tapered Tari Total.csv"
@@ -77,16 +80,19 @@ tapered_sampling_pathfile <- paste(path, tapered_sampling_file, sep = "/")
 extra_sampling_pathfile <- paste(path, extra_sampling_file, sep = "/")
 all_sampling_pathfile <- paste(path, all_sampling_file, sep = "/")
 
+single_parameterandyield_filepath <- paste(path, single_parameterandyield_file, sep = "/")
 single_parameter_filepath <- paste(path, single_parameter_file, sep = "/")
 single_time_filepath <- paste(path, single_time_file, sep = "/")
 single_submitter_filepath <- paste(path, single_submitter_file, sep = "/")
 single_total_filepath <- paste(path, single_total_file, sep = "/")
 
+multi_parameterandyield_filepath <- paste(path, multi_parameterandyield_file, sep = "/")
 multi_parameter_filepath <- paste(path, multi_parameter_file, sep = "/")
 multi_time_filepath <- paste(path, multi_time_file, sep = "/")
 multi_submitter_filepath <- paste(path, multi_submitter_file, sep = "/")
 multi_total_filepath <- paste(path, multi_total_file, sep = "/")
 
+tapered_parameterandyield_filepath <- paste(path, tapered_parameterandyield_file, sep = "/")
 tapered_parameter_filepath <- paste(path, tapered_parameter_file, sep = "/")
 tapered_time_filepath <- paste(path, tapered_time_file, sep = "/")
 tapered_submitter_filepath <- paste(path, tapered_submitter_file, sep = "/")
@@ -124,6 +130,8 @@ multi_sampling_data[is.na(multi_sampling_data)] <- ""
 tapered_sampling_data[is.na(tapered_sampling_data)] <- ""
 
 
+single_tari_parameter_and_yield_data <- read.csv(single_parameterandyield_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                                 check.names = FALSE)
 single_tari_parameter_data <- read.csv(single_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
 single_tari_time_data <- read.csv(single_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
@@ -133,6 +141,8 @@ single_tari_submitter_data <- read.csv(single_submitter_filepath, header = TRUE,
 single_tari_total_data <- read.csv(single_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
 
+multi_tari_parameter_and_yield_data <- read.csv(multi_parameterandyield_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                                 check.names = FALSE)
 multi_tari_parameter_data <- read.csv(multi_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                                        check.names = FALSE)
 multi_tari_time_data <- read.csv(multi_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
@@ -142,6 +152,8 @@ multi_tari_submitter_data <- read.csv(multi_submitter_filepath, header = TRUE, s
 multi_tari_total_data <- read.csv(multi_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
                                    check.names = FALSE)
 
+tapered_tari_parameter_and_yield_data <- read.csv(tapered_parameterandyield_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                                 check.names = FALSE)
 tapered_tari_parameter_data <- read.csv(tapered_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                                       check.names = FALSE)
 tapered_tari_time_data <- read.csv(tapered_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
