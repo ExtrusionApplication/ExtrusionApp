@@ -40,19 +40,22 @@ ui<-dashboardPage(
                menuSubItem("Total Extrusion", tabName = "totalsamplingtab")
         ), #end menuItem
       menuItem("Single Layer Extrusion - MES Batch Data", icon = icon("cogs"),
-               menuSubItem("MES Parameters and Yield", tabName = "singlemesparameterstab"),
+               menuSubItem("MES Parameters and Yield", tabName = "singlemesparametersandyieldtab"),
+               menuSubItem("MES Parameters", tabName = "singlemesparameterstab"),
                menuSubItem("MES Timestamps", tabName = "singlemestimetab"),
                menuSubItem("MES Submitters", tabName = "singlemessubmitterstab"),
                menuSubItem("MES Total", tabName = "singlemestotaltab")
       ), #end menuItem
       menuItem("Multi Layer Extrusion - MES Batch Data", icon = icon("cogs"),
-               menuSubItem("MES Parameters and Yield", tabName = "multimesparameterstab"),
+               menuSubItem("MES Parameters and Yield", tabName = "multimesparametersandyieldtab"),
+               menuSubItem("MES Parameters", tabName = "multimesparameterstab"),
                menuSubItem("MES Timestamps", tabName = "multimestimetab"),
                menuSubItem("MES Submitters", tabName = "multimessubmitterstab"),
                menuSubItem("MES Total", tabName = "multimestotaltab")
       ), #end menuItem
       menuItem("Tapered Extrusion - MES Batch Data", icon = icon("cogs"),
-               menuSubItem("MES Parameters and Yield", tabName = "taperedmesparameterstab"),
+               menuSubItem("MES Parameters and Yield", tabName = "taperedmesparametersandyieldtab"),
+               menuSubItem("MES Parameters", tabName = "taperedmesparameterstab"),
                menuSubItem("MES Timestamps", tabName = "taperedmestimetab"),
                menuSubItem("MES Submitters", tabName = "taperedmessubmitterstab"),
                menuSubItem("MES Total", tabName = "taperedmestotaltab")
@@ -2504,122 +2507,374 @@ ui<-dashboardPage(
                 DT::dataTableOutput("all_sampling_ui")
               )
       ), #end tabItem
+      tabItem(tabName = "singlemesparametersandyieldtab",
+              fluidRow(
+                column(3,
+                       box(title = "Temperature Parameters", 
+                           solidHeader = TRUE, status = "primary", collapsible = TRUE, 
+                           width = 12,
+                           selectInput("singletaritempcolumns", 
+                                              label = NULL,
+                                              choices = single_tari_temp_columns,
+                                              multiple = TRUE,
+                                              selectize = TRUE,
+                                              selected = NULL
+                                              )
+                       )
+                ),
+                column(3,
+                       box(title = "Pressure Parameters", 
+                           solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                           selectInput("singletaripresscolumns", 
+                                              label = NULL,
+                                              choices = single_tari_press_columns,
+                                              multiple = TRUE,
+                                              selectize = TRUE,
+                                              selected = NULL
+                           )
+                       )
+                ),
+                column(3,
+                       box(title = "Speed Parameters", 
+                           solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                           selectInput("singletarispeedcolumns", 
+                                              label = NULL,
+                                              choices = single_tari_speed_columns,
+                                              multiple = TRUE,
+                                              selectize = TRUE,
+                                              selected = NULL
+                           )
+                       )
+                ),
+                column(3,
+                       box(title = "Exra Parameters", 
+                           solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                           selectInput("singletariextracolumns", 
+                                              label = NULL,
+                                              choices = single_tari_extra_columns,
+                                              multiple = TRUE,
+                                              selectize = TRUE,
+                                              selected = c("Material Number", "SAP Batch Number",
+                                                           "Start Date", "Start Qty", "Start Qty Unit",
+                                                           "Yield Qty", "Scrap Qty",
+                                                           "Contribution to Plant Level Yield VOP",
+                                                           "Contribution to Plant Level Scrap VOP",
+                                                           "Contribution to Plant Level Total VOP",
+                                                           "Yield Percentage", "Scrap Percentage")
+                           )
+                       )
+                )
+              ),
+              fluidRow(
+                column(12,
+                       box(title = "MES Parameters and Yield Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("singleMESparametersandyield")
+                       )
+                )
+              )
+      ), #end tabItem
       tabItem(tabName = "singlemesparameterstab",
               fluidRow(
                 column(12,
-                       DT::dataTableOutput("singleMESparameters")
+                       box(title = "MES Parameters Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("singleMESparameters")
+                       )
                        )
               )
       ), #end tabItem
       tabItem(tabName = "singlemestimetab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("singleMEStime")
+                       box(title = "MES Timestamp Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("singleMEStime")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "singlemessubmitterstab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("singleMESsubmitter")
+                       box(title = "MES Submitter Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("singleMESsubmitter")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "singlemestotaltab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("singleMEStotal")
+                       box(title = "MES Total Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("singleMEStotal")
+                       )
+                )
+              )
+      ), #end tabItem
+      tabItem(tabName = "multimesparametersandyieldtab",
+              fluidRow(
+                fluidRow(
+                  column(3,
+                         box(title = "Temperature Parameters", 
+                             solidHeader = TRUE, status = "primary", collapsible = TRUE, 
+                             width = 12,
+                             selectInput("multitaritempcolumns", 
+                                         label = NULL,
+                                         choices = multi_tari_temp_columns,
+                                         multiple = TRUE,
+                                         selectize = TRUE,
+                                         selected = NULL
+                             )
+                         )
+                  ),
+                  column(3,
+                         box(title = "Pressure Parameters", 
+                             solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                             selectInput("multitaripresscolumns", 
+                                                label = NULL,
+                                                choices = multi_tari_press_columns,
+                                         multiple = TRUE,
+                                         selectize = TRUE,
+                                                selected = NULL
+                             )
+                         )
+                  ),
+                  column(3,
+                         box(title = "Speed Parameters", 
+                             solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                             selectInput("multitarispeedcolumns", 
+                                                label = NULL,
+                                                choices = multi_tari_speed_columns,
+                                         multiple = TRUE,
+                                         selectize = TRUE,
+                                                selected = NULL
+                             )
+                         )
+                  ),
+                  column(3,
+                         box(title = "Exra Parameters", 
+                             solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                             selectInput("multitariextracolumns", 
+                                                label = NULL,
+                                                choices = multi_tari_extra_columns,
+                                         multiple = TRUE,
+                                         selectize = TRUE,
+                                                selected = c("Material Number", "SAP Batch Number",
+                                                             "Start Date", "Start Qty", "Start Qty Unit",
+                                                             "Yield Qty", "Scrap Qty",
+                                                             "Contribution to Plant Level Yield VOP",
+                                                             "Contribution to Plant Level Scrap VOP",
+                                                             "Contribution to Plant Level Total VOP",
+                                                             "Yield Percentage", "Scrap Percentage")
+                             )
+                         )
+                  )
+                ),
+                column(12,
+                       box(title = "MES Parameters and Yield Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("multiMESparametersandyield")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "multimesparameterstab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("multiMESparameters")
+                       box(title = "MES Parameters Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("multiMESparameters")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "multimestimetab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("multiMEStime")
+                       box(title = "MES Timestamp Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("multiMEStime")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "multimessubmitterstab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("multiMESsubmitter")
+                       box(title = "MES Submitter Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("multiMESsubmitter")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "multimestotaltab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("multiMEStotal")
+                       box(title = "MES Total Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("multiMEStotal")
+                       )
+                )
+              )
+      ), #end tabItem
+      tabItem(tabName = "taperedmesparametersandyieldtab",
+              fluidRow(
+                column(3,
+                       box(title = "Temperature Parameters", 
+                           solidHeader = TRUE, status = "primary", collapsible = TRUE, 
+                           width = 12,
+                           selectInput("taperedtaritempcolumns", 
+                                              label = NULL,
+                                              choices = tapered_tari_temp_columns,
+                                       multiple = TRUE,
+                                       selectize = TRUE,
+                                              selected = NULL
+                           )
+                       )
+                ),
+                column(3,
+                       box(title = "Pressure Parameters", 
+                           solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                           selectInput("taperedtaripresscolumns", 
+                                              label = NULL,
+                                              choices = tapered_tari_press_columns,
+                                       multiple = TRUE,
+                                       selectize = TRUE,
+                                              selected = NULL
+                           )
+                       )
+                ),
+                column(3,
+                       box(title = "Speed Parameters", 
+                           solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                           selectInput("taperedtarispeedcolumns", 
+                                              label = NULL,
+                                              choices = tapered_tari_speed_columns,
+                                       multiple = TRUE,
+                                       selectize = TRUE,
+                                              selected = NULL
+                           )
+                       )
+                ),
+                column(3,
+                       box(title = "Exra Parameters", 
+                           solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+                           selectInput("taperedtariextracolumns", 
+                                              label = NULL,
+                                              choices = tapered_tari_extra_columns,
+                                       multiple = TRUE,
+                                       selectize = TRUE,
+                                              selected = c("Material Number", "SAP Batch Number",
+                                                           "Start Date", "Start Qty", "Start Qty Unit",
+                                                           "Yield Qty", "Scrap Qty",
+                                                           "Contribution to Plant Level Yield VOP",
+                                                           "Contribution to Plant Level Scrap VOP",
+                                                           "Contribution to Plant Level Total VOP",
+                                                           "Yield Percentage", "Scrap Percentage")
+                           )
+                       )
+                )
+              ),
+              fluidRow(
+                column(12,
+                       box(title = "MES Parameters and Yield Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("taperedMESparametersandyield")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "taperedmesparameterstab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("taperedMESparameters")
+                       box(title = "MES Parameters Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("taperedMESparameters")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "taperedmestimetab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("taperedMEStime")
+                       box(title = "MES Timestamp Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("taperedMEStime")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "taperedmessubmitterstab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("taperedMESsubmitter")
+                       box(title = "MES Submitter Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("taperedMESsubmitter")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "taperedmestotaltab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("taperedMEStotal")
+                       box(title = "MES Total Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("taperedMEStotal")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "singlescrapcodestab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("singlescrapcodes")
+                       box(title = "Scrapcode Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("singlescrapcodes")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "mutliscrapcodestab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("multiscrapcodes")
+                       box(title = "Scrapcode Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("multiscrapcodes")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "taperedscrapcodestab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("taperedscrapcodes")
+                       box(title = "MES Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("taperedscrapcodes")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "resininfotab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("resin_data_ui")
+                       box(title = "Resin Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("resin_data_ui")
+                       )
                 )
               )
       ), #end tabItem
       tabItem(tabName = "screwinfotab",
               fluidRow(
                 column(12,
-                DT::dataTableOutput("screw_data_ui")
+                       box(title = "Screw Data", 
+                           solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
+                           DT::dataTableOutput("screw_data_ui")
+                       )
                 )
               )
       ), #end tabItem

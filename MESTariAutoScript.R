@@ -4,7 +4,7 @@
 #concatenate to the master files
 #write the master files to the UI location
 #delete files after eight weeks. Keep one file from that period.
-#close out the script
+#close out the script 
 
 
 #### Loading the Current Master Files ####

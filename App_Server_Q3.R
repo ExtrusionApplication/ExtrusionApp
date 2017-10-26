@@ -3927,225 +3927,474 @@ server<-function(input,output,session){
   
   
   
-  #### EXTRA ####
+  #### MES Data and OPMR Data ####
   
+  ## Single
+  
+  single_tari_columns_selected <- reactive({
+    columns <- c(input$singletaritempcolumns, input$singletaripresscolumns,
+                 input$singletarispeedcolumns, input$singletariextracolumns)
+    
+    column_indices_full <- sort(which(colnames(single_tari_parameter_and_yield_data) %in% columns))
+    column_indices_short <- sort(which(colnames(single_tari_parameter_data) %in% columns))
+    
+    column_list <- list()
+    column_list$full <- column_indices_full
+    column_list$short <- column_indices_short
+    
+    return(column_list)
+    
+  })
+  
+  single_tari_parametersandyield_reactive <- reactive({
+    df <- single_tari_parameter_and_yield_data[single_tari_parameter_and_yield_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',
+                                               single_tari_columns_selected()$full]
+  })
+  
+  output$singleMESparametersandyield <- renderDataTable({
+    
+    #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
+    #in the shopping cart
+    
+    return (single_tari_parametersandyield_reactive())
+  },
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  
+  single_tari_parameters_reactive <- reactive({
+    
+    df <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',
+                                               single_tari_columns_selected()$short]
+    
+    return(df)
+  })
   
   output$singleMESparameters <- renderDataTable({
 
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
-    data <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
-    return (data)
+    
+    return(single_tari_parameters_reactive())
+    
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
-                 scrollX=TRUE,
+                 scrollX= TRUE,
                  scrollY=500,
                  autoWidth=TRUE))
 
 
-  
+  single_tari_time_reactive <- reactive({
+    df <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',
+                                     single_tari_columns_selected()$short]
+  })
 
-  
  
-    output$singleMEStime <- renderDataTable({
+  output$singleMEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
     #shopping cart
-    data <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
-    return(data)
+    return(single_tari_time_reactive())
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE))
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  
+  single_tari_submitter_reactive <- reactive({
+    df <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',
+                                single_tari_columns_selected()$short]
+  })
 
   
   output$singleMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
     #shopping cart
-    data <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
-    return(data)
+    
+    return(single_tari_submitter_reactive())
+    
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE))
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
 
+  
+  single_tari_total_reactive <- reactive({
+    df <- single_tari_total_data[single_tari_total_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',
+                                     single_tari_columns_selected()$short]
+  })
   
     
   output$singleMEStotal <- renderDataTable({
     #This returns the table of all MES inputs based on the SAP batch numbers in the
     #shopping cart
-    data <- single_tari_total_data[single_tari_total_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
-    return(data)
+    return(single_tari_total_reactive())
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE))
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
 
+  
+  single_scrapcodes_reactive <- reactive({
+    df <- scrapcodes_data[scrapcodes_data$Order %in% singleshoppingcart$data$'SAP Batch',]
+  })
   
   output$singlescrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
     #shopping cart
-    data <- scrapcodes_data[scrapcodes_data$Order %in% singleshoppingcart$data$'SAP Batch',]
-    return(data)
+    reutnr(single_scrapcodes_reactive())
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE))
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
 
   
   
-  output$multiMESparameters <- renderDataTable({
+  ## Multi MES Data
+  
+  multi_tari_columns_selected <- reactive({
+    columns <- c(input$multitaritempcolumns, input$multitaripresscolumns,
+                 input$multitarispeedcolumns, input$multitariextracolumns)
+    
+    column_indices_full <- sort(which(colnames(multi_tari_parameter_and_yield_data) %in% columns))
+    column_indices_short <- sort(which(colnames(multi_tari_parameter_data) %in% columns))
+    
+    column_list <- list()
+    column_list$full <- column_indices_full
+    column_list$short <- column_indices_short
+    
+    return(column_list)
+    
+  })
+  
+  multi_tari_parametersandyield_reactive <- reactive({
+    df <- multi_tari_parameter_and_yield_data[multi_tari_parameter_and_yield_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',
+                                               multi_tari_columns_selected()$full]
+  })
+  
+  output$multiMESparametersandyield <- renderDataTable({
+    
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
-    data <- multi_tari_parameter_data[multi_tari_parameter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
-    return(data)
+    
+    return (multi_tari_parametersandyield_reactive())
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  
+  multi_tari_parameters_reactive <- reactive({
+    
+    df <- multi_tari_parameter_data[multi_tari_parameter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',
+                                     multi_tari_columns_selected()$short]
+    
+    return(df)
+  })
+  
+  output$multiMESparameters <- renderDataTable({
+    
+    #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
+    #in the shopping cart
+    
+    return(multi_tari_parameters_reactive())
+    
+  },
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX= TRUE,
+                 scrollY=500,
                  autoWidth=TRUE))
+  
+  
+  multi_tari_time_reactive <- reactive({
+    df <- multi_tari_time_data[multi_tari_time_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',
+                                multi_tari_columns_selected()$short]
+  })
+  
   
   output$multiMEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
     #shopping cart
-    data <- multi_tari_time_data[multi_tari_time_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
-    return(data)
+    return(multi_tari_time_reactive())
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE))
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  
+  multi_tari_submitter_reactive <- reactive({
+    df <- multi_tari_submitter_data[multi_tari_submitter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',
+                                     multi_tari_columns_selected()$short]
+  })
+  
   
   output$multiMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
     #shopping cart
-    data <- multi_tari_submitter_data[multi_tari_submitter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
-    return(data)
+    
+    return(multi_tari_submitter_reactive())
+    
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE))
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  
+  multi_tari_total_reactive <- reactive({
+    df <- multi_tari_total_data[multi_tari_total_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',
+                                 multi_tari_columns_selected()$short]
+  })
+  
   
   output$multiMEStotal <- renderDataTable({
     #This returns the table of all MES inputs based on the SAP batch numbers in the
     #shopping cart
-    data <- multi_tari_total_data[multi_tari_total_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
-    return(data)
+    return(multi_tari_total_reactive())
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE))
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
   
+  
+  multi_scrapcodes_reactive <- reactive({
+    df <- scrapcodes_data[scrapcodes_data$Order %in% multishoppingcart$data$'SAP Batch',]
+  })
   
   output$multiscrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
     #shopping cart
-    data <- scrapcodes_data[scrapcodes_data$Order %in% multishoppingcart$data$'SAP Batch',]
-    return(data)
+    reutnr(multi_scrapcodes_reactive())
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE)
-  )
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
   
-  output$taperedMESparameters <- renderDataTable({
+  
+  ## Tapered
+  
+  tapered_tari_columns_selected <- reactive({
+    columns <- c(input$taperedtaritempcolumns, input$taperedtaripresscolumns,
+                 input$taperedtarispeedcolumns, input$taperedtariextracolumns)
+    
+    column_indices_full <- sort(which(colnames(tapered_tari_parameter_and_yield_data) %in% columns))
+    column_indices_short <- sort(which(colnames(tapered_tari_parameter_data) %in% columns))
+    
+    column_list <- list()
+    column_list$full <- column_indices_full
+    column_list$short <- column_indices_short
+    
+    return(column_list)
+    
+  })
+  
+  tapered_tari_parametersandyield_reactive <- reactive({
+    df <- tapered_tari_parameter_and_yield_data[tapered_tari_parameter_and_yield_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',
+                                               tapered_tari_columns_selected()$full]
+  })
+  
+  output$taperedMESparametersandyield <- renderDataTable({
+    
     #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
     #in the shopping cart
-    data <- tapered_tari_parameter_data[tapered_tari_parameter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
-    return(data)
+    
+    return (tapered_tari_parametersandyield_reactive())
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE)
-  )
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  
+  tapered_tari_parameters_reactive <- reactive({
+    
+    df <- tapered_tari_parameter_data[tapered_tari_parameter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',
+                                     tapered_tari_columns_selected()$short]
+    
+    return(df)
+  })
+  
+  output$taperedMESparameters <- renderDataTable({
+    
+    #This returns the table of the MES paramters and SAP yields times based on the SAP batch numbers 
+    #in the shopping cart
+    
+    return(tapered_tari_parameters_reactive())
+    
+  },
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX= TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE))
+  
+  
+  tapered_tari_time_reactive <- reactive({
+    df <- tapered_tari_time_data[tapered_tari_time_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',
+                                tapered_tari_columns_selected()$short]
+  })
+  
   
   output$taperedMEStime <- renderDataTable({
     #This returns the table of the MES input times based on the SAP batch numbers in the
     #shopping cart
-    data <- tapered_tari_time_data[tapered_tari_time_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
-    return(data)
+    return(tapered_tari_time_reactive())
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE)
-  )
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  
+  tapered_tari_submitter_reactive <- reactive({
+    df <- tapered_tari_submitter_data[tapered_tari_submitter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',
+                                     tapered_tari_columns_selected()$short]
+  })
+  
   
   output$taperedMESsubmitter <- renderDataTable({
     #This returns the table of the MES submitter IDs based on the SAP batch numbers in the
     #shopping cart
-    data <- tapered_tari_submitter_data[tapered_tari_submitter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
-    return(data)
+    
+    return(tapered_tari_submitter_reactive())
+    
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE)
-  )
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
   
+  
+  tapered_tari_total_reactive <- reactive({
+    df <- tapered_tari_total_data[tapered_tari_total_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',
+                                 tapered_tari_columns_selected()$short]
+  })
   
   
   output$taperedMEStotal <- renderDataTable({
     #This returns the table of all MES inputs based on the SAP batch numbers in the
     #shopping cart
-    data <- tapered_tari_total_data[tapered_tari_total_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
-    return(data)
+    return(tapered_tari_total_reactive())
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE)
-  )
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
   
+  
+  tapered_scrapcodes_reactive <- reactive({
+    df <- scrapcodes_data[scrapcodes_data$Order %in% taperedshoppingcart$data$'SAP Batch',]
+  })
   
   output$taperedscrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
     #shopping cart
-    data <- scrapcodes_data[scrapcodes_data$Order %in% taperedshoppingcart$data$'SAP Batch',]
-    return(data)
+    reutnr(tapered_scrapcodes_reactive())
   },
-  filter = "top",
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
   options = list(orderClasses = TRUE,
                  columnDefs = list(list(className = 'dt-center',targets = "_all")),
                  scrollX=TRUE,
                  scrollY=500,
-                 autoWidth=TRUE)
-  )
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+
+  
+  
+  
+  #### AppStats Stuff ####
   
   
   
@@ -4181,16 +4430,11 @@ server<-function(input,output,session){
   
 
   
-  
-# Test--SHow The numbe of part number that have been added to shopping cart
-  #output$ShoppingCart_Count<-renderText({
-   # Count<-count(singleshoppingcartparts$data)
-    #Count
-  #})
+
   
   
   
-  
+  #### Shopping Cart add Buttons ####
   
   
 # Add Manually part number input button
