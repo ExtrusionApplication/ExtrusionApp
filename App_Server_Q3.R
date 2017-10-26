@@ -5060,37 +5060,37 @@ server<-function(input,output,session){
   #MES Data Analysis
   
   # Swith the data set
-  plotdata <- reactive({
-    switch(input$Data_set, "Single" = single_tari_parametersandyield_reactive(), 
+  MES_plotdata <- reactive({
+    switch(input$MES_Data_set, "Single" = single_tari_parametersandyield_reactive(), 
            "Multi"=multi_tari_parametersandyield_reactive(),
            "Tapered"=tapered_tari_parametersandyield_reactive())
   })
   
   
   #X-variable& Y-variable
-  output$Xvar_ui<-renderUI({
-    selectInput("Xvar","X-value",choices=names(plotdata()),selected = "Start Date")
+  output$MES_Xvar_ui<-renderUI({
+    selectInput("MES_Xvar","X-value",choices=names(MES_plotdata()),selected = "Start Date")
   })
   
-  output$Yvar_ui<-renderUI({
-    selectInput("Yvar","Y-value",choices=names(plotdata()),selected="Yield Qty")
+  output$MES_Yvar_ui<-renderUI({
+    selectInput("MES_Yvar","Y-value",choices=names(MES_plotdata()),selected="Yield Qty")
   })
   
   #get the x-value
-  xvar<-reactive({
-    data<-input$Xvar
+  MES_xvar<-reactive({
+    data<-input$MES_Xvar
     return(data)
   })
-  xvals<-reactive({
-    data<-plotdata()[[xvar()]]
+  MES_xvals<-reactive({
+    data<-MES_plotdata()[[MES_xvar()]]
   })
   #get the y-value
-  yvar<-reactive({
-    data<-input$Yvar
+  MES_yvar<-reactive({
+    data<-input$MES_Yvar
     return(data)
   })
-  yvals<-reactive({
-    data<-plotdata()[[yvar()]]
+  MES_yvals<-reactive({
+    data<-MES_plotdata()[[MES_yvar()]]
   })
   
   
@@ -5098,7 +5098,7 @@ server<-function(input,output,session){
   output$Groupby_ui<-renderUI({
     selectInput(
       "Groupby","Group by:",
-      choices=names(plotdata()),selected = "Material Number"
+      choices=names(MES_plotdata()),selected = "Material Number"
     )
   })
   
@@ -5110,27 +5110,27 @@ server<-function(input,output,session){
   })
   
   
-  ranges2 <- reactiveValues(x = NULL, y = NULL)
+  ranges_MES <- reactiveValues(x = NULL, y = NULL)
   
   output$MES_plot1 <- renderPlot({
-    Groupby<-factor(plotdata()[,input$Groupby]) #factorize the variables
+    Groupby<-factor(MES_plotdata()[,input$Groupby]) #factorize the variables
     # Plot Type will depends on the chosen plot type by user
     if(length(input$PlotType)==1){
       if(input$PlotType=="Scatter"){
-        p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))#+geom_line(aes(colour=Groupby))
+        p<-ggplot(MES_plotdata(), aes(MES_xvals(), MES_yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))#+geom_line(aes(colour=Groupby))
       } else if (input$PlotType=="Line"){
-        p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_line(aes(colour=Groupby))+geom_line(aes(colour=Groupby))
+        p<-ggplot(MES_plotdata(), aes(MES_xvals(), MES_yvals())) +geom_line(aes(colour=Groupby))+geom_line(aes(colour=Groupby))
       }
     } 
     else if (length(input$PlotType)==2){
-      p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))
+      p<-ggplot(MES_plotdata(), aes(MES_xvals(), MES_yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))
     }
-    p<-p+labs(x=xvar(),y=yvar(),title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
+    p<-p+labs(x=MES_xvar(),y=MES_yvar(),title=input$MES_PlotTitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
                                                                                                                  plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))+labs(caption=paste("The plot is group by:\n",Text1()))
     p
   })
   
-  output$plotui<-renderUI({
+  output$MES_plotui<-renderUI({
     plotOutput("MES_plot1",height = 400,
                hover = hoverOpts(id = "plot_hover", delay = 0),
                brush = brushOpts(
@@ -5143,24 +5143,24 @@ server<-function(input,output,session){
   observe({
     brush <- input$MES_plot1_brush
     if (!is.null(brush)) {
-      ranges2$x <- c(brush$xmin, brush$xmax)
-      ranges2$y <- c(brush$ymin, brush$ymax)
+      ranges_MES$x <- c(brush$xmin, brush$xmax)
+      ranges_MES$y <- c(brush$ymin, brush$ymax)
       
     } else {
-      ranges2$x <- NULL
-      ranges2$y <- NULL
+      ranges_MES$x <- NULL
+      ranges_MES$y <- NULL
     }
   })
   
   output$MES_plot2 <- renderPlot({
-    Groupby<-factor(plotdata()[,input$Groupby])
-    p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+coord_cartesian(xlim = ranges2$x, ylim = ranges2$y, expand = FALSE)
-    p+labs(x=xvar(),y=yvar())
+    Groupby<-factor(MES_plotdata()[,input$Groupby])
+    p<-ggplot(MES_plotdata(), aes(MES_xvals(), MES_yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+coord_cartesian(xlim = ranges_MES$x, ylim = ranges_MES$y, expand = FALSE)
+    p+labs(x=MES_xvar(),y=MES_yvar())
   })
   
   #display brushed points
   brushed_data<-reactive({
-    brushed_data <- brushedPoints(plotdata(), input$MES_plot1_brush,xvar=xvar(),yvar=yvar())
+    brushed_data <- brushedPoints(MES_plotdata(), input$MES_plot1_brush,MES_xvar=MES_xvar(),MES_yvar=MES_yvar())
     data<-datatable(brushed_data)
     return(data)
   })
@@ -5178,12 +5178,16 @@ server<-function(input,output,session){
                    autoWidth=TRUE),
     filter = "top",
     rownames = FALSE, 
-    escape = FALSE, #escape allows for html elements to be rendered in the table
+    escape = FALSE, 
     server = FALSE
   )
+  # end MES Data Analysis Tab
+  
+  #Scrap Analysis Tab
   
   
-
+  
+  
   
   #Preview the manually uploaded data set
   # output$UploadDataPreview <-DT ::renderDataTable({
