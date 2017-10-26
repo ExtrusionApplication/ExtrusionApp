@@ -418,9 +418,6 @@ screw_data[is.na(screw_data)]<-""
 
 
 
-
-
-
 #Catalog--Multi Extrusion PPS Table---Fill the Partnumber and PPS number for each single row in the table
 for (i in 1:nrow(multi_pps_data)){
   if(multi_pps_data[i,"Part Number"]==""){
