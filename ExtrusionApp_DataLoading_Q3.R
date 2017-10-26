@@ -46,17 +46,20 @@ tapered_sampling_file <- "Tapered Sampling.csv"
 extra_sampling_file <- "Extra Sampling.csv"
 all_sampling_file <- "All Sampling.csv"
 
-single_parameter_file <- "Single Parameters and Yield.csv"
+single_parameterandyield_file <- "Single Tari Parameters and Yield.csv"
+single_parameter_file <- "Single Tari Parameters.csv"
 single_time_file <- "Single Tari Time.csv"
 single_submitter_file <- "Single Tari Submitter.csv"
 single_total_file <- "Single Tari Total.csv"
 
-multi_parameter_file <- "Multi Parameters and Yield.csv"
+multi_parameterandyield_file <- "Multi Tari Parameters and Yield.csv"
+multi_parameter_file <- "Multi Tari Parameters.csv"
 multi_time_file <- "Multi Tari Time.csv"
 multi_submitter_file <- "Multi Tari Submitter.csv"
 multi_total_file <- "Multi Tari Total.csv"
 
-tapered_parameter_file <- "Tapered Parameters and Yield.csv"
+tapered_parameterandyield_file <- "Tapered Tari Parameters and Yield.csv"
+tapered_parameter_file <- "Tapered Tari Parameters.csv"
 tapered_time_file <- "Tapered Tari Time.csv"
 tapered_submitter_file <- "Tapered Tari Submitter.csv"
 tapered_total_file <- "Tapered Tari Total.csv"
@@ -77,16 +80,19 @@ tapered_sampling_pathfile <- paste(path, tapered_sampling_file, sep = "/")
 extra_sampling_pathfile <- paste(path, extra_sampling_file, sep = "/")
 all_sampling_pathfile <- paste(path, all_sampling_file, sep = "/")
 
+single_parameterandyield_filepath <- paste(path, single_parameterandyield_file, sep = "/")
 single_parameter_filepath <- paste(path, single_parameter_file, sep = "/")
 single_time_filepath <- paste(path, single_time_file, sep = "/")
 single_submitter_filepath <- paste(path, single_submitter_file, sep = "/")
 single_total_filepath <- paste(path, single_total_file, sep = "/")
 
+multi_parameterandyield_filepath <- paste(path, multi_parameterandyield_file, sep = "/")
 multi_parameter_filepath <- paste(path, multi_parameter_file, sep = "/")
 multi_time_filepath <- paste(path, multi_time_file, sep = "/")
 multi_submitter_filepath <- paste(path, multi_submitter_file, sep = "/")
 multi_total_filepath <- paste(path, multi_total_file, sep = "/")
 
+tapered_parameterandyield_filepath <- paste(path, tapered_parameterandyield_file, sep = "/")
 tapered_parameter_filepath <- paste(path, tapered_parameter_file, sep = "/")
 tapered_time_filepath <- paste(path, tapered_time_file, sep = "/")
 tapered_submitter_filepath <- paste(path, tapered_submitter_file, sep = "/")
@@ -124,6 +130,8 @@ multi_sampling_data[is.na(multi_sampling_data)] <- ""
 tapered_sampling_data[is.na(tapered_sampling_data)] <- ""
 
 
+single_tari_parameter_and_yield_data <- read.csv(single_parameterandyield_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                                 check.names = FALSE)
 single_tari_parameter_data <- read.csv(single_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
 single_tari_time_data <- read.csv(single_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
@@ -133,6 +141,8 @@ single_tari_submitter_data <- read.csv(single_submitter_filepath, header = TRUE,
 single_tari_total_data <- read.csv(single_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
                        check.names = FALSE)
 
+multi_tari_parameter_and_yield_data <- read.csv(multi_parameterandyield_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                                 check.names = FALSE)
 multi_tari_parameter_data <- read.csv(multi_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                                        check.names = FALSE)
 multi_tari_time_data <- read.csv(multi_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
@@ -142,6 +152,8 @@ multi_tari_submitter_data <- read.csv(multi_submitter_filepath, header = TRUE, s
 multi_tari_total_data <- read.csv(multi_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
                                    check.names = FALSE)
 
+tapered_tari_parameter_and_yield_data <- read.csv(tapered_parameterandyield_filepath, header = TRUE, stringsAsFactors = FALSE, 
+                                                 check.names = FALSE)
 tapered_tari_parameter_data <- read.csv(tapered_parameter_filepath, header = TRUE, stringsAsFactors = FALSE, 
                                       check.names = FALSE)
 tapered_tari_time_data <- read.csv(tapered_time_filepath, header = TRUE, stringsAsFactors = FALSE, 
@@ -150,6 +162,58 @@ tapered_tari_submitter_data <- read.csv(tapered_submitter_filepath, header = TRU
                                       check.names = FALSE)
 tapered_tari_total_data <- read.csv(tapered_total_filepath, header = TRUE, stringsAsFactors = FALSE, 
                                   check.names = FALSE)
+
+
+single_tari_temp_columns <- sort(colnames(single_tari_parameter_and_yield_data)[which(grepl("temp",
+                                                                                       colnames(single_tari_parameter_and_yield_data),
+                                                                                       ignore.case = TRUE))]
+                                 )
+single_tari_press_columns <- sort(colnames(single_tari_parameter_and_yield_data)[which(grepl("press",
+                                                                                       colnames(single_tari_parameter_and_yield_data),
+                                                                                       ignore.case = TRUE))]
+                                  )
+single_tari_speed_columns <- sort(colnames(single_tari_parameter_and_yield_data)[which(grepl("speed",
+                                                                                        colnames(single_tari_parameter_and_yield_data),
+                                                                                        ignore.case = TRUE))]
+                                  )
+single_tari_extra_columns <- sort(colnames(single_tari_parameter_and_yield_data)[which(!grepl(paste(c("temp", "press", "speed"), collapse = "|"),
+                                                                                             colnames(single_tari_parameter_and_yield_data),
+                                                                                             ignore.case = TRUE))]
+                                  )
+
+multi_tari_temp_columns <- sort(colnames(multi_tari_parameter_and_yield_data)[which(grepl("temp",
+                                                                                            colnames(multi_tari_parameter_and_yield_data),
+                                                                                            ignore.case = TRUE))]
+)
+multi_tari_press_columns <- sort(colnames(multi_tari_parameter_and_yield_data)[which(grepl("press",
+                                                                                             colnames(multi_tari_parameter_and_yield_data),
+                                                                                             ignore.case = TRUE))]
+)
+multi_tari_speed_columns <- sort(colnames(multi_tari_parameter_and_yield_data)[which(grepl("speed",
+                                                                                             colnames(multi_tari_parameter_and_yield_data),
+                                                                                             ignore.case = TRUE))]
+)
+multi_tari_extra_columns <- sort(colnames(multi_tari_parameter_and_yield_data)[which(!grepl(paste(c("temp", "press", "speed"), collapse = "|"),
+                                                                                              colnames(multi_tari_parameter_and_yield_data),
+                                                                                              ignore.case = TRUE))]
+)
+
+tapered_tari_temp_columns <- sort(colnames(tapered_tari_parameter_and_yield_data)[which(grepl("temp",
+                                                                                            colnames(tapered_tari_parameter_and_yield_data),
+                                                                                            ignore.case = TRUE))]
+)
+tapered_tari_press_columns <- sort(colnames(tapered_tari_parameter_and_yield_data)[which(grepl("press",
+                                                                                             colnames(tapered_tari_parameter_and_yield_data),
+                                                                                             ignore.case = TRUE))]
+)
+tapered_tari_speed_columns <- sort(colnames(tapered_tari_parameter_and_yield_data)[which(grepl("speed",
+                                                                                             colnames(tapered_tari_parameter_and_yield_data),
+                                                                                             ignore.case = TRUE))]
+)
+tapered_tari_extra_columns <- sort(colnames(tapered_tari_parameter_and_yield_data)[which(!grepl(paste(c("temp", "press", "speed"), collapse = "|"),
+                                                                                              colnames(tapered_tari_parameter_and_yield_data),
+                                                                                              ignore.case = TRUE))]
+)
 
 
 scrapcodes_data <- read.csv(scrapcode_filepath, header = TRUE, stringsAsFactors = FALSE, 
@@ -330,16 +394,19 @@ single_pps_data[is.na(single_pps_data)]<-""
 multi_pps_data[is.na(multi_pps_data)]<-""
 tapered_pps_data[is.na(tapered_pps_data)]<-""
 
+single_tari_parameter_and_yield_data[is.na(single_tari_parameter_and_yield_data)]<-""
 single_tari_parameter_data[is.na(single_tari_parameter_data)]<-""
 single_tari_time_data[is.na(single_tari_time_data)]<-""
 single_tari_submitter_data[is.na(single_tari_submitter_data)]<-""
 single_tari_total_data[is.na(single_tari_total_data)]<-""
 
+multi_tari_parameter_and_yield_data[is.na(multi_tari_parameter_and_yield_data)]<-""
 multi_tari_parameter_data[is.na(multi_tari_parameter_data)]<-""
 multi_tari_time_data[is.na(multi_tari_time_data)]<-""
 multi_tari_submitter_data[is.na(multi_tari_submitter_data)]<-""
 multi_tari_total_data[is.na(multi_tari_total_data)]<-""
 
+tapered_tari_parameter_and_yield_data[is.na(tapered_tari_parameter_and_yield_data)]<-""
 tapered_tari_parameter_data[is.na(tapered_tari_parameter_data)]<-""
 tapered_tari_time_data[is.na(tapered_tari_time_data)]<-""
 tapered_tari_submitter_data[is.na(tapered_tari_submitter_data)]<-""
@@ -347,57 +414,6 @@ tapered_tari_total_data[is.na(tapered_tari_total_data)]<-""
 
 resin_data[is.na(resin_data)]<-""
 screw_data[is.na(screw_data)]<-""
-
-
-
-#Output--MES--get the start date from Start Time
-temp=as.data.frame(matrix(0,nrow=nrow(single_tari_parameter_data),ncol=2))
-colnames(temp)=c("Start Date","Start Time")
-temp[,1:2]=str_split_fixed(single_tari_parameter_data$`Start Time`,' ',2)
-temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
-single_tari_parameter_data=cbind(single_tari_parameter_data[,1:which(colnames(single_tari_parameter_data)=="Start Time")-1],
-                       temp,single_tari_parameter_data[,(which(colnames(single_tari_parameter_data)=="Start Time")+1):ncol(single_tari_parameter_data)])
-Time_Start=sqldf("select Min([Start Date]) from single_tari_parameter_data")
-Time_Start<-as.numeric(Time_Start)
-Time_Start<-as.Date(Time_Start,origin="1970-01-01")
-Time_End<-sqldf("select Max([Start Date]) from single_tari_parameter_data")
-Time_End<-as.numeric(Time_End)
-Time_End<-as.Date(Time_End,origin="1970-01-01")
-
-temp=as.data.frame(matrix(0,nrow=nrow(multi_tari_parameter_data),ncol=2))
-colnames(temp)=c("Start Date","Start Time")
-temp[,1:2]=str_split_fixed(multi_tari_parameter_data$`Start Time`,' ',2)
-temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
-multi_tari_parameter_data=cbind(multi_tari_parameter_data[,1:which(colnames(multi_tari_parameter_data)=="Start Time")-1],
-                                 temp,multi_tari_parameter_data[,(which(colnames(multi_tari_parameter_data)=="Start Time")+1):ncol(multi_tari_parameter_data)])
-Time_Start=sqldf("select Min([Start Date]) from multi_tari_parameter_data")
-Time_Start<-as.numeric(Time_Start)
-Time_Start<-as.Date(Time_Start,origin="1970-01-01")
-Time_End<-sqldf("select Max([Start Date]) from multi_tari_parameter_data")
-Time_End<-as.numeric(Time_End)
-Time_End<-as.Date(Time_End,origin="1970-01-01")
-
-temp=as.data.frame(matrix(0,nrow=nrow(tapered_tari_parameter_data),ncol=2))
-colnames(temp)=c("Start Date","Start Time")
-temp[,1:2]=str_split_fixed(tapered_tari_parameter_data$`Start Time`,' ',2)
-temp[,1]=as.Date(temp[,1],"%m/%d/%Y",origin="1970-01-01")
-tapered_tari_parameter_data=cbind(tapered_tari_parameter_data[,1:which(colnames(tapered_tari_parameter_data)=="Start Time")-1],
-                                 temp,tapered_tari_parameter_data[,(which(colnames(tapered_tari_parameter_data)=="Start Time")+1):ncol(tapered_tari_parameter_data)])
-Time_Start=sqldf("select Min([Start Date]) from tapered_tari_parameter_data")
-Time_Start<-as.numeric(Time_Start)
-Time_Start<-as.Date(Time_Start,origin="1970-01-01")
-Time_End<-sqldf("select Max([Start Date]) from tapered_tari_parameter_data")
-
-Time_End<-as.numeric(Time_End)
-Time_End<-as.Date(Time_End,origin="1970-01-01")
-
-
-#MES-Multi--get the start date and time from Start Time
-
-#Get the date range for Multi MES
-
-#MES-Tapered--get the start date and time from Start Time
-#Get the date range for tapered MES
 
 
 
