@@ -3032,14 +3032,27 @@ ui<-dashboardPage(
                          #     actionButton(inputId = "filter_select", label = "(un)select all")  #an action button to select or unselect all
                          #   ) #end Filter
                          
-                     ),#End Filter section
-                     div(class = "option-group",
-                         div(class = "option-header", "Download"),
-                         radioButtons('MES_GraphFormat', 'Graph format', c('PDF', 'png'),
-                                      inline = TRUE),
-                         downloadButton("MES_GraphDownload_DataAnalysis","Download Graph")
+                     )#End Filter section
+                 ),#end explorer box
+                 
+                 #Make a comment below the plot, and this comment can be printed in the same page with plot.
+                 box(title="Plot Comment",solidHeader = TRUE, status = "info", collapsible = TRUE, width = 12,
+                     selectInput("MES_Fontsize","Font Size",choices=c("10","11","12","13","14","15"),selected="10",width="50%"),
+                     
+                     tags$head(tags$script(HTML(Button_Click_jscode))), # use keyboard "Enter"
+                     actionButton("MES_Comment_btn", "Add"),
+                     tagAppendAttributes(
+                       textAreaInput("MES_Plot_Comment", "", value="",placeholder="You can make a comment on the plot", width = "100%",height = "100px"),
+                       `data-proxy-click` = "MES_Comment_btn"
+                       )
+                     ),
+                   
+                 box(title = "Download",
+                     solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                     radioButtons('MES_GraphFormat', 'Graph format', c('PDF', 'png'),
+                                  inline = TRUE),
+                     downloadButton("MES_GraphDownload_DataAnalysis","Download Graph")
                      )#end download secion
-                 )
                  
           ), #end plot managing section
           

@@ -15,7 +15,23 @@ server<-function(input,output,session){
   
   
   
-  
+button_click_jscode <- '
+$(function() {
+  var $els = $("[data-proxy-click]");
+  $.each(
+    $els,
+      function(idx, el) {
+        var $el = $(el);
+        var $proxy = $("#" + $el.data("proxyClick"));
+        $el.keydown(function (e) {
+          if (e.keyCode == 13) {
+            $proxy.click();
+          }
+        });
+      }
+    );
+});
+'
   #### Single PPS  ####
   
   generateNewDF <- function(df, index_name, value){
@@ -5103,10 +5119,11 @@ server<-function(input,output,session){
   })
   
   
-  Text1<-reactive({
-    #Filter1<-input$Filter1
-    Group<-input$Groupby
-    return(Group)
+  MES_Comment<-reactive({
+    input$MES_Comment_btn
+    isolate({
+      input$MES_Plot_Comment
+    })
   })
   
   
@@ -5126,13 +5143,13 @@ server<-function(input,output,session){
       p<-ggplot(MES_plotdata(), aes(MES_xvals(), MES_yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))
     }
     p<-p+labs(x=MES_xvar(),y=MES_yvar(),title=input$MES_PlotTitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
-                                                                                                                 plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))+labs(caption=paste("The plot is group by:\n",Text1()))
+                                                                                                                 plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15),
+                                                                                                                 plot.caption = element_text(hjust=0.1,color="#000000",size=input$MES_Fontsize))+labs(caption=paste(MES_Comment()))
     p
   })
 
   
-  
-  
+
   output$MES_plotui<-renderUI({
     plotOutput("MES_plot1",height = 400,
                hover = hoverOpts(id = "plot_hover", delay = 0),
@@ -5162,15 +5179,15 @@ server<-function(input,output,session){
   })
   
   #display brushed points
-  brushed_data<-reactive({
-    brushed_data <- brushedPoints(MES_plotdata(), input$MES_plot1_brush,MES_xvar=MES_xvar(),MES_yvar=MES_yvar())
+  MES_brushed_data<-reactive({
+    brushed_data <- brushedPoints(MES_plotdata(), input$MES_plot1_brush, xvar=MES_xvar(),yvar=MES_yvar())
     data<-datatable(brushed_data)
     return(data)
   })
   
   
-  output$plot_brushed_points <-DT::renderDataTable(
-    {brushed_data()},
+  output$MES_plot_brushed_points <-DT::renderDataTable(
+    {MES_brushed_data()},
     options = list(orderClasses = TRUE,
                    columnDefs = list(list(className = 'dt-center',
                                           targets = "_all"
