@@ -4225,7 +4225,7 @@ server<-function(input,output,session){
   output$multiscrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
     #shopping cart
-    reutnr(multi_scrapcodes_reactive())
+    return(multi_scrapcodes_reactive())
   },
   filter = "none",
   extensions = 'ColReorder',
@@ -4379,7 +4379,7 @@ server<-function(input,output,session){
   output$taperedscrapcodes <- renderDataTable({
     #This returns the table of SAP scrap codes based on the SAP batch numbers in the
     #shopping cart
-    reutnr(tapered_scrapcodes_reactive())
+    return(tapered_scrapcodes_reactive())
   },
   filter = "none",
   extensions = 'ColReorder',
