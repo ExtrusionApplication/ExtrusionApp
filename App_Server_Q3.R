@@ -5117,7 +5117,7 @@ server<-function(input,output,session){
     # Plot Type will depends on the chosen plot type by user
     if(length(input$PlotType)==1){
       if(input$PlotType=="Scatter"){
-        p<-ggplot(MES_plotdata(), aes(MES_xvals(), MES_yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))#+geom_line(aes(colour=Groupby))
+        p<-ggplot(MES_plotdata(), aes(MES_xvals(), MES_yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))
       } else if (input$PlotType=="Line"){
         p<-ggplot(MES_plotdata(), aes(MES_xvals(), MES_yvals())) +geom_line(aes(colour=Groupby))+geom_line(aes(colour=Groupby))
       }
