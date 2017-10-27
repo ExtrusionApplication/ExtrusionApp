@@ -5115,20 +5115,23 @@ server<-function(input,output,session){
   output$MES_plot1 <- renderPlot({
     Groupby<-factor(MES_plotdata()[,input$Groupby]) #factorize the variables
     # Plot Type will depends on the chosen plot type by user
-    if(length(input$PlotType)==1){
-      if(input$PlotType=="Scatter"){
+    if(length(input$MES_PlotType)==1){
+      if(input$MES_PlotType=="Scatter"){
         p<-ggplot(MES_plotdata(), aes(MES_xvals(), MES_yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))
-      } else if (input$PlotType=="Line"){
+      } else if (input$MES_PlotType=="Line"){
         p<-ggplot(MES_plotdata(), aes(MES_xvals(), MES_yvals())) +geom_line(aes(colour=Groupby))+geom_line(aes(colour=Groupby))
       }
-    } 
-    else if (length(input$PlotType)==2){
+    }
+    else if (length(input$MES_PlotType)==2){
       p<-ggplot(MES_plotdata(), aes(MES_xvals(), MES_yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))
     }
     p<-p+labs(x=MES_xvar(),y=MES_yvar(),title=input$MES_PlotTitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
                                                                                                                  plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))+labs(caption=paste("The plot is group by:\n",Text1()))
     p
   })
+
+  
+  
   
   output$MES_plotui<-renderUI({
     plotOutput("MES_plot1",height = 400,
