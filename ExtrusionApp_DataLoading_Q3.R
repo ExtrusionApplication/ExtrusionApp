@@ -109,7 +109,6 @@ screw_pathfile <- paste(path, screw_file, sep = "/")
 
 single_pps_data <- read.csv(single_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                             check.names = FALSE)
-single_pps_names <- names(single_pps_data)
 multi_pps_data <- read.csv(multi_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
                            check.names = FALSE)
 tapered_pps_data <- read.csv(tapered_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 

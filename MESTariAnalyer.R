@@ -23,7 +23,7 @@ aggregateTariData <- function(directory){
   
   while (directory_count < length(file_list) + 1){
     file_name <- file_list[directory_count]
-    print(paste0("Running File: ", file_name))
+    #print(paste0("Running File: ", file_name))
     
     if (grepl("-2", file_name, ignore.case = TRUE)){
       #if the sheet was first downloaded as an excel file it may have two csv files associated to it
@@ -96,7 +96,7 @@ generateTariList <- function(data){
   
   while (part_count < partnumberslength + 1){
     part <- partnumbers[part_count]
-    print(part)
+    #print(part)
     
     part_data <- data[which(data$'Material' == part),] #gets the information for the part
     partbatches <- unique(part_data$'SAP Batch')
@@ -107,7 +107,7 @@ generateTariList <- function(data){
     while (partbatch_count < partbatcheslength + 1){
       
       partbatch <- partbatches[partbatch_count]
-      print(partbatch)
+      #print(partbatch)
       
       partbatchdata <- part_data[which(part_data$'SAP Batch' == partbatch),]
       
@@ -187,8 +187,8 @@ generateTariList <- function(data){
           search_name_matches <- search_name_matches[1]
         }
         
-        print(current_datapointname)
-        print(grep(search_name, partbatchdata$'Data Point Name'))
+        #print(current_datapointname)
+        #print(grep(search_name, partbatchdata$'Data Point Name'))
         
         parameterdf[overallbatch_count, current_datapointname] <- partbatchdata$'Data Point  Value'[search_name_matches]
         submitterdf[overallbatch_count, current_datapointname] <- partbatchdata$"Submitter"[search_name_matches]
