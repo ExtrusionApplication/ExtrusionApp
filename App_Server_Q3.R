@@ -1,4 +1,3 @@
-
 #_d:id of the output of checkbox
 #_input: the name of the searchbox
 #PCS:Part Catalog--Single Extrusion PPS
@@ -48,6 +47,21 @@ server<-function(input,output,session){
       column_index <- grep(paste0("^",parameter_name), names(df), ignore.case = TRUE)
       
       new_df <- df[df[,column_index] <= value,]
+      return(new_df)
+      
+    }
+    else if (length(grep(paste(c("number", "description", "print"), collapse = "|"), 
+                         index_name, ignore.case = TRUE)) != 0){
+      #this will catch part number, part description, resin number, resin description, and
+      #pps numbers
+      
+      string_to_search <- gsub("\\| ", "|", gsub(";", "|", value))
+      #this replaces semi-colons with a or for grep. It also removes spaces for example:
+      #"90161; 123124;435 -> 90161|123124|435
+      
+      column_index <- grep(paste0("^",index_name), names(df), ignore.case = TRUE)
+      
+      new_df <- df[grep(string_to_search, df[,column_index], ignore.case = TRUE),]
       return(new_df)
       
     }
@@ -572,8 +586,16 @@ server<-function(input,output,session){
         updateNumericInput(session,
                           inputId = id,
                           label = NULL,
-                          value = value
+                          value = ""
                           )
+      }
+      else if (length(grep(paste(c("number", "description", "print"), collapse = "|"), 
+                           input_name, ignore.case = TRUE)) > 0){
+        updateTextInput(session,
+                        inputId = id,
+                        label = NULL,
+                        value = value
+        )
       }
       else{
         print("resetSI: In the else")
@@ -874,7 +896,6 @@ server<-function(input,output,session){
                  scrollX=TRUE,
                  scrollY=600,
                  autoWidth=TRUE),
-  filter = "top",
   rownames = FALSE, 
   escape = FALSE, #escape allows for html elements to be rendered in the table
   server = FALSE) #end Single Extrusion PPS Data
@@ -1312,6 +1333,21 @@ server<-function(input,output,session){
       part_numbers <- middle_df[,"Part Number"]#then it gets the unique part numbers
       new_df <- df[df[,"Part Number"] %in% part_numbers,]#then it cleans up the original df
       
+      return(new_df)
+      
+    }
+    else if (length(grep(paste(c("number", "description", "print"), collapse = "|"), 
+                         index_name, ignore.case = TRUE)) != 0){
+      #this will catch part number, part description, resin number, resin description, and
+      #pps numbers
+      
+      string_to_search <- gsub("\\| ", "|", gsub(";", "|", value))
+      #this replaces semi-colons with a or for grep. It also removes spaces for example:
+      #"90161; 123124;435 -> 90161|123124|435
+      
+      column_index <- grep(paste0("^",index_name), names(df), ignore.case = TRUE)
+      
+      new_df <- df[grep(string_to_search, df[,column_index], ignore.case = TRUE),]
       return(new_df)
       
     }
@@ -1845,6 +1881,14 @@ server<-function(input,output,session){
                            value = value
         )
       }
+      else if (length(grep(" max", input_name, ignore.case = TRUE)) > 0){
+        print("resetSI: In the max")
+        updateNumericInput(session,
+                           inputId = id,
+                           label = NULL,
+                           value = ""
+        )
+      }
       else{
         print("resetMI: In the else")
         updateSelectInput(session, 
@@ -2167,7 +2211,6 @@ server<-function(input,output,session){
                    scrollY=500,
                    autoWidth=TRUE))
   },
-  filter = "top",
   rownames = FALSE, 
   escape = FALSE, #escape allows for html elements to be rendered in the table
   server = FALSE)#END Multi Extrusion PPS Data
@@ -3069,6 +3112,14 @@ server<-function(input,output,session){
                            value = value
         )
       }
+      else if (length(grep(" max", input_name, ignore.case = TRUE)) > 0){
+        print("resetSI: In the max")
+        updateNumericInput(session,
+                           inputId = id,
+                           label = NULL,
+                           value = ""
+        )
+      }
       else{
         print("resetTI: In the else")
         updateSelectInput(session, 
@@ -3403,7 +3454,6 @@ server<-function(input,output,session){
                    autoWidth=TRUE)
     )
   },
-  filter = "top",
   rownames = FALSE, 
   escape = FALSE, #escape allows for html elements to be rendered in the table
   server = FALSE) #end Tapered Extrusion PPS Data

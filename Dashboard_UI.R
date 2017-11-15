@@ -27,59 +27,61 @@ ui<-dashboardPage(
   dashboardSidebar(
     width = 350,
     sidebarMenu(
+      menuItem("Welcome", tabName = "welcome", icon = icon("home")),
       menuItem("Part Catalog - PPS Data", tabName = "partcatalog", icon = icon("list"),
                menuSubItem("Single Layer Extrusion", tabName = "singleppstab"),
                menuSubItem("Multi Layer Extrusion", tabName = "multippstab"),
                menuSubItem("Tapered Extrusion", tabName = "taperedppstab")
         ), #end menuItem
-      menuItem("Sampling and Test Method Information", icon = icon("wrench"),
+      menuItem("Sampling and Test Method Information", tabName = "samplinginformation", icon = icon("wrench"),
                menuSubItem("Single Layer Extrusion", tabName = "singlesamplingtab"),
                menuSubItem("Multi Layer Extrusion", tabName = "multisamplingtab"),
                menuSubItem("Tapered Extrusion", tabName = "taperedsamplingtab"),
                menuSubItem("Extra Extrusion", tabName = "extrasamplingtab"),
                menuSubItem("Total Extrusion", tabName = "totalsamplingtab")
         ), #end menuItem
-      menuItem("Single Layer Extrusion - MES Batch Data", icon = icon("cogs"),
+      menuItem("Single Layer Extrusion - MES Batch Data", tabName = "singlemesdata", icon = icon("cogs"),
                menuSubItem("MES Parameters and Yield", tabName = "singlemesparametersandyieldtab"),
                menuSubItem("MES Parameters", tabName = "singlemesparameterstab"),
                menuSubItem("MES Timestamps", tabName = "singlemestimetab"),
                menuSubItem("MES Submitters", tabName = "singlemessubmitterstab"),
                menuSubItem("MES Total", tabName = "singlemestotaltab")
       ), #end menuItem
-      menuItem("Multi Layer Extrusion - MES Batch Data", icon = icon("cogs"),
+      menuItem("Multi Layer Extrusion - MES Batch Data", tabName = "multimesdata", icon = icon("cogs"),
                menuSubItem("MES Parameters and Yield", tabName = "multimesparametersandyieldtab"),
                menuSubItem("MES Parameters", tabName = "multimesparameterstab"),
                menuSubItem("MES Timestamps", tabName = "multimestimetab"),
                menuSubItem("MES Submitters", tabName = "multimessubmitterstab"),
                menuSubItem("MES Total", tabName = "multimestotaltab")
       ), #end menuItem
-      menuItem("Tapered Extrusion - MES Batch Data", icon = icon("cogs"),
+      menuItem("Tapered Extrusion - MES Batch Data", tabName = "taperedmesdata", icon = icon("cogs"),
                menuSubItem("MES Parameters and Yield", tabName = "taperedmesparametersandyieldtab"),
                menuSubItem("MES Parameters", tabName = "taperedmesparameterstab"),
                menuSubItem("MES Timestamps", tabName = "taperedmestimetab"),
                menuSubItem("MES Submitters", tabName = "taperedmessubmitterstab"),
                menuSubItem("MES Total", tabName = "taperedmestotaltab")
       ), #end menuItem
-      menuItem("Scrap Rates and Codes", icon = icon("chain-broken"),
+      menuItem("Scrap Rates and Codes", tabName = "scrapcodes", icon = icon("chain-broken"),
                menuSubItem("Single Layer Extrusion", tabName = "singlescrapcodestab"),
                menuSubItem("Multi Layer Extrusion", tabName = "multiscrapcodestab"),
                menuSubItem("Tapered Extrusion", tabName = "taperedscrapcodestab")
       ),
-      menuItem("Extra Information", icon = icon("book"),
+      menuItem("Extra Information", tabName = "extrainformation", icon = icon("book"),
                menuSubItem("Resin Information", tabName = "resininfotab"),
                menuSubItem("Screw Print Information", tabName = "screwinfotab")
       ),
-      menuItem("Shopping Cart PPS Data", icon = icon("clone"),
+      menuItem("Shopping Cart PPS Data", tabName = "shoppingcartdata", icon = icon("clone"),
                menuSubItem("Single Layer Extrusion", tabName = "singleshoppingcarttab"),
                menuSubItem("Multi Layer Extrusion", tabName = "multishoppingcarttab"),
                menuSubItem("Tapered Extrusion", tabName = "taperedshoppingcarttab"),
                menuSubItem("Total Extrusion", tabName = "totalshoppingcarttab")
       ), #end menuItem
-      menuItem("Analysis Tool",icon=icon("bar-chart"),
+      menuItem("Analysis Tool", tabName = "analysistool", icon=icon("bar-chart"),
                menuSubItem("MES Data Analysis",tabName = "MESDataAnalysis"),
                menuSubItem("Scrap Analysis",tabName = "ScrapAnalysis"),
                menuSubItem("Financial Data",tabName = "FinancialDataAnalysis")
-      )#end menuItem
+      ),#end menuItem
+      menuItem("Help", tabName = "help", icon = icon("question-circle-o"))
     ) #end sidebarMenu
     
   ), #end dashboardSidebar
@@ -88,6 +90,33 @@ ui<-dashboardPage(
   
   dashboardBody(
     tabItems(
+      tabItem(tabName = "welcome",
+              fluidRow(
+                box(title = "Introduction", solidHeader = TRUE, status = "info", width = 12,
+                    tags$p(HTML(paste(readLines("IntroductionText.txt"), collapse = "<br>")))
+                )#end box
+              ),#end fluidRow
+              fluidRow(
+                box(title = "About the Part Catalog", solidHeader = TRUE, status = "primary", width = 12,
+                    tags$p(HTML(paste(readLines("PartCatalogText.txt"), collapse = "<br>")))
+                )#end box
+              ),#end fluidRow
+              fluidRow(
+                box(title = "About the Shopping Cart", solidHeader = TRUE, status = "info", width = 12,
+                    tags$p(HTML(paste(readLines("ShoppingCartText.txt"), collapse = "<br>")))
+                )#end box
+              ),#end fluidRow
+              fluidRow(
+                box(title = "About the MES Batch Information", solidHeader = TRUE, status = "primary", width = 12,
+                    tags$p(HTML(paste(readLines("MESBatchInformationText.txt"), collapse = "<br>")))
+                )#end box
+              ),#end fluidRow
+              fluidRow(
+                box(title = "About the Scrap Codes", solidHeader = TRUE, status = "info", width = 12,
+                    tags$p(HTML(paste(readLines("ScrapRatesAndCodesText.txt"), collapse = "<br>")))
+                )#end box
+              )#end fluidRow
+              ), #end tabItem
       tabItem(tabName = "singleppstab",
               #Part Resin
               fluidRow(
@@ -100,8 +129,7 @@ ui<-dashboardPage(
                            fluidRow(
                              conditionalPanel(
                                condition="input.PCSPN_d",   #If it were Ture, then there will have a search box for Part Number under checkbox
-                               selectInput("PCSPN",label = "Select One",
-                                           c("All",unique(as.character(single_pps_data$`Part Number`))))
+                               textInput("PCSPN",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                
                              ))),
                     # Part Description
@@ -110,8 +138,7 @@ ui<-dashboardPage(
                            fluidRow(
                              conditionalPanel(
                                condition = "input.PCSPD_d",
-                               selectInput("PCSPD",label = "Select One",
-                                           c("All",unique(as.character(single_pps_data$`Part Description`))))
+                               textInput("PCSPD",label = "Type in a query to search. Semi-colons seperate individual searches.")
                              ))), 
                     # Resin Number
                     column(2, align = "center", style='padding-left: 20px; padding-right:20px;',
@@ -119,8 +146,7 @@ ui<-dashboardPage(
                            fluidRow(
                              conditionalPanel(
                                condition = "input.PCSRN_d",
-                               selectInput("PCSRN",label = "Select One",
-                                           c("All",unique(as.character(single_pps_data$`Resin Number`))))
+                               textInput("PCSRN",label = "Type in a query to search. Semi-colons seperate individual searches.")
                              ))),
                     #Resin Description
                     column(2, align = "center", style='padding-left: 20px; padding-right:20px;',
@@ -128,8 +154,7 @@ ui<-dashboardPage(
                            fluidRow(
                              conditionalPanel(
                                condition = "input.PCSRD_d",
-                               selectInput("PCSRD",label = "Select One",
-                                           c("All",unique(as.character(single_pps_data$`Resin Description`))))
+                               textInput("PCSRD",label = "Type in a query to search. Semi-colons seperate individual searches.")
                              ))),
                     #PPS Number
                     column(2, align = "center", style='padding-left: 20px; padding-right:20px;',
@@ -137,8 +162,7 @@ ui<-dashboardPage(
                            fluidRow(
                              conditionalPanel(
                                condition = "input.PCSPPSN_d",
-                               selectInput("PCSPPSN",label = "Select One",
-                                           c("All",unique(as.character(single_pps_data$`PPS Number`))))
+                               textInput("PCSPPSN",label = "Type in a query to search. Semi-colons seperate individual searches.")
                              )))
                     )
               ),
@@ -260,8 +284,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCSSP_d",
-                                 selectInput("PCSSP",label = "Select One",
-                                             c("All",unique(as.character(multi_pps_data$`Screw Print`))))
+                                 textInput("PCSSP",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                )))
                     ),#end Tooling
                 fluidRow(
@@ -676,9 +699,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition="input.PCMPN_d",
-                                 
-                                 selectInput("PCMPN",label = "Select One",
-                                             c("All",unique(as.character(multi_pps_data$`Part Number`))))
+                                 textInput("PCMPN",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                  
                                ))),
                       # Part Description
@@ -687,8 +708,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMPD_d",
-                                 selectInput("PCMPD",label = "Select One",
-                                             c("All",unique(as.character(multi_pps_data$`Part Description`))))
+                                 textInput("PCMPD",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                ))), 
                       # Resin Number
                       column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
@@ -696,8 +716,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMRN_d",
-                                 selectInput("PCMRN",label = "Select One",
-                                             c("All",unique(as.character(multi_pps_data$`Resin Number`))))
+                                 textInput("PCMRN",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                ))),
                       #Resin Description
                       column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
@@ -705,9 +724,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMRD_d",
-                                 selectInput("PCMRD",label = "Select One",
-                                             
-                                             c("All",unique(as.character(multi_pps_data$`Resin Description`))))
+                                 textInput("PCMRD",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                  
                                ))),
                       #PPS Number
@@ -716,8 +733,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMPPSN_d",
-                                 selectInput("PCMPPSN",label = "Select One",
-                                             c("All",unique(as.character(multi_pps_data$`PPS Number`))))
+                                 textInput("PCMPPSN",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                  
                                )))
                       
@@ -731,7 +747,6 @@ ui<-dashboardPage(
                     solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
                     
                     fluidRow(
-                      tags$h1(strong("Resin Information"),style="font-size:25px;",align="left"),
                       #Resin Families
                       column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              fluidRow(checkboxInput("PCMRF_d","Resin Families",value=F))
@@ -859,8 +874,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCMSP_d",
-                                 selectInput("PCMSP",label = "Select One",
-                                             c("All",unique(as.character(multi_pps_data$`Screw Print`))))
+                                 textInput("PCMSP",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                )))
                     ),
                     fluidRow(
@@ -1403,9 +1417,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition="input.PCTPN_d",
-                                 
-                                 selectInput("PCTPN",label = "Select One",
-                                             c("All",unique(as.character(tapered_pps_data$`Part Number`))))
+                                 textInput("PCTPN",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                  
                                ))),
                       # Part Description
@@ -1414,8 +1426,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTPD_d",
-                                 selectInput("PCTPD",label = "Select One",
-                                             c("All",unique(as.character(single_pps_data$`Part Description`))))
+                                 textInput("PCTPD",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                ))), 
                       # Resin Number
                       column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
@@ -1423,8 +1434,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTRN_d",
-                                 selectInput("PCTRN",label = "Select One",
-                                             c("All",unique(as.character(single_pps_data$`Resin Number`))))
+                                 textInput("PCTRN",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                ))),
                       #Resin Description
                       column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
@@ -1432,8 +1442,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTRD_d",
-                                 selectInput("PCTRD",label = "Select One",
-                                             c("All",unique(as.character(single_pps_data$`Resin Description`))))
+                                 textInput("PCTRD",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                ))),
                       #PPS Number
                       column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
@@ -1441,8 +1450,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTPPSN_d",
-                                 selectInput("PCTPPSN",label = "Select One",
-                                             c("All",unique(as.character(single_pps_data$`PPS Number`))))
+                                 textInput("PCTPPSN",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                )))
                     )
                 )
@@ -1575,8 +1583,7 @@ ui<-dashboardPage(
                              fluidRow(
                                conditionalPanel(
                                  condition = "input.PCTSP_d",
-                                 selectInput("PCTSP",label = "Select One",
-                                             c("All",unique(as.character(single_pps_data$`Screw Print`))))
+                                 textInput("PCTSP",label = "Type in a query to search. Semi-colons seperate individual searches.")
                                )))
                     ),
                     fluidRow(

@@ -1,15 +1,15 @@
 #This R code is used to load csv or xls file into R. And clean the raw data based on demand.
 #And we need to add more code to update our database daily
-require(shiny)
-require(bootstrap)
-require(jpeg)
-require(ggplot2)
-require(DT)
-require(stringr)
-require(gsubfn)
-require(proto)
-require(sqldf)
-require(plyr)
+library(shiny)
+library(bootstrap)
+library(jpeg)
+library(ggplot2)
+library(DT)
+library(stringr)
+library(gsubfn)
+library(proto)
+library(sqldf)
+library(plyr)
 
 
 #LOADING DATA
