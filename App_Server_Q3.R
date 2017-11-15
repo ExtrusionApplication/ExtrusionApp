@@ -1164,19 +1164,46 @@ server<-function(input,output,session){
   
   output$singledownloadSPPSData <- downloadHandler(
     #downlaod the data
-    filename = function() { paste("Single PPS Data", '.csv', sep='') },
+    filename = function() { paste("Visible Single-Layer PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(clean_single_pps_data$data[2:ncol(clean_single_pps_data$data)], file, row.names = FALSE)
+      output <- clean_single_pps_data$data[2:ncol(clean_single_pps_data$data)]
+      
+      if (length(grep("Part Number", colnames(output), ignore.case = TRUE) > 0)){
+        #if a user has selected the column
+        raw_parts <- unlist(strsplit(unlist(strsplit(single_df_output$data$`Part Number`, ">")), "<"))
+        clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+        output$'Part Number' <- clean_parts
+      }
+      
+      if (length(grep("PPS Number", colnames(output), ignore.case = TRUE) > 0)){
+        #if a user has selected the column
+        raw_pps <- unlist(strsplit(unlist(strsplit(single_df_output$data$`PPS Number`, ">")), "<"))
+        clean_pps <- raw_parts[seq(3,length(raw_pps), 4)]
+        output$'PPS Number' <- clean_pps
+      }
+      
+      write.csv(output, file, row.names = FALSE)
     }
   )
   
   output$singledownloadSPPSDataAll <- downloadHandler(
     #downlaod the data
-    filename = function() { paste("Single PPS Data", '.csv', sep='') },
+    filename = function() { paste("All Single-Layer PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(single_df_output$data[2:ncol(single_df_output$data)], file, row.names = FALSE)
+      output <- single_df_output$data[2:ncol(single_df_output$data)]
+      
+      raw_parts <- unlist(strsplit(unlist(strsplit(single_df_output$data$`Part Number`, ">")), "<"))
+      clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+      output$'Part Number' <- clean_parts
+      
+      raw_pps <- unlist(strsplit(unlist(strsplit(single_df_output$data$`PPS Number`, ">")), "<"))
+      clean_pps <- raw_parts[seq(3,length(raw_pps), 4)]
+      output$'PPS Number' <- clean_pps
+      
+      
+      write.csv(output, file, row.names = FALSE)
     }
   )
   
@@ -2555,20 +2582,47 @@ server<-function(input,output,session){
   
   output$multidownloadSPPSData <- downloadHandler(
     #downlaod the data
-    filename = function() { paste("Multi-Layer PPS Data", '.csv', sep='') },
+    filename = function() { paste("Visible Multi-Layer PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(clean_multi_pps_data$data[2:ncol(clean_multi_pps_data$data)], file, row.names = FALSE)
+      output <- clean_multi_pps_data$data[2:ncol(clean_multi_pps_data$data)]
+      
+      if (length(grep("Part Number", colnames(output), ignore.case = TRUE) > 0)){
+        #if a user has selected the column
+        raw_parts <- unlist(strsplit(unlist(strsplit(multi_df_output$data$`Part Number`, ">")), "<"))
+        clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+        output$'Part Number' <- clean_parts
+      }
+      
+      if (length(grep("PPS Number", colnames(output), ignore.case = TRUE) > 0)){
+        #if a user has selected the column
+        raw_pps <- unlist(strsplit(unlist(strsplit(multi_df_output$data$`PPS Number`, ">")), "<"))
+        clean_pps <- raw_parts[seq(3,length(raw_pps), 4)]
+        output$'PPS Number' <- clean_pps
+      }
+      
+      write.csv(output, file, row.names = FALSE)
     }
   )
 
   
   output$multidownloadSPPSDataAll <- downloadHandler(
     #downlaod the data
-    filename = function() { paste("Multi PPS Data", '.csv', sep='') },
+    filename = function() { paste("All Multi-Layer PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(multi_df_output$data[2:ncol(multi_df_output$data)], file, row.names = FALSE)
+      output <- multi_df_output$data[2:ncol(multi_df_output$data)]
+      
+      raw_parts <- unlist(strsplit(unlist(strsplit(multi_df_output$data$`Part Number`, ">")), "<"))
+      clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+      output$'Part Number' <- clean_parts
+      
+      raw_pps <- unlist(strsplit(unlist(strsplit(multi_df_output$data$`PPS Number`, ">")), "<"))
+      clean_pps <- raw_parts[seq(3,length(raw_pps), 4)]
+      output$'PPS Number' <- clean_pps
+      
+      
+      write.csv(output, file, row.names = FALSE)
     }
   )
   
@@ -3877,21 +3931,47 @@ server<-function(input,output,session){
   
   
   output$tapereddownloadSPPSData <- downloadHandler(
-    #downlaod the data
-    filename = function() { paste("tapered-Layer PPS Data", '.csv', sep='') },
+    #downloadd the data
+    filename = function() { paste("Visible Tapered PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(clean_tapered_pps_data$data[2:ncol(clean_tapered_pps_data$data)], file, row.names = FALSE)
+      output <- clean_tapered_pps_data$data[2:ncol(clean_tapered_pps_data$data)]
+      
+      if (length(grep("Part Number", colnames(output), ignore.case = TRUE) > 0)){
+        #if a user has selected the column
+        raw_parts <- unlist(strsplit(unlist(strsplit(tapered_df_output$data$`Part Number`, ">")), "<"))
+        clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+        output$'Part Number' <- clean_parts
+      }
+      
+      if (length(grep("PPS Number", colnames(output), ignore.case = TRUE) > 0)){
+        #if a user has selected the column
+        raw_pps <- unlist(strsplit(unlist(strsplit(tapered_df_output$data$`PPS Number`, ">")), "<"))
+        clean_pps <- raw_parts[seq(3,length(raw_pps), 4)]
+        output$'PPS Number' <- clean_pps
+      }
+      
+      write.csv(output, file, row.names = FALSE)
     }
   )
   
   
   output$tapereddownloadSPPSDataAll <- downloadHandler(
     #downlaod the data
-    filename = function() { paste("tapered PPS Data", '.csv', sep='') },
+    filename = function() { paste("All Tapered PPS Data", '.csv', sep='') },
     content = function(file) {
       #I remove the first column so the HTML is not outputed
-      write.csv(tapered_df_output$data[2:ncol(tapered_df_output$data)], file, row.names = FALSE)
+      output <- tapered_df_output$data[2:ncol(tapered_df_output$data)]
+      
+      raw_parts <- unlist(strsplit(unlist(strsplit(tapered_df_output$data$`Part Number`, ">")), "<"))
+      clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+      output$'Part Number' <- clean_parts
+      
+      raw_pps <- unlist(strsplit(unlist(strsplit(tapered_df_output$data$`PPS Number`, ">")), "<"))
+      clean_pps <- raw_parts[seq(3,length(raw_pps), 4)]
+      output$'PPS Number' <- clean_pps
+      
+      write.csv(output, file, row.names = FALSE)
     }
   )
   
