@@ -973,6 +973,11 @@ server<-function(input,output,session){
     }
     else{
       #Do nothing if the part is already there
+      showModal(modalDialog(
+        title = "Add Part Number",
+        "The part is already in the shopping cart",
+        easyClose = T
+      ))
     }
     
     
@@ -1020,6 +1025,90 @@ server<-function(input,output,session){
     }
     
   })
+  
+  observeEvent(input$singleaddtable,{
+    #this observes for the button singleaddtable which will add all the parts in the table to the
+    #shopping cart.
+    
+    raw_parts <- unlist(strsplit(unlist(strsplit(single_df_output$data$`Part Number`, ">")), "<"))
+    
+    clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+    
+    count <- 1
+    
+    while (count < (length(clean_parts) + 1)){
+      #iterates through the parts
+      
+      part <- clean_parts[count]
+      
+      #Action button to delete part
+      deletepart <- as.character(
+        actionButton(inputId = paste0("button_", part),
+                     label = "Delete Part",
+                     onclick = 'Shiny.onInputChange(\"singledelete_part_button\",  this.id)'))
+      
+      #Get the SAP batches
+      SAP_batches <- single_tari_parameter_data$`SAP Batch Number`[single_tari_parameter_data$`Material Number` == part]
+      numberofbatches <- length(SAP_batches)
+      
+      if(numberofbatches > 0){
+        #if there are batches
+        batches <- "Yes"
+        
+        #Action button to delete batch
+        #' if there are not batches the part will not be added to this shopping cart table but will
+        #' be added to the part
+        batch_count <- 1
+        vectorofbuttons <- c(rep(0, length(SAP_batches)))
+        
+        while(batch_count < length(SAP_batches) + 1){
+          vectorofbuttons[batch_count] <- as.character(
+            actionButton(inputId = paste0("button_", SAP_batches[batch_count]),
+                         label = "Delete Batch",
+                         onclick = 'Shiny.onInputChange(\"singledelete_batch_button\",  this.id)'))
+          batch_count <- batch_count + 1
+        }
+        
+        #Vectors of parts and buttons
+        partvector <- rep(part, numberofbatches)
+        deletepartvector <- rep(deletepart, numberofbatches)
+        
+        new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
+        
+        colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        
+        if (length(grep(part, singleshoppingcart$data$"Part")) == 0){
+          singleshoppingcart$data <- rbind(singleshoppingcart$data, new_data, stringsAsFactors = FALSE)
+          colnames(singleshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        }
+        else{
+          #Do nothing if the part is already there
+        }
+        
+      }
+      else{
+        batches <- "No"
+      }
+      
+      new_data <- cbind(part, batches, deletepart)
+      
+      colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+      
+      
+      if (length(grep(part, singleshoppingcartparts$data$"Part")) == 0){
+        singleshoppingcartparts$data <- rbind(singleshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+        colnames(singleshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+      }
+      else{
+        #Do nothing if the part is already there
+      }
+      
+      count <- count + 1
+    }
+    
+    
+  })
+    
   
   
   observeEvent(input$singledelete_part_button,{
@@ -2329,6 +2418,90 @@ server<-function(input,output,session){
     
   }) #end observeEvent(input$multiadd_button)
   
+  observeEvent(input$multiaddtable,{
+    #this observes for the button multiaddtable which will add all the parts in the table to the
+    #shopping cart.
+    
+    raw_parts <- unlist(strsplit(unlist(strsplit(multi_df_output$data$`Part Number`, ">")), "<"))
+    
+    clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+    
+    count <- 1
+    
+    while (count < (length(clean_parts) + 1)){
+      #iterates through the parts
+      
+      part <- clean_parts[count]
+      
+      #Action button to delete part
+      deletepart <- as.character(
+        actionButton(inputId = paste0("button_", part),
+                     label = "Delete Part",
+                     onclick = 'Shiny.onInputChange(\"multidelete_part_button\",  this.id)'))
+      
+      #Get the SAP batches
+      SAP_batches <- multi_tari_parameter_data$`SAP Batch Number`[multi_tari_parameter_data$`Material Number` == part]
+      numberofbatches <- length(SAP_batches)
+      
+      if(numberofbatches > 0){
+        #if there are batches
+        batches <- "Yes"
+        
+        #Action button to delete batch
+        #' if there are not batches the part will not be added to this shopping cart table but will
+        #' be added to the part
+        batch_count <- 1
+        vectorofbuttons <- c(rep(0, length(SAP_batches)))
+        
+        while(batch_count < length(SAP_batches) + 1){
+          vectorofbuttons[batch_count] <- as.character(
+            actionButton(inputId = paste0("button_", SAP_batches[batch_count]),
+                         label = "Delete Batch",
+                         onclick = 'Shiny.onInputChange(\"multidelete_batch_button\",  this.id)'))
+          batch_count <- batch_count + 1
+        }
+        
+        #Vectors of parts and buttons
+        partvector <- rep(part, numberofbatches)
+        deletepartvector <- rep(deletepart, numberofbatches)
+        
+        new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
+        
+        colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        
+        if (length(grep(part, multishoppingcart$data$"Part")) == 0){
+          multishoppingcart$data <- rbind(multishoppingcart$data, new_data, stringsAsFactors = FALSE)
+          colnames(multishoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        }
+        else{
+          #Do nothing if the part is already there
+        }
+        
+      }
+      else{
+        batches <- "No"
+      }
+      
+      new_data <- cbind(part, batches, deletepart)
+      
+      colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+      
+      
+      if (length(grep(part, multishoppingcartparts$data$"Part")) == 0){
+        multishoppingcartparts$data <- rbind(multishoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+        colnames(multishoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+      }
+      else{
+        #Do nothing if the part is already there
+      }
+      
+      count <- count + 1
+    }
+    
+  })
+    
+    
+  
   
   observeEvent(input$multidelete_part_button,{
     #'this observes whether a person deleted a part from the shopping cart. If the button is clicked
@@ -3564,6 +3737,89 @@ server<-function(input,output,session){
     }
     
   }) #end observeEvent(input$taperedadd_button)
+  
+  
+  observeEvent(input$taperedaddtable,{
+    #this observes for the button taperedaddtable which will add all the parts in the table to the
+    #shopping cart.
+    
+    raw_parts <- unlist(strsplit(unlist(strsplit(tapered_df_output$data$`Part Number`, ">")), "<"))
+    
+    clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+    
+    count <- 1
+    
+    while (count < (length(clean_parts) + 1)){
+      #iterates through the parts
+      
+      part <- clean_parts[count]
+      
+      #Action button to delete part
+      deletepart <- as.character(
+        actionButton(inputId = paste0("button_", part),
+                     label = "Delete Part",
+                     onclick = 'Shiny.onInputChange(\"tapereddelete_part_button\",  this.id)'))
+      
+      #Get the SAP batches
+      SAP_batches <- tapered_tari_parameter_data$`SAP Batch Number`[tapered_tari_parameter_data$`Material Number` == part]
+      numberofbatches <- length(SAP_batches)
+      
+      if(numberofbatches > 0){
+        #if there are batches
+        batches <- "Yes"
+        
+        #Action button to delete batch
+        #' if there are not batches the part will not be added to this shopping cart table but will
+        #' be added to the part
+        batch_count <- 1
+        vectorofbuttons <- c(rep(0, length(SAP_batches)))
+        
+        while(batch_count < length(SAP_batches) + 1){
+          vectorofbuttons[batch_count] <- as.character(
+            actionButton(inputId = paste0("button_", SAP_batches[batch_count]),
+                         label = "Delete Batch",
+                         onclick = 'Shiny.onInputChange(\"tapereddelete_batch_button\",  this.id)'))
+          batch_count <- batch_count + 1
+        }
+        
+        #Vectors of parts and buttons
+        partvector <- rep(part, numberofbatches)
+        deletepartvector <- rep(deletepart, numberofbatches)
+        
+        new_data <- cbind(partvector, deletepartvector, SAP_batches, vectorofbuttons)
+        
+        colnames(new_data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        
+        if (length(grep(part, taperedshoppingcart$data$"Part")) == 0){
+          taperedshoppingcart$data <- rbind(taperedshoppingcart$data, new_data, stringsAsFactors = FALSE)
+          colnames(taperedshoppingcart$data) <- c("Part", "Delete Part", "SAP Batch", "Delete Batch")
+        }
+        else{
+          #Do nothing if the part is already there
+        }
+        
+      }
+      else{
+        batches <- "No"
+      }
+      
+      new_data <- cbind(part, batches, deletepart)
+      
+      colnames(new_data) <- c("Part", "Batches?", "Delete Part")
+      
+      
+      if (length(grep(part, taperedshoppingcartparts$data$"Part")) == 0){
+        taperedshoppingcartparts$data <- rbind(taperedshoppingcartparts$data, new_data, stringsAsFactors = FALSE)
+        colnames(taperedshoppingcartparts$data) <- c("Part", "Batches?", "Delete Part")
+      }
+      else{
+        #Do nothing if the part is already there
+      }
+      
+      count <- count + 1
+    }
+    
+  })
   
   
   observeEvent(input$tapereddelete_part_button,{

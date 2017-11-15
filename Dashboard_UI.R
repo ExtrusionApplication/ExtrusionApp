@@ -672,6 +672,9 @@ ui<-dashboardPage(
                 box(title = "Special Operations", 
                     solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
                     fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton('singleaddtable','Add Parts in Table to Shopping Cart')
+                      ),
                       column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              downloadButton('singledownloadSPPSData','Download Single PPS Data')
                       ),
@@ -1389,6 +1392,9 @@ ui<-dashboardPage(
                 box(title = "Download and Reset Buttons", 
                     solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
                     fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton('multiaddtable','Add Parts in Table to Shopping Cart')
+                      ),
                       column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              downloadButton('multidownloadSPPSData','Download Multi-Layer PPS Data')
                       ),
@@ -2189,6 +2195,9 @@ ui<-dashboardPage(
                 box(title = "Download and Reset Buttons", 
                     solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
                     fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             actionButton('taperedaddtable','Add Parts in Table to Shopping Cart')
+                      ),
                       column(2,align = "center", style='padding-left: 20px; padding-right:20px;',
                              downloadButton('tapereddownloadSPPSData','Download Tapered PPS Data')
                       ),
