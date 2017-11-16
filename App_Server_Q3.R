@@ -1486,7 +1486,11 @@ server<-function(input,output,session){
       
       clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
       
-      new_df <- df[grep(string_to_search, clean_parts, ignore.case = TRUE),]
+      middle_df <- df[grep(string_to_search, clean_parts, ignore.case = TRUE),]
+      
+      part_numbers <- middle_df[,"Part Number"]#then it gets the unique part numbers
+      new_df <- df[df[,"Part Number"] %in% part_numbers,]#then it cleans up the original df
+      
       return(new_df)
       
     }
@@ -1499,7 +1503,11 @@ server<-function(input,output,session){
       
       column_index <- grep(paste0("^",index_name), names(df), ignore.case = TRUE)
       
-      new_df <- df[grep(string_to_search, df[,column_index], ignore.case = TRUE),]
+      middle_df <- df[grep(string_to_search, df[,column_index], ignore.case = TRUE),]
+      
+      part_numbers <- middle_df[,"Part Number"]#then it gets the unique part numbers
+      new_df <- df[df[,"Part Number"] %in% part_numbers,]#then it cleans up the original df
+      
       return(new_df)
       
       
@@ -2392,11 +2400,10 @@ server<-function(input,output,session){
     #this is a shopping cart to hold all the multi extrusion parts and SAP batches that a user wants.
     #this is linked to the output data, so only the output data located of the associated batches 
     #in the shopping cart is displayed
-    data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
-                      "SAP Batch" = numeric(0), "Delete Batch" = numeric(0),
+    data = data.frame("Part" = numeric(0), "Batches?" = numeric(0), "Delete Part" = numeric(0),
                       stringsAsFactors = FALSE,
                       check.names = FALSE)
-  ) #end multishoppingcart
+  ) #end multishoppingcartparts
   
   observeEvent(input$multiadd_button,{
     #this observes whether the user clicked a button to add a part to the shopping cart
@@ -3733,7 +3740,7 @@ server<-function(input,output,session){
   
   
   taperedshoppingcart <- reactiveValues(
-    #this is a shopping cart to hold all the singl extrusion parts and SAP batches that a user wants.
+    #this is a shopping cart to hold all the tapered extrusion parts that a user wants.
     #this is linked to the output data, so only the output data located of the associated batches 
     #in the shopping cart is displayed
     data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
@@ -3746,8 +3753,7 @@ server<-function(input,output,session){
     #this is a shopping cart to hold all the tapered extrusion parts and SAP batches that a user wants.
     #this is linked to the output data, so only the output data located of the associated batches 
     #in the shopping cart is displayed
-    data = data.frame("Part" = numeric(0), "Delete Part" = numeric(0),
-                      "SAP Batch" = numeric(0), "Delete Batch" = numeric(0),
+    data = data.frame("Part" = numeric(0), "Batches?" = numeric(0), "Delete Part" = numeric(0),
                       stringsAsFactors = FALSE,
                       check.names = FALSE)
   ) #end taperedshoppingcart
@@ -4372,6 +4378,8 @@ server<-function(input,output,session){
   single_tari_parametersandyield_reactive <- reactive({
     df <- single_tari_parameter_and_yield_data[single_tari_parameter_and_yield_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',
                                                single_tari_columns_selected()$full]
+    
+    return(df)
   })
   
   output$singleMESparametersandyield <- renderDataTable({
@@ -4516,13 +4524,18 @@ server<-function(input,output,session){
     column_list$full <- column_indices_full
     column_list$short <- column_indices_short
     
+    
     return(column_list)
     
   })
   
   multi_tari_parametersandyield_reactive <- reactive({
+    
+    
     df <- multi_tari_parameter_and_yield_data[multi_tari_parameter_and_yield_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',
                                                multi_tari_columns_selected()$full]
+    
+    return(df)
   })
   
   output$multiMESparametersandyield <- renderDataTable({
@@ -5799,6 +5812,42 @@ server<-function(input,output,session){
   # )
   
   
+  
+  
+  
+  
+  #### Extra HTML ####
+  
+  #This will change the header of the app to match that of the currently selected tab
+  tabtitles <- c("Single Layer Extrusion Catalog", "Multi Layer Extrusion Catalog", "Tapered Extrusion Catalog", 
+                 "Single Layer Sampling Information", "Multi Layer Sampling Information", "Tapered Sampling Information", "Extra Extrusion Sampling Information", "Total Extrusion Sampling Information",
+                 "Single MES Parameters and Yield", "Single MES Parameters", "Single MES Timestamps", "Single MES Submitters", "Single MES Total",
+                 "Multi MES Parameters and Yield", "Multi MES Parameters", "Multi MES Timestamps", "Multi MES Submitters", "Multi MES Total",
+                 "Tapered MES Parameters and Yield", "Tapered MES Parameters", "Tapered MES Timestamps", "Tapered MES Submitters", "Tapered MES Total",
+                 "Single Scrap Codes", "Multi Scrap Codes", "Tapered Scrap Codes",
+                 "Resin Information", "Screw Information",
+                 "Single Layer Shopping Cart", "Multi Layer Shopping Cart", "Tapered Shopping Cart", "Total Shopping Cart",
+                 "MES Data Analysis", "Scrap Analysis", "Financial Data Analysis",
+                 "Help")
+  
+  tabids <- c("singleppstab", "multippstab", "taperedppstab", 
+              "singlesamplingtab", "multisamplingtab", "taperedsamplingtab", "extrasamplingtab", "totalsamplingtab",
+              "singlemesparametersandyieldtab", "singlemesparameterstab", "singlemestimetab", "singlemessubmitterstab", "singlemestotaltab",
+              "multimesparametersandyieldtab", "multimesparameterstab", "multimestimetab", "multimessubmitterstab", "multimestotaltab",
+              "taperedmesparametersandyieldtab", "taperedmesparameterstab", "taperedmestimetab", "taperedmessubmitterstab", "taperedmestotaltab",
+              "singlescrapcodestab", "multiscrapcodestab", "taperedscrapcodestab",
+              "resininfotab", "screwinfotab",
+              "singleshoppingcarttab", "multishoppingcarttab", "taperedshoppingcarttab", "totalshoppingcarttab",
+              "MESDataAnalysis", "ScrapAnalysis", "FinancialDataAnalysis",
+              "help")
+  
+  
+  output$currenttabtitle <- renderUI({
+    
+    #finds the index of th tab, gets the tab name from the vector and then renders it as HTML
+    return(HTML(tabtitles[grep(input$tabs, tabids, ignore.case = TRUE)]))
+    
+  })
   
   
   } #end server

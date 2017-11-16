@@ -26,7 +26,7 @@ ui<-dashboardPage(
   
   dashboardSidebar(
     width = 350,
-    sidebarMenu(
+    sidebarMenu(id = "tabs",
       menuItem("Welcome", tabName = "welcome", icon = icon("home")),
       menuItem("Part Catalog - PPS Data", tabName = "partcatalog", icon = icon("list"),
                menuSubItem("Single Layer Extrusion", tabName = "singleppstab"),
@@ -3285,9 +3285,9 @@ ui<-dashboardPage(
     
     absolutePanel(
       #this will display the title
-      
-      draggable = F,right = 10,top = 3, fixed = F,
-      style = "z-index: 999999"
+      htmlOutput("currenttabtitle", container = tags$h2),
+      draggable = F, fixed = F,
+      style = "z-index: 1000; top: 0px; left: 50%; color: white"
     )
     
     
