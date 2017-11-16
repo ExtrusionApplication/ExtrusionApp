@@ -4357,8 +4357,7 @@ server<-function(input,output,session){
   
   single_tari_parameters_reactive <- reactive({
     
-    df <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',
-                                               single_tari_columns_selected()$short]
+    df <- single_tari_parameter_data[single_tari_parameter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
     
     return(df)
   })
@@ -4382,8 +4381,7 @@ server<-function(input,output,session){
 
 
   single_tari_time_reactive <- reactive({
-    df <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',
-                                     single_tari_columns_selected()$short]
+    df <- single_tari_time_data[single_tari_time_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
   })
 
  
@@ -4404,8 +4402,7 @@ server<-function(input,output,session){
   
   
   single_tari_submitter_reactive <- reactive({
-    df <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',
-                                single_tari_columns_selected()$short]
+    df <- single_tari_submitter_data[single_tari_submitter_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
   })
 
   
@@ -4428,8 +4425,7 @@ server<-function(input,output,session){
 
   
   single_tari_total_reactive <- reactive({
-    df <- single_tari_total_data[single_tari_total_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',
-                                     single_tari_columns_selected()$short]
+    df <- single_tari_total_data[single_tari_total_data$`SAP Batch Number` %in% singleshoppingcart$data$'SAP Batch',]
   })
   
     
@@ -4512,8 +4508,7 @@ server<-function(input,output,session){
   
   multi_tari_parameters_reactive <- reactive({
     
-    df <- multi_tari_parameter_data[multi_tari_parameter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',
-                                     multi_tari_columns_selected()$short]
+    df <- multi_tari_parameter_data[multi_tari_parameter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
     
     return(df)
   })
@@ -4537,8 +4532,7 @@ server<-function(input,output,session){
   
   
   multi_tari_time_reactive <- reactive({
-    df <- multi_tari_time_data[multi_tari_time_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',
-                                multi_tari_columns_selected()$short]
+    df <- multi_tari_time_data[multi_tari_time_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
   })
   
   
@@ -4559,8 +4553,7 @@ server<-function(input,output,session){
   
   
   multi_tari_submitter_reactive <- reactive({
-    df <- multi_tari_submitter_data[multi_tari_submitter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',
-                                     multi_tari_columns_selected()$short]
+    df <- multi_tari_submitter_data[multi_tari_submitter_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
   })
   
   
@@ -4583,8 +4576,7 @@ server<-function(input,output,session){
   
   
   multi_tari_total_reactive <- reactive({
-    df <- multi_tari_total_data[multi_tari_total_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',
-                                 multi_tari_columns_selected()$short]
+    df <- multi_tari_total_data[multi_tari_total_data$`SAP Batch Number` %in% multishoppingcart$data$'SAP Batch',]
   })
   
   
@@ -4666,8 +4658,7 @@ server<-function(input,output,session){
   
   tapered_tari_parameters_reactive <- reactive({
     
-    df <- tapered_tari_parameter_data[tapered_tari_parameter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',
-                                     tapered_tari_columns_selected()$short]
+    df <- tapered_tari_parameter_data[tapered_tari_parameter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
     
     return(df)
   })
@@ -4691,8 +4682,7 @@ server<-function(input,output,session){
   
   
   tapered_tari_time_reactive <- reactive({
-    df <- tapered_tari_time_data[tapered_tari_time_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',
-                                tapered_tari_columns_selected()$short]
+    df <- tapered_tari_time_data[tapered_tari_time_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
   })
   
   
@@ -4713,8 +4703,7 @@ server<-function(input,output,session){
   
   
   tapered_tari_submitter_reactive <- reactive({
-    df <- tapered_tari_submitter_data[tapered_tari_submitter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',
-                                     tapered_tari_columns_selected()$short]
+    df <- tapered_tari_submitter_data[tapered_tari_submitter_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
   })
   
   
@@ -4737,8 +4726,7 @@ server<-function(input,output,session){
   
   
   tapered_tari_total_reactive <- reactive({
-    df <- tapered_tari_total_data[tapered_tari_total_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',
-                                 tapered_tari_columns_selected()$short]
+    df <- tapered_tari_total_data[tapered_tari_total_data$`SAP Batch Number` %in% taperedshoppingcart$data$'SAP Batch',]
   })
   
   
@@ -4778,6 +4766,165 @@ server<-function(input,output,session){
                  colReorder = TRUE))
 
   
+  
+  #### MES Download Buttons ####
+  
+  
+  ## Single Layer Extrusion
+  
+  output$smpydownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Single Layer Extrusion MES Parameters and Yield Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(single_tari_parametersandyield_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$smpdownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Single Layer Extrusion MES Parameters Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(single_tari_parameters_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$smsdownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Single Layer Extrusion MES Submitter Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(single_tari_submitter_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$smtdownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Single Layer Extrusion MES Timestamp Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(single_tari_time_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$smtodownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Single Layer Extrusion MES Total Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(single_tari_total_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  ## Multi Layer Extrusion
+  
+  output$mmpydownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Multi Layer Extrusion MES Parameters and Yield Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(multi_tari_parametersandyield_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$mmpdownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Multi Layer Extrusion MES Parameters Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(multi_tari_parameters_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$mmsdownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Multi Layer Extrusion MES Submitter Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(multi_tari_submitter_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$smtdownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Multi Layer Extrusion MES Timestamp Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(multi_tari_time_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$mmtodownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Multi Layer Extrusion MES Total Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(multi_tari_total_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  ## Tapered Extrusion
+  
+  output$tmpydownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Tapered Extrusion MES Parameters and Yield Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(tapered_tari_parametersandyield_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$tmpdownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Tapered Extrusion MES Parameters Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(tapered_tari_parameters_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$tmsdownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Tapered Extrusion MES Submitter Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(tapered_tari_submitter_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$tmtdownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Tapered Extrusion MES Timestamp Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(tapered_tari_time_reactive(), file, row.names = FALSE)
+    }
+  )
+  
+  output$tmtodownload <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Tapered Extrusion MES Total Data", '.csv', sep='') },
+    content = function(file) {
+      
+      
+      write.csv(tapered_tari_total_reactive(), file, row.names = FALSE)
+    }
+  )
   
   
   #### AppStats Stuff ####

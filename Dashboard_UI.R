@@ -2592,6 +2592,16 @@ ui<-dashboardPage(
                            DT::dataTableOutput("singleMESparametersandyield")
                        )
                 )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('smpydownload','Download MES Parameters and Yield Data')
+                      )
+                    )
+                )
               )
       ), #end tabItem
       tabItem(tabName = "singlemesparameterstab",
@@ -2602,6 +2612,16 @@ ui<-dashboardPage(
                            DT::dataTableOutput("singleMESparameters")
                        )
                        )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('smpdownload','Download MES Parameters Data')
+                      )
+                    )
+                )
               )
       ), #end tabItem
       tabItem(tabName = "singlemestimetab",
@@ -2611,6 +2631,16 @@ ui<-dashboardPage(
                            solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
                            DT::dataTableOutput("singleMEStime")
                        )
+                )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('smtdownload','Download MES Timestamp Data')
+                      )
+                    )
                 )
               )
       ), #end tabItem
@@ -2622,6 +2652,16 @@ ui<-dashboardPage(
                            DT::dataTableOutput("singleMESsubmitter")
                        )
                 )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('smsdownload','Download MES Submitter Data')
+                      )
+                    )
+                )
               )
       ), #end tabItem
       tabItem(tabName = "singlemestotaltab",
@@ -2632,10 +2672,19 @@ ui<-dashboardPage(
                            DT::dataTableOutput("singleMEStotal")
                        )
                 )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('smtodownload','Download MES Total Data')
+                      )
+                    )
+                )
               )
       ), #end tabItem
       tabItem(tabName = "multimesparametersandyieldtab",
-              fluidRow(
                 fluidRow(
                   column(3,
                          box(title = "Temperature Parameters", 
@@ -2693,11 +2742,22 @@ ui<-dashboardPage(
                          )
                   )
                 ),
+              fluidRow(
                 column(12,
                        box(title = "MES Parameters and Yield Data", 
                            solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
                            DT::dataTableOutput("multiMESparametersandyield")
                        )
+                )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('mmpydownload','Download MES Parameters and Yield Data')
+                      )
+                    )
                 )
               )
       ), #end tabItem
@@ -2709,6 +2769,16 @@ ui<-dashboardPage(
                            DT::dataTableOutput("multiMESparameters")
                        )
                 )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('mmpdownload','Download MES Parameters Data')
+                      )
+                    )
+                )
               )
       ), #end tabItem
       tabItem(tabName = "multimestimetab",
@@ -2718,6 +2788,16 @@ ui<-dashboardPage(
                            solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
                            DT::dataTableOutput("multiMEStime")
                        )
+                )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('mmtdownload','Download MES Timestamp Data')
+                      )
+                    )
                 )
               )
       ), #end tabItem
@@ -2729,6 +2809,16 @@ ui<-dashboardPage(
                            DT::dataTableOutput("multiMESsubmitter")
                        )
                 )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('mmsdownload','Download MES Submitter Data')
+                      )
+                    )
+                )
               )
       ), #end tabItem
       tabItem(tabName = "multimestotaltab",
@@ -2738,6 +2828,16 @@ ui<-dashboardPage(
                            solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
                            DT::dataTableOutput("multiMEStotal")
                        )
+                )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('mmtodownload','Download MES Total Data')
+                      )
+                    )
                 )
               )
       ), #end tabItem
@@ -2806,6 +2906,16 @@ ui<-dashboardPage(
                            DT::dataTableOutput("taperedMESparametersandyield")
                        )
                 )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('tmpydownload','Download MES Parameters and Yield Data')
+                      )
+                    )
+                )
               )
       ), #end tabItem
       tabItem(tabName = "taperedmesparameterstab",
@@ -2815,6 +2925,16 @@ ui<-dashboardPage(
                            solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
                            DT::dataTableOutput("taperedMESparameters")
                        )
+                )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('tmpdownload','Download MES Parameters Data')
+                      )
+                    )
                 )
               )
       ), #end tabItem
@@ -2826,6 +2946,16 @@ ui<-dashboardPage(
                            DT::dataTableOutput("taperedMEStime")
                        )
                 )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('tmtdownload','Download MES Timestamp Data')
+                      )
+                    )
+                )
               )
       ), #end tabItem
       tabItem(tabName = "taperedmessubmitterstab",
@@ -2836,6 +2966,16 @@ ui<-dashboardPage(
                            DT::dataTableOutput("taperedMESsubmitter")
                        )
                 )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('tmsdownload','Download MES Submitter Data')
+                      )
+                    )
+                )
               )
       ), #end tabItem
       tabItem(tabName = "taperedmestotaltab",
@@ -2845,6 +2985,16 @@ ui<-dashboardPage(
                            solidHeader = TRUE, status = "success", collapsible = TRUE, width = 12,
                            DT::dataTableOutput("taperedMEStotal")
                        )
+                )
+              ),
+              fluidRow(
+                box(title = "Download Button", 
+                    solidHeader = TRUE, status = "warning", collapsible = TRUE, width = 12,
+                    fluidRow(
+                      column(3,align = "center", style='padding-left: 20px; padding-right:20px;',
+                             downloadButton('tmtodownload','Download MES Total Data')
+                      )
+                    )
                 )
               )
       ), #end tabItem
