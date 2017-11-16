@@ -3279,7 +3279,16 @@ ui<-dashboardPage(
       draggable = F,right = 10,top = 3, fixed = F,
       style = "z-index: 999999"
       
-    ) #end absolutePanel
+      
+    ), #end absolutePanel
+    
+    
+    absolutePanel(
+      #this will display the title
+      
+      draggable = F,right = 10,top = 3, fixed = F,
+      style = "z-index: 999999"
+    )
     
     
   )#end dashboardbody

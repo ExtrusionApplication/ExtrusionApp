@@ -50,10 +50,28 @@ server<-function(input,output,session){
       return(new_df)
       
     }
-    else if (length(grep(paste(c("number", "description", "print"), collapse = "|"), 
+    else if (length(grep(paste(c("number", "print"), collapse = "|"), 
                          index_name, ignore.case = TRUE)) != 0){
       #this will catch part number, part description, resin number, resin description, and
       #pps numbers
+      
+      string_to_search <- gsub("\\| ", "|", gsub(";", "|", value))
+      #this replaces semi-colons with a or for grep. It also removes spaces for example:
+      #"90161; 123124;435 -> 90161|123124|435
+      
+      
+      column_index <- grep(paste0("^",index_name), names(df), ignore.case = TRUE)
+      
+      raw_parts <- unlist(strsplit(unlist(strsplit(df[,column_index], ">")), "<"))
+      
+      clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+      
+      new_df <- df[grep(string_to_search, clean_parts, ignore.case = TRUE),]
+      return(new_df)
+      
+    }
+    else if(length(grep("description", index_name, ignore.case = TRUE)) != 0){
+      #catches description because we cannot string split
       
       string_to_search <- gsub("\\| ", "|", gsub(";", "|", value))
       #this replaces semi-colons with a or for grep. It also removes spaces for example:
@@ -63,6 +81,7 @@ server<-function(input,output,session){
       
       new_df <- df[grep(string_to_search, df[,column_index], ignore.case = TRUE),]
       return(new_df)
+      
       
     }
     else{
@@ -92,7 +111,7 @@ server<-function(input,output,session){
       
     }#end if-else on the types of parameters
     
-  }#end generateNewDf
+  }#end generateNewDF
   
   e1 <- new.env(
     #This environment will store variable of inputs and stack that are used for comparison
@@ -1452,10 +1471,27 @@ server<-function(input,output,session){
       return(new_df)
       
     }
-    else if (length(grep(paste(c("number", "description", "print"), collapse = "|"), 
+    else if (length(grep(paste(c("number", "print"), collapse = "|"), 
                          index_name, ignore.case = TRUE)) != 0){
-      #this will catch part number, part description, resin number, resin description, and
+      #this will catch part number, resin number, resin description, and
       #pps numbers
+      
+      string_to_search <- gsub("\\| ", "|", gsub(";", "|", value))
+      #this replaces semi-colons with a or for grep. It also removes spaces for example:
+      #"90161; 123124;435 -> 90161|123124|435
+      
+      column_index <- grep(paste0("^",index_name), names(df), ignore.case = TRUE)
+      
+      raw_parts <- unlist(strsplit(unlist(strsplit(df[,column_index], ">")), "<"))
+      
+      clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+      
+      new_df <- df[grep(string_to_search, clean_parts, ignore.case = TRUE),]
+      return(new_df)
+      
+    }
+    else if(length(grep("description", index_name, ignore.case = TRUE)) != 0){
+      #catches description because we cannot string split
       
       string_to_search <- gsub("\\| ", "|", gsub(";", "|", value))
       #this replaces semi-colons with a or for grep. It also removes spaces for example:
@@ -1465,6 +1501,7 @@ server<-function(input,output,session){
       
       new_df <- df[grep(string_to_search, df[,column_index], ignore.case = TRUE),]
       return(new_df)
+      
       
     }
     else{
