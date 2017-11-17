@@ -3237,7 +3237,12 @@ ui<-dashboardPage(
     
     
     
-    
+    absolutePanel(
+      #this will display the title
+      htmlOutput("currenttabtitle", container = tags$h2, style = "color: white"),
+      draggable = F, fixed = F,
+      style = "z-index: 999999; top: -5px; left: 45%;"
+    ),
     
     #create a pop up window for the shopping cart
     absolutePanel(
@@ -3280,15 +3285,10 @@ ui<-dashboardPage(
       style = "z-index: 999999"
       
       
-    ), #end absolutePanel
+    ) #end absolutePanel
     
     
-    absolutePanel(
-      #this will display the title
-      htmlOutput("currenttabtitle", container = tags$h2),
-      draggable = F, fixed = F,
-      style = "z-index: 1000; top: 0px; left: 50%; color: white"
-    )
+    
     
     
   )#end dashboardbody

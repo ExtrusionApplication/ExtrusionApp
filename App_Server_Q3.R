@@ -5819,7 +5819,8 @@ server<-function(input,output,session){
   #### Extra HTML ####
   
   #This will change the header of the app to match that of the currently selected tab
-  tabtitles <- c("Single Layer Extrusion Catalog", "Multi Layer Extrusion Catalog", "Tapered Extrusion Catalog", 
+  tabtitles <- c("Welcome",
+                 "Single Layer Extrusion Catalog", "Multi Layer Extrusion Catalog", "Tapered Extrusion Catalog", 
                  "Single Layer Sampling Information", "Multi Layer Sampling Information", "Tapered Sampling Information", "Extra Extrusion Sampling Information", "Total Extrusion Sampling Information",
                  "Single MES Parameters and Yield", "Single MES Parameters", "Single MES Timestamps", "Single MES Submitters", "Single MES Total",
                  "Multi MES Parameters and Yield", "Multi MES Parameters", "Multi MES Timestamps", "Multi MES Submitters", "Multi MES Total",
@@ -5830,7 +5831,8 @@ server<-function(input,output,session){
                  "MES Data Analysis", "Scrap Analysis", "Financial Data Analysis",
                  "Help")
   
-  tabids <- c("singleppstab", "multippstab", "taperedppstab", 
+  tabids <- c("welcome",
+              "singleppstab", "multippstab", "taperedppstab", 
               "singlesamplingtab", "multisamplingtab", "taperedsamplingtab", "extrasamplingtab", "totalsamplingtab",
               "singlemesparametersandyieldtab", "singlemesparameterstab", "singlemestimetab", "singlemessubmitterstab", "singlemestotaltab",
               "multimesparametersandyieldtab", "multimesparameterstab", "multimestimetab", "multimessubmitterstab", "multimestotaltab",
