@@ -81,7 +81,8 @@ ui<-dashboardPage(
                menuSubItem("Scrap Analysis",tabName = "ScrapAnalysis"),
                menuSubItem("Financial Data",tabName = "FinancialDataAnalysis")
       ),#end menuItem
-      menuItem("Help", tabName = "help", icon = icon("question-circle-o"))
+      menuItem("Help", tabName = "help", icon = icon("question-circle-o")),
+      menuItem("Test Analaysis Tab", tabName = "testanalysis")
     ) #end sidebarMenu
     
   ), #end dashboardSidebar
@@ -3230,6 +3231,7 @@ ui<-dashboardPage(
                  )
           )
         )#end Analysis Tool
+      
    
       
     ),#end tabItems
