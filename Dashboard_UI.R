@@ -2,7 +2,6 @@ require(shiny)
 require(bootstrap)
 require(jpeg)
 require(ggplot2)
-require(DT)
 require(stringr)
 require(gsubfn)
 require(proto)
@@ -20,6 +19,31 @@ library(shinydashboard)
 #PCT: Part Catalog--Tapered Extrusion PPS
 
 ui<-dashboardPage(
+  
+  tags$head(tags$style('
+                       #dot_display {
+                       position: absolute;
+                       width: 300px;
+                       z-index: 100;
+                       }
+                       ')),
+  tags$script('
+              $(document).ready(function(){
+              // id of the plot
+              $("#plotui2").mousemove(function(e){ 
+              
+              // ID of uiOutput
+              $("#dot_display").show();         
+              $("#dot_display").css({             
+              top: (e.pageY + 5) + "px",             
+              left: (e.pageX + 5) + "px"         
+              });     
+              });     
+              });
+              '),
+  
+  
+  
   dashboardHeader(title = "SIBYL - Extrusion Application",
                   titleWidth = 350
                   ),
@@ -3213,11 +3237,15 @@ ui<-dashboardPage(
           column(width = 9, class = "well",
                  box(title = "Plot", solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
                      column(width = 6,
+                            #Main plot
                             uiOutput("plotui")
                      ),
                      column(width = 6,
-                            plotOutput("MES_plot2")
-                     )),#end plot section
+                            #zoom plot
+                            uiOutput("plotui2"),
+                            uiOutput("dot_display")
+                     )
+                     ),#end plot section
                  
                  
                  fluidRow(

@@ -5715,7 +5715,7 @@ server<-function(input,output,session){
   
   output$plotui<-renderUI({
     plotOutput("MES_plot1",height = 400,
-               hover = hoverOpts(id = "plot_hover", delay = 0),
+               #hover = hoverOpts(id = "plot_hover", delay = 0),
                brush = brushOpts(
                  id = "MES_plot1_brush",
                  # delay = 0,
@@ -5740,6 +5740,39 @@ server<-function(input,output,session){
     p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+coord_cartesian(xlim = ranges2$x, ylim = ranges2$y, expand = FALSE)
     p+labs(x=xvar(),y=yvar())
   })
+  
+  #test for plot2
+  output$plotui2 <- renderUI({
+    plotOutput(
+      hover = hoverOpts(id = "plot_hover", delay = 0),
+      "MES_plot2"
+    )
+  }) #end plotui2
+  
+  #hover on plotui2
+  
+  output$dot_display <- renderUI({
+    verbatimTextOutput("vals")
+  })
+  
+  output$vals <- renderPrint({
+    #hover <- input$plot_hover 
+    y <- nearPoints(plotdata(), input$plot_hover)[ , c("Start Date","Yield Qty")]
+    # y <- nearPoints(data(), input$plot_hover)["wt"]
+    #req(nrow(y) != 0)
+    # y is a data frame and you can freely edit content of the tooltip 
+    # with "paste" function 
+    y
+  })
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   #display brushed points
   brushed_data<-reactive({
