@@ -179,30 +179,36 @@ ui <- dashboardPage(
                         conditionalPanel(#appears if the filter will be used
                           condition = "input.usematerialfilter == '1'",
                           #if the user has selected to use the material filter
-                          tags$p("Placeholder")
-                          # radioButtons(inputId = ""),
-                          # selectizeInput(inputId = "materialfilter choices")
+                          radioButtons(inputId = "includeexculdematerial",
+                                       label = "Include or Exclude the Choices?",
+                                       choices = list("Include" = 1, "Exclude" = 0),
+                                       selected = "1"),
+                          selectizeInput(inputId = "materialfilter choices",
+                                         label = "Select the Material Numbers",
+                                         choices = unique(tapered_tari_parameter_and_yield_data$`Material Number`),
+                                         selected = unique(tapered_tari_parameter_and_yield_data$`Material Number`),
+                                         multiple = TRUE)
                           )#end conditionPanel
                         ), #end box for Material Filter
                     box(title = "SAP Batch Filter", solidHeader = TRUE, 
                         status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
-                        tags$p("Placeholder")
+                        
                     ),
                     box(title = "Line Filter", solidHeader = TRUE, 
                         status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
-                        tags$p("Placeholder")
+                        
                     ),
                     box(title = "Date Range Filter", solidHeader = TRUE, 
                         status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
-                        tags$p("Placeholder")
+                        
                     ),
                     box(title = "Choose a Column to Filter", solidHeader = TRUE, 
                         status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
-                        tags$p("Placeholder")
+                        
                     ),
                     box(title = "Choose a Column to Filter", solidHeader = TRUE, 
                         status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
-                        tags$p("Placeholder")
+                        
                     )
                     
                   )#end wellPanel for filters
