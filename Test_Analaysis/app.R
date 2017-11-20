@@ -82,19 +82,18 @@ ui <- dashboardPage(
                                       #'individual charts will be greater than 100
                                       #'3 
                                       label = "Select a Chart/Graph Type",
-                                      choices = list("Scatter Chart" = 06,
-                                                     "Line Chart" = 07,
-                                                     "Line Chart with 2 Y-Axes" = 08,
-                                                     "Bar Chart" = 09,
-                                                     "Column Chart" = 10,
+                                      choices = list("Scatter Chart" = 6,
+                                                     "Line Chart" = 7,
+                                                     "Line Chart with 2 Y-Axes" = 8,
+                                                     "Bar Chart (Horzintal Bars)" = 9,
+                                                     "Column Chart (Vertical Bars)" = 10,
                                                      "Area Chart" = 11,
                                                      "Stepped Area Chart" = 12,
-                                                     "Combo Chart" = 13,
                                                      "Bubble Chart" = 14,
                                                      "Pie Chart" = 15,
                                                      "Histogram" = 16,
                                                      "Motion Chart" = 17,
-                                                     "Annotated Time Line Chart" = 18)
+                                                     "Annotation Time Line Chart" = 18)
                           )
                         ),#end conditionPanel of Google Plot
                         conditionalPanel(
@@ -107,7 +106,7 @@ ui <- dashboardPage(
                                       #'the axis
                                       #'
                                       label = "Select a Chart/Graph Type",
-                                      choices = list("Scatter Plot" = 10200119,
+                                      choices = list("Scatter Plot" = 19,
                                                      "Counts Plot" = 20,
                                                      "Area Chart" = 21,
                                                      "Ordered Bar Chart" = 22,
@@ -151,8 +150,64 @@ ui <- dashboardPage(
                     )#end box for choosing data set and graph
                   )#end wellPanel
                   
-                )#end column
-              )
+                ),#end column
+                column(
+                  #'this column will contain the parameters needed to plot the graph such as
+                  #'defining the axes, defining the id, etc.
+                  width = 4,
+                  wellPanel(#a well panel to store the box for choosing the data
+                    id = "datawellpanel", style = "overflow-y:scroll; max-height: 500px",
+                    box(title = "Select the Parameters for the Graph", solidHeader = TRUE, 
+                        status = "primary", collapsible = TRUE, width = 12,
+                        uiOutput("graphaxeshtmloutput")
+                    )#end box
+                  )#end wellPanel
+                ),#end column
+                column(
+                  #'this column will contain the filters for the data
+                  width = 4,
+                  wellPanel(#a well panel to store the box for filtering the data
+                    id = "filterwellpanel", style = "overflow-y:scroll; max-height: 500px",
+                    box(title = "Material Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        #radio button choose whether the filter is allowed to be used
+                        #by default the filter will not eb used
+                        radioButtons(inputId = "usematerialfilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usematerialfilter == '1'",
+                          #if the user has selected to use the material filter
+                          tags$p("Placeholder")
+                          # radioButtons(inputId = ""),
+                          # selectizeInput(inputId = "materialfilter choices")
+                          )#end conditionPanel
+                        ), #end box for Material Filter
+                    box(title = "SAP Batch Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        tags$p("Placeholder")
+                    ),
+                    box(title = "Line Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        tags$p("Placeholder")
+                    ),
+                    box(title = "Date Range Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        tags$p("Placeholder")
+                    ),
+                    box(title = "Choose a Column to Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        tags$p("Placeholder")
+                    ),
+                    box(title = "Choose a Column to Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        tags$p("Placeholder")
+                    )
+                    
+                  )#end wellPanel for filters
+                )#end column for filters
+              ) #end fluidRow
               
               
       ) #end tabItem for testanalysis
@@ -164,83 +219,361 @@ ui <- dashboardPage(
 ) #end UI
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
+server <- function(input, output, session) {
+  
+  
+  graphinformation <- reactiveValues(
+    graphaxeshtml = NULL
+  )
+  
   
   observeEvent(input$graphtype,{
     
     graphtypeid <- input$graphtype #gets the graph id that lets the program know what type of graph
-    #it is
     
-    is_special <- (substring(graphtypeid, 2, 2) != 0) #if it is not zero, it is special
-    
-    if (is_special){
-      #if it is a special type of graph we will determine what type of graph
-    }
-    else{
-      #it is not a special type of graph
-      dof <- substring(graphtypeid, 3, 3) #gets the number of degrees of freedom
-      has_color <- (substring(graphtypeid, 4, 4) == 1) #graph represents a degree of freedom
-      #with colors
-      has_size <- (substring(graphtypeid, 5, 5) == 1) #graph represents a degree of freedom
-      #with size
-      allows_multiple_traces <- (substring(graphtypeid, 6, 6) == 1) #graph supports multiple traces
-      
-      if (dof == 1){
-        if (has_color){
-          if (has_size){
-            if(allows_multiple_traces){
-              
-            }
-            else{
-              
-            }
-          }
-          else{
-            if(allows_multiple_traces){
-              
-            }
-            else{
-              
-            }
-          }
-        }
-        else{
-          if (has_size){
-            if(allows_multiple_traces){
-              
-            }
-            else{
-              
-            }
-          }
-          else{
-            if(allows_multiple_traces){
-              
-            }
-            else{
-              
-            }
-          }
-        }
-      } #end else for dof == 1
-      else if (dof == 2){
-        
-      }#end else for dof == 2
-      else if (dof == 3){
-        
-      }#end else for dof == 3
-      else if (dof == 4){
-        
-      }#end else for dof == 4
-      else if (dof == 5){
-        
-      }#end else for dof == 5
-      
-    }
+    #'this will store the html to render the next questions that the user must answer to plot the
+    #'data.
     
     
+    axeshtml <- switch(graphtypeid,
+                       "1" = #not curerntly available
+                         Null,
+                       "2" = #not curerntly available
+                         Null,
+                       "3" = #not curerntly available
+                         Null,
+                       "4" = #not curerntly available
+                         Null,
+                       "5" = #not curerntly available
+                         Null,
+                       "6" = #googleVis Scatter Plot
+                         tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                                              choices = list("No" = 0, "Yes" = 1),
+                                              selected = "0"),
+                                 conditionalPanel(
+                                   condition = "input.isxcategorical == '0'",
+                                   #if the user does NOT want the x-axis to be categorical
+                                   selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                               choices = colnames(tapered_tari_parameter_and_yield_data),
+                                               selected = NULL)
+                                 ),
+                                   #if the user does want the x-axis to be categorical
+                                 conditionalPanel(
+                                   condition = "input.isxcategorical == '1'",
+                                   #if the user does want the x-axis to be categorical
+                                   radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                                                choices = list("Material Number" = 1, "Line" = 2, 
+                                                               "SAP Batch Number" = 3, "The Columns" = 4),
+                                                selected = "1"),
+                                   uiOutput("xaxis_data_render")
+                                   #the xaxis data will be inputted here by inserUI in the observe
+                                   #event of xcategoricalselection
+                                 ), #end conditionPanel
+                                 selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                                          choices = list("Linear" = 1, "Log" = 2),
+                                          selected = NULL),
+                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL)
+                              ),
+                       "7" = #googleVis Line Chart
+                         list(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                                          choices = list("No" = 0, "Yes" = 1),
+                                          selected = "0"),
+                              conditionalPanel(
+                                condition = "input.isxcategorical == '0'",
+                                #if the user does NOT want the x-axis to be categorical
+                                selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                            choices = colnames(tapered_tari_parameter_and_yield_data),
+                                            selected = NULL)
+                              ),
+                              #if the user does want the x-axis to be categorical
+                              conditionalPanel(
+                                condition = "input.isxcategorical == '1'",
+                                #if the user does want the x-axis to be categorical
+                                radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                                             choices = list("Material Number" = 1, "Line" = 2, 
+                                                            "SAP Batch Number" = 3, "The Columns" = 4),
+                                             selected = "1"),
+                                uiOutput("xaxis_data_render")
+                                #the xaxis data will be inputted here by inserUI in the observe
+                                #event of xcategoricalselection
+                              ), #end conditionPanel
+                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL),
+                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL)
+                              ),
+                       "8" = #googleVis Line Chart with 2 Y-Axes
+                         tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                                             choices = list("No" = 0, "Yes" = 1),
+                                             selected = "0"),
+                                 conditionalPanel(
+                                   condition = "input.isxcategorical == '0'",
+                                   #if the user does NOT want the x-axis to be categorical
+                                   selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                               choices = colnames(tapered_tari_parameter_and_yield_data),
+                                               selected = NULL)
+                                 ),
+                                 #if the user does want the x-axis to be categorical
+                                 conditionalPanel(
+                                   condition = "input.isxcategorical == '1'",
+                                   #if the user does want the x-axis to be categorical
+                                   radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                                                choices = list("Material Number" = 1, "Line" = 2, 
+                                                               "SAP Batch Number" = 3, "The Columns" = 4),
+                                                selected = "1"),
+                                   uiOutput("xaxis_data_render")
+                                   #the xaxis data will be inputted here by inserUI in the observe
+                                   #event of xcategoricalselection
+                                 ), #end conditionPanel
+                              selectInput("yaxis_data1", "Choose Data for the First Y-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("yaxis_data2", "Choose Data for the Second Y-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL),
+                              radioButtons("yaxis_scale1", "Choose a Scale for the First Y-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL),
+                              radioButtons("yaxis_scale2", "Choose a Scale for the Second Y-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL)
+                              ),
+                       "9" = #googleVis Bar Chart
+                         tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL)
+                         ),
+                       "10" = #googleVis Column Chart
+                         list(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL)
+                         ),
+                       "11" = #googleVis Area Chart
+                         tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL),
+                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL)
+                         ),
+                       "12" = #googleVis Stepped Area Chart
+                         list(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL),
+                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL)
+                         ),
+                       "13" = #not curerntly available
+                         Null,
+                       "14" = #googleVis Bubble Chart
+                         tagList(selectInput("idaxis_data", "Choose Grouping for the ID of the Bubble",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL),
+                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL),
+                              selectInput("coloraxis_data", "Choose Grouping for the Color",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("sizeaxis_data", "Choose Data for the Size of the Bubble",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL)
+                         ),
+                       "15" = #googleVis Pie Chart
+                         tagList(selectInput("idaxis_data", "Choose Data for the ID of Each Slice",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("comparisonaxis_data", "Choose Data for Comparison",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL)
+                         ),
+                       "16" = #googleVis Histogram
+                         tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL)
+                         ),
+                       "17" = #googleVis Motion Chart
+                         tagList(selectInput("idaxis_data", "Choose Data for ID of Each Bubble",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("timeaxis_data", "Choose Data for the Time Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL)
+                         )
+                         ,
+                       "18" = #googleVis Annotation Chart
+                         tagList(#the time-axis will be chosen automatically as the start date,
+                              selectInput("timeaxis_data", "Choose Data for the Time Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                          choices = colnames(tapered_tari_parameter_and_yield_data),
+                                          selected = NULL),
+                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                           choices = list("Linear" = 1, "Log" = 2),
+                                           selected = NULL)
+                         ),
+                       "19" = #GGplot2 Scatter Plot
+                         tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                                              choices = list("No" = 0, "Yes" = 1),
+                                              selected = "0"),
+                                 conditionalPanel(
+                                   condition = "input.isxcategorical == '0'",
+                                   #if the user does NOT want the x-axis to be categorical
+                                   selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                               choices = colnames(tapered_tari_parameter_and_yield_data),
+                                               selected = NULL)
+                                 ),
+                                 #if the user does want the x-axis to be categorical
+                                 conditionalPanel(
+                                   condition = "input.isxcategorical == '1'",
+                                   #if the user does want the x-axis to be categorical
+                                   radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                                                choices = list("Material Number" = 1, "Line" = 2, 
+                                                               "SAP Batch Number" = 3, "The Columns" = 4),
+                                                selected = "1"),
+                                   uiOutput("xaxis_data_render")
+                                   #the xaxis data will be inputted here by inserUI in the observe
+                                   #event of xcategoricalselection
+                                 ), #end conditionPanel
+                                 selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                             choices = colnames(tapered_tari_parameter_and_yield_data),
+                                             selected = NULL),
+                                 radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                                              choices = list("Linear" = 1, "Log" = 2),
+                                              selected = NULL),
+                                 radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                              choices = list("Linear" = 1, "Log" = 2),
+                                              selected = NULL)
+                         ),
+                       "20" = tagList(),
+                       "21" = tagList(),
+                       "22" = tagList(),
+                       "23" = tagList(),
+                       "24" = tagList(),
+                       "25" = tagList(),
+                       "26" = tagList(),
+                       "27" = tagList(),
+                       "28" = tagList(),
+                       "29" = tagList(),
+                       "30" = tagList(),
+                       "31" = tagList(),
+                       "32" = tagList(),
+                       "33" = tagList(),
+                       "34" = tagList(),
+                       "35" = tagList(),
+                       "36" = tagList(),
+                       "37" = tagList(),
+                       "38" = tagList(),
+                       "39" = tagList(),
+                       "40" = tagList(),
+                       "41" = tagList(),
+                       "42" = tagList(),
+                       "43" = tagList(),
+                       "44" = tagList(),
+                       "45" = tagList(),
+                       "46" = tagList(),
+                       "47" = tagList(),
+                       "48" = tagList(),
+                       "49" = tagList()
+                       )
+    
+    graphinformation$graphaxeshtml <- axeshtml
+  
   })#end observeEvent(input$graphtype)
-   
+  
+  output$graphaxeshtmloutput <- renderUI({
+    #will render the information the user has to input for the axes of the specif graph
+    return(graphinformation$graphaxeshtml)
+  })
+  
+  
+  observeEvent(input$xcategoricalselection,{
+    #this observes what the user seleced for the categorical variable
+    
+    choice_options <- switch(input$xcategoricalselection,
+                             #based on waht the user selected for the categorical variable, this
+                             #will change
+                      "1" = unique(tapered_tari_parameter_and_yield_data$`Material Number`),
+                      "2" = unique(tapered_tari_parameter_and_yield_data$Line),
+                      "3" = unique(tapered_tari_parameter_and_yield_data$`SAP Batch Number`),
+                      "4" = colnames(tapered_tari_parameter_and_yield_data)
+    )
+    
+    whatisselected <- switch(input$xcategoricalselection,
+                             #depend on the user's selection the initial choices selected changes
+                             #all have everything selected except for the "Column" selection
+                             "1" = choice_options,
+                             "2" = choice_options,
+                             "3" = choice_options,
+                             "4" = NULL
+      
+    )
+    
+      output$xaxis_data_render <- renderUI(
+        selectizeInput(inputId = "xaxis_data",
+                       label = "Select the Inputs for the Category (multiple are allowed)", 
+                       choices = choice_options,
+                       selected = whatisselected,
+                       multiple = TRUE) 
+        
+      )#end output$xaxis_data_render
+  }) 
+  
+  
    
 }#end server
 
