@@ -38,9 +38,9 @@ ui <- dashboardPage(
                 column(
                   width = 4,
                   wellPanel(#a well panel to store the box for choosing the data
-                    id = "datawellpanel", style = "overflow-y:scroll; max-height: 500px",
+                    id = "datawellpanel", style = "overflow-y:scroll; height: 600px",
                     box(title = "Choose Data and Graph", solidHeader = TRUE, 
-                        status = "primary", collapsible = TRUE, width = 12,
+                        status = "primary", collapsible = FALSE, width = 12,
                         #radio button to choose the data set
                         radioButtons(inputId = "dataset",
                                      #'this controls the data set a user chooses
@@ -156,9 +156,9 @@ ui <- dashboardPage(
                   #'defining the axes, defining the id, etc.
                   width = 4,
                   wellPanel(#a well panel to store the box for choosing the data
-                    id = "datawellpanel", style = "overflow-y:scroll; max-height: 500px",
+                    id = "datawellpanel", style = "overflow-y:scroll; height: 600px",
                     box(title = "Select the Parameters for the Graph", solidHeader = TRUE, 
-                        status = "primary", collapsible = TRUE, width = 12,
+                        status = "primary", collapsible = FALSE, width = 12,
                         uiOutput("graphaxeshtmloutput")
                     )#end box
                   )#end wellPanel
@@ -167,7 +167,7 @@ ui <- dashboardPage(
                   #'this column will contain the filters for the data
                   width = 4,
                   wellPanel(#a well panel to store the box for filtering the data
-                    id = "filterwellpanel", style = "overflow-y:scroll; max-height: 500px",
+                    id = "filterwellpanel", style = "overflow-y:scroll; max-height: 600px",
                     box(title = "Material Filter", solidHeader = TRUE, 
                         status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
                         #radio button choose whether the filter is allowed to be used
@@ -183,7 +183,7 @@ ui <- dashboardPage(
                                        label = "Include or Exclude the Choices?",
                                        choices = list("Include" = 1, "Exclude" = 0),
                                        selected = "1"),
-                          selectizeInput(inputId = "materialfilter choices",
+                          selectizeInput(inputId = "materialfilterchoices",
                                          label = "Select the Material Numbers",
                                          choices = unique(tapered_tari_parameter_and_yield_data$`Material Number`),
                                          selected = unique(tapered_tari_parameter_and_yield_data$`Material Number`),
@@ -192,28 +192,280 @@ ui <- dashboardPage(
                         ), #end box for Material Filter
                     box(title = "SAP Batch Filter", solidHeader = TRUE, 
                         status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
-                        
-                    ),
+                        #radio button choose whether the filter is allowed to be used
+                        #by default the filter will not eb used
+                        radioButtons(inputId = "usebatchfilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usebatchfilter == '1'",
+                          #if the user has selected to use the material filter
+                          radioButtons(inputId = "includeexculdebatch",
+                                       label = "Include or Exclude the Choices?",
+                                       choices = list("Include" = 1, "Exclude" = 0),
+                                       selected = "1"),
+                          selectizeInput(inputId = "batchfilterchoices",
+                                         label = "Select the Batch Numbers",
+                                         choices = unique(tapered_tari_parameter_and_yield_data$`SAP Batch Number`),
+                                         selected = unique(tapered_tari_parameter_and_yield_data$`SAP Batch Number`),
+                                         multiple = TRUE)
+                        )#end conditionPanel
+                    ),#end Box for SAP Batch filter
                     box(title = "Line Filter", solidHeader = TRUE, 
                         status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
-                        
+                        #radio button choose whether the filter is allowed to be used
+                        #by default the filter will not eb used
+                        radioButtons(inputId = "uselinefilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.uselinefilter == '1'",
+                          #if the user has selected to use the material filter
+                          radioButtons(inputId = "includeexculdeline",
+                                       label = "Include or Exclude the Choices?",
+                                       choices = list("Include" = 1, "Exclude" = 0),
+                                       selected = "1"),
+                          selectizeInput(inputId = "linefilterchoices",
+                                         label = "Select the Lines",
+                                         choices = unique(tapered_tari_parameter_and_yield_data$Line),
+                                         selected = unique(tapered_tari_parameter_and_yield_data$Line),
+                                         multiple = TRUE)
+                        )#end conditionPanel
                     ),
                     box(title = "Date Range Filter", solidHeader = TRUE, 
                         status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
-                        
+                        #radio button choose whether the filter is allowed to be used
+                        #by default the filter will not eb used
+                        radioButtons(inputId = "usedatefilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usedatefilter == '1'",
+                          #if the user has selected to use the material filter
+                          radioButtons(inputId = "includeexculdedate",
+                                       label = "Include or Exclude the Choices?",
+                                       choices = list("Include" = 1, "Exclude" = 0),
+                                       selected = "1"),
+                          dateRangeInput(inputId = "daterange",
+                                         label = 'Start Date range input: yyyy-mm-dd',
+                                         start = min(tapered_tari_parameter_and_yield_data$`Start Date`), 
+                                         end = max(tapered_tari_parameter_and_yield_data$`Start Date`)
+                                         )
+                        )#end conditionPanel
                     ),
                     box(title = "Choose a Column to Filter", solidHeader = TRUE, 
                         status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
-                        
+                        radioButtons(inputId = "usefirstcolumnfilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usefirstcolumnfilter == '1'",
+                          selectInput(inputId = "firstcolumnchoice",
+                                      #'user selects the column to filter
+                                      label = "Select a Column to Filter",
+                                      choices = colnames(tapered_tari_parameter_and_yield_data),
+                                      selected = NULL
+                          ),
+                          selectInput(inputId = "firstcolumnoperator",
+                                      #user selects operator
+                                      label = "Select an Operator",
+                                      choices = list("None" = 0,
+                                                     "Inequality" = 1, 
+                                                     "Range" = 2, 
+                                                     "Matching Values" = 3
+                                      ),
+                                      selected = "1"
+                          ),
+                          conditionalPanel(#user has selected Inequality
+                            condition = "input.firstcolumnoperator == '1'",
+                            fluidRow(
+                              column(width = 6,
+                                     selectInput(inputId = "firstcolumninequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ),#end column
+                              column(width = 6,
+                                     textInput(inputId = "firstcolumninequalityinput" ,
+                                               label = "")  
+                              )#end column
+                            )#end fluidRow
+                            
+                          ), #end conditionalPanel
+                          conditionalPanel(#user has selected range
+                            condition = "input.firstcolumnoperator == '2'",
+                            fluidRow(
+                              column(width = 12,
+                                     radioButtons(inputId = "firstcolumnrangeie",
+                                                  label = "Include or Exclude the Range?",
+                                                  choices = list("Include" = 1, "Exclude" = 0),
+                                                  selected = "1")
+                                     )
+                            ),
+                            fluidRow(
+                              column(width = 6,
+                                     selectInput(inputId = "firstcolumnrangemininequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ),#end column
+                              column(width = 6,
+                                     textInput(inputId = "firstcolumnrangemininput" ,
+                                               label = "")  
+                              )#end column
+                            ),#end fluidRow
+                            fluidRow(
+                              column(width = 6,
+                                     textInput(inputId = "firstcolumnrangemaxinput" ,
+                                               label = "")  
+                              ), #end column
+                              column(width = 6,
+                                     selectInput(inputId = "firstcolumnrangemaxinequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ) #end column
+                            ) #end fluidRow
+                          ), #end conditionalPanel
+                          conditionalPanel(#user has selected matching values
+                            condition = "input.firstcolumnoperator == '3'",
+                            radioButtons(inputId = "firstcolumnvaluesie",
+                                         label = "Include or Exclude the Values?",
+                                         choices = list("Yes" = 1, "No" = 0),
+                                         selected = "1"),
+                            uiOutput("firstcolumnfilter")
+                            ) #end conditionalPanel 3
+                        )#end outer conditionalPanel
                     ),
                     box(title = "Choose a Column to Filter", solidHeader = TRUE, 
                         status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
-                        
+                        radioButtons(inputId = "usesecondcolumnfilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usesecondcolumnfilter == '1'",
+                          selectInput(inputId = "secondcolumnchoice",
+                                      #'user selects the column to filter
+                                      label = "Select a Column to Filter",
+                                      choices = colnames(tapered_tari_parameter_and_yield_data),
+                                      selected = NULL
+                          ),
+                          selectInput(inputId = "secondcolumnoperator",
+                                      #user selects operator
+                                      label = "Select an Operator",
+                                      choices = list("None" = 0,
+                                                     "Inequality" = 1, 
+                                                     "Range" = 2, 
+                                                     "Matching Values" = 3
+                                      ),
+                                      selected = "1"
+                          ),
+                          conditionalPanel(#user has selected Inequality
+                            condition = "input.secondcolumnoperator == '1'",
+                            fluidRow(
+                              column(width = 6,
+                                     selectInput(inputId = "secondcolumninequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ),#end column
+                              column(width = 6,
+                                     textInput(inputId = "secondcolumninequalityinput" ,
+                                               label = "")  
+                              )#end column
+                            )#end fluidRow
+                            
+                          ), #end conditionalPanel
+                          conditionalPanel(#user has selected range
+                            condition = "input.secondcolumnoperator == '2'",
+                            fluidRow(
+                              column(width = 12,
+                                     radioButtons(inputId = "secondcolumnrangeie",
+                                                  label = "Include or Exclude the Range?",
+                                                  choices = list("Include" = 1, "Exclude" = 0),
+                                                  selected = "1")
+                              )
+                            ),
+                            fluidRow(
+                              column(width = 6,
+                                     selectInput(inputId = "secondcolumnrangemininequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ),#end column
+                              column(width = 6,
+                                     textInput(inputId = "secondcolumnrangemininput" ,
+                                               label = "")  
+                              )#end column
+                            ),#end fluidRow
+                            fluidRow(
+                              column(width = 6,
+                                     textInput(inputId = "secondcolumnrangemaxinput" ,
+                                               label = "")  
+                              ), #end column
+                              column(width = 6,
+                                     selectInput(inputId = "secondcolumnrangemaxinequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ) #end column
+                            ) #end fluidRow
+                          ), #end conditionalPanel
+                          conditionalPanel(#user has selected matching values
+                            condition = "input.secondcolumnoperator == '3'",
+                            radioButtons(inputId = "secondcolumnvaluesie",
+                                         label = "Include or Exclude the Values?",
+                                         choices = list("Yes" = 1, "No" = 0),
+                                         selected = "1"),
+                            uiOutput("secondcolumnfilter")
+                          ) #end conditionalPanel 3
+                        )#end outer conditionalPanel
                     )
                     
                   )#end wellPanel for filters
                 )#end column for filters
-              ) #end fluidRow
+              ), #end fluidRow
+              fluidRow(
+                column(
+                  width = 12,
+                  htmlOutput("googleplot")
+                  )#end column
+              )#end fluid row
               
               
       ) #end tabItem for testanalysis
@@ -577,8 +829,47 @@ server <- function(input, output, session) {
                        multiple = TRUE) 
         
       )#end output$xaxis_data_render
-  }) 
+  })
   
+  
+  output$firstcolumnfilter <- renderUI(
+    #output for the user to select the values for the first column filter
+    selectizeInput(inputId = "firstcolumnvalues",
+                   label = "Choose the Values",
+                   choices = unique(tapered_tari_parameter_and_yield_data[,input$firstcolumnchoice]),
+                   selected = unique(tapered_tari_parameter_and_yield_data[,input$firstcolumnchoice]),
+                   multiple = TRUE
+                   )
+  )
+  
+  output$secondcolumnfilter <- renderUI(
+    #output for the user to select the values for the second column filter
+    selectizeInput(inputId = "secondcolumnvalues",
+                   label = "Choose the Values",
+                   choices = unique(tapered_tari_parameter_and_yield_data[,input$secondcolumnchoice]),
+                   selected = unique(tapered_tari_parameter_and_yield_data[,input$secondcolumnchoice]),
+                   multiple = TRUE
+    )
+  )
+  
+  
+  output$googleplot <- renderGvis(
+    gvisLineChart(data = test_data,
+                  xvar = "Start Date",
+                  yvar = "Yield Percentage",
+                  options=list(explorer="{actions: ['dragToZoom', 
+                                          'rightClickToReset'],
+                               maxZoomIn:0.05}",
+                               crosshair="{trigger:'both'}",
+                               chartArea="{width:'85%',height:'80%'}",
+                               height= 1000,
+                               width = 1000,
+                               gvis.editor="Edit me!"),
+                  chartid = "googleplotid"
+                  )
+  )
+                                           
+                                           
   
    
 }#end server
