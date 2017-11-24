@@ -5700,6 +5700,7 @@ server<-function(input,output,session){
     # Plot Type will depends on the chosen plot type by user
     if(length(input$PlotType)==1){
       if(input$PlotType=="Scatter"){
+        print(xvals())
         p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))#+geom_line(aes(colour=Groupby))
       } else if (input$PlotType=="Line"){
         p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_line(aes(colour=Groupby))+geom_line(aes(colour=Groupby))

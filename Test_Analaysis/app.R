@@ -54,8 +54,8 @@ ui <- dashboardPage(
                           radioButtons(inputId = "graphpackage",
                                        #'this controls what type of graphs are available
                                        label = "Select a Chart/Graph Type",
-                                       choiceNames = c("Google Plot (zoom works on Internet Explorer)",
-                                                       "GGplot2",
+                                       choiceNames = c("Google Plot",
+                                                       "GGplot2 (Recommended)",
                                                        "Plotly"),
                                        choiceValues = c(1,2,3)
                           )
@@ -72,80 +72,7 @@ ui <- dashboardPage(
                         #'sixth integer -> does the graph allow multiple traces (0 = no, 1 = yes)
                         #'7 and 8 integer -> graph ID (currently starts at 06).
                         
-                        conditionalPanel(
-                          condition = "input.graphpackage == '1'",
-                          #this only appears of Google Plot is selected
-                          selectInput(inputId = "graphtype",
-                                      #'the regular 2D charts will be less than 10 for value
-                                      #'the combo charts for two data sets per category will be
-                                      #'between 10 - 20
-                                      #'individual charts will be greater than 100
-                                      #'3 
-                                      label = "Select a Chart/Graph Type",
-                                      choices = list("Scatter Chart" = 6,
-                                                     "Line Chart" = 7,
-                                                     "Line Chart with 2 Y-Axes" = 8,
-                                                     "Bar Chart (Horzintal Bars)" = 9,
-                                                     "Column Chart (Vertical Bars)" = 10,
-                                                     "Area Chart" = 11,
-                                                     "Stepped Area Chart" = 12,
-                                                     "Bubble Chart" = 14,
-                                                     "Pie Chart" = 15,
-                                                     "Histogram" = 16,
-                                                     "Motion Chart" = 17,
-                                                     "Annotation Time Line Chart" = 18)
-                          )
-                        ),#end conditionPanel of Google Plot
-                        conditionalPanel(
-                          condition = "input.graphpackage == '2'",
-                          #this only appears of GGplot2 is selected
-                          selectInput(inputId = "graphtype",
-                                      #'for a 2D graph on certain options are available
-                                      #'if the value is greater than 10, it has 3 degress of freedom
-                                      #'Marginal plots are in the 20s and have distributions along
-                                      #'the axis
-                                      #'
-                                      label = "Select a Chart/Graph Type",
-                                      choices = list("Scatter Plot" = 19,
-                                                     "Counts Plot" = 20,
-                                                     "Area Chart" = 21,
-                                                     "Ordered Bar Chart" = 22,
-                                                     "Histogram" = 23,
-                                                     "Density Plot" = 24,
-                                                     "Box Plot" = 25,
-                                                     "Pie Chart" = 26,
-                                                     "Bubble Plot" = 27,
-                                                     "Tree Map" = 28,
-                                                     "Marginal Histogram" = 29,
-                                                     "Marginal Boxplot" = 30,
-                                                     "Dendrogram" = 31,
-                                                     "Cluster for PCA" = 32)
-                          )
-                        ),#end conditionPanel of GGplot2
-                        conditionalPanel(
-                          condition = "input.graphpackage == '3'",
-                          #this only appears of PD custom is available
-                          selectInput(inputId = "graphtype",
-                                      #'for a 2D graph on certain options are available
-                                      #'if the value is greater than 10, it has 3 axis,
-                                      #'things such as a heat map and bubble plot
-                                      label = "Select a Chart/Graph Type",
-                                      choices = list("Scatter Plot" = 33,
-                                                     "Line Plot" = 34,
-                                                     "Filled Area Plot" = 35,
-                                                     "Box Plot" = 36,
-                                                     "Histogram" = 37,
-                                                     "2D Histogram" = 38,
-                                                     "Bubble Chart" = 39,
-                                                     "Heat Map" = 40,
-                                                     "Stacked Area Plot" = 41,
-                                                     "3D Scatter Plot" = 42,
-                                                     "3D Line Plot" = 43,
-                                                     "3D Mesh Plot" = 44,
-                                                     "3D Mesh Plot" = 45,
-                                                     "Parallel Coordinates Plot" = 46)
-                          )
-                        )#end conditionPanel of Plotly
+                        uiOutput("graphchoiceoutput") #the choice for the user of which graph
                         
                     )#end box for choosing data set and graph
                   )#end wellPanel
@@ -179,15 +106,11 @@ ui <- dashboardPage(
                         conditionalPanel(#appears if the filter will be used
                           condition = "input.usematerialfilter == '1'",
                           #if the user has selected to use the material filter
-                          radioButtons(inputId = "includeexculdematerial",
+                          radioButtons(inputId = "includeexcludematerial",
                                        label = "Include or Exclude the Choices?",
                                        choices = list("Include" = 1, "Exclude" = 0),
                                        selected = "1"),
-                          selectizeInput(inputId = "materialfilterchoices",
-                                         label = "Select the Material Numbers",
-                                         choices = unique(tapered_tari_parameter_and_yield_data$`Material Number`),
-                                         selected = unique(tapered_tari_parameter_and_yield_data$`Material Number`),
-                                         multiple = TRUE)
+                          uiOutput("materialfilterchoicesoutput")
                           )#end conditionPanel
                         ), #end box for Material Filter
                     box(title = "SAP Batch Filter", solidHeader = TRUE, 
@@ -201,15 +124,11 @@ ui <- dashboardPage(
                         conditionalPanel(#appears if the filter will be used
                           condition = "input.usebatchfilter == '1'",
                           #if the user has selected to use the material filter
-                          radioButtons(inputId = "includeexculdebatch",
+                          radioButtons(inputId = "includeexcludebatch",
                                        label = "Include or Exclude the Choices?",
                                        choices = list("Include" = 1, "Exclude" = 0),
                                        selected = "1"),
-                          selectizeInput(inputId = "batchfilterchoices",
-                                         label = "Select the Batch Numbers",
-                                         choices = unique(tapered_tari_parameter_and_yield_data$`SAP Batch Number`),
-                                         selected = unique(tapered_tari_parameter_and_yield_data$`SAP Batch Number`),
-                                         multiple = TRUE)
+                          uiOutput("batchfilterchoicesoutput")#render the choices for the batch numbers
                         )#end conditionPanel
                     ),#end Box for SAP Batch filter
                     box(title = "Line Filter", solidHeader = TRUE, 
@@ -223,15 +142,11 @@ ui <- dashboardPage(
                         conditionalPanel(#appears if the filter will be used
                           condition = "input.uselinefilter == '1'",
                           #if the user has selected to use the material filter
-                          radioButtons(inputId = "includeexculdeline",
+                          radioButtons(inputId = "includeexcludeline",
                                        label = "Include or Exclude the Choices?",
                                        choices = list("Include" = 1, "Exclude" = 0),
                                        selected = "1"),
-                          selectizeInput(inputId = "linefilterchoices",
-                                         label = "Select the Lines",
-                                         choices = unique(tapered_tari_parameter_and_yield_data$Line),
-                                         selected = unique(tapered_tari_parameter_and_yield_data$Line),
-                                         multiple = TRUE)
+                          uiOutput("linefilterchoicesoutput")
                         )#end conditionPanel
                     ),
                     box(title = "Date Range Filter", solidHeader = TRUE, 
@@ -245,15 +160,11 @@ ui <- dashboardPage(
                         conditionalPanel(#appears if the filter will be used
                           condition = "input.usedatefilter == '1'",
                           #if the user has selected to use the material filter
-                          radioButtons(inputId = "includeexculdedate",
+                          radioButtons(inputId = "includeexcludedate",
                                        label = "Include or Exclude the Choices?",
                                        choices = list("Include" = 1, "Exclude" = 0),
                                        selected = "1"),
-                          dateRangeInput(inputId = "daterange",
-                                         label = 'Start Date range input: yyyy-mm-dd',
-                                         start = min(tapered_tari_parameter_and_yield_data$`Start Date`), 
-                                         end = max(tapered_tari_parameter_and_yield_data$`Start Date`)
-                                         )
+                          uiOutput("daterangefilteroutput")
                         )#end conditionPanel
                     ),
                     box(title = "Choose a Column to Filter", solidHeader = TRUE, 
@@ -264,12 +175,7 @@ ui <- dashboardPage(
                                      selected = "0"),
                         conditionalPanel(#appears if the filter will be used
                           condition = "input.usefirstcolumnfilter == '1'",
-                          selectInput(inputId = "firstcolumnchoice",
-                                      #'user selects the column to filter
-                                      label = "Select a Column to Filter",
-                                      choices = colnames(tapered_tari_parameter_and_yield_data),
-                                      selected = NULL
-                          ),
+                          uiOutput("firstcolumnchoiceoutput"),
                           selectInput(inputId = "firstcolumnoperator",
                                       #user selects operator
                                       label = "Select an Operator",
@@ -303,14 +209,6 @@ ui <- dashboardPage(
                           ), #end conditionalPanel
                           conditionalPanel(#user has selected range
                             condition = "input.firstcolumnoperator == '2'",
-                            fluidRow(
-                              column(width = 12,
-                                     radioButtons(inputId = "firstcolumnrangeie",
-                                                  label = "Include or Exclude the Range?",
-                                                  choices = list("Include" = 1, "Exclude" = 0),
-                                                  selected = "1")
-                                     )
-                            ),
                             fluidRow(
                               column(width = 6,
                                      selectInput(inputId = "firstcolumnrangemininequality",
@@ -364,12 +262,7 @@ ui <- dashboardPage(
                                      selected = "0"),
                         conditionalPanel(#appears if the filter will be used
                           condition = "input.usesecondcolumnfilter == '1'",
-                          selectInput(inputId = "secondcolumnchoice",
-                                      #'user selects the column to filter
-                                      label = "Select a Column to Filter",
-                                      choices = colnames(tapered_tari_parameter_and_yield_data),
-                                      selected = NULL
-                          ),
+                          uiOutput("secondcolumnchoiceoutput"),
                           selectInput(inputId = "secondcolumnoperator",
                                       #user selects operator
                                       label = "Select an Operator",
@@ -459,13 +352,59 @@ ui <- dashboardPage(
                     
                   )#end wellPanel for filters
                 )#end column for filters
-              ), #end fluidRow
+              ),#end fluidRow
+              fluidRow(
+                column(
+                  width = 4,
+                  wellPanel(#a well panel to store the box for choosing the grouping
+                    id = "groupingwellpanel", style = "overflow-y:scroll; height: 600px",
+                    box(title = "Choose Data and Graph", solidHeader = TRUE, 
+                        status = "primary", collapsible = FALSE, width = 12,
+                        radioButtons(inputId = "usemaingroup",
+                                     label = "Do you want to group the data?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usemaingroup == '1'",
+                          #if the user has selected to use the material filter
+                          uiOutput("mainggroupchoiceoutput"),
+                          radioButtons(inputId = "usesubgroup",
+                                       label = "Do you want use a secondary grouping for the data?",
+                                       choices = list("Yes" = 1, "No" = 0),
+                                       selected = "0"),
+                          conditionalPanel(#appears if the filter will be used
+                            condition = "input.usesubgroup == '1'",
+                            uiOutput("subgroupchoiceoutput")
+                          )#end conditionPanel
+                          
+                        )#end conditionPanel
+                    )#end Box
+                  )#end wellPanel
+                )#end column
+              ),#end fluidRow for the second row
               fluidRow(
                 column(
                   width = 12,
-                  htmlOutput("googleplot")
-                  )#end column
-              )#end fluid row
+                  dataTableOutput("testdatatable") 
+                )
+              ),
+              fluidRow(
+                #fluid row to hold the plots
+                plotOutput("mainplotoutput",height = 800, width = 800,
+                           hover = hoverOpts(id = "plot_hover", delay = 0),
+                           brush = brushOpts(
+                             id = "mainplot_brush",
+                             # delay = 0,
+                             # delayType = input$brush_policy,
+                             # direction = input$brush_dir,
+                             resetOnNew = TRUE)) #end plotui
+              )
+              # fluidRow(
+              #   column(
+              #     width = 12,
+              #     htmlOutput("googleplot") #perhaps this will be used later
+              #     )#end column
+              # )#end fluid row
               
               
       ) #end tabItem for testanalysis
@@ -479,6 +418,70 @@ ui <- dashboardPage(
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
+  #### Must be Loaded #### 
+  
+  listofgraphs <- list(list("Scatter Chart" = 6,
+                            "Line Chart" = 7,
+                            "Line Chart with 2 Y-Axes" = 8,
+                            "Bar Chart (Horzintal Bars)" = 9,
+                            "Column Chart (Vertical Bars)" = 10,
+                            "Area Chart" = 11,
+                            "Stepped Area Chart" = 12,
+                            "Bubble Chart" = 14,
+                            "Pie Chart" = 15,
+                            "Histogram" = 16,
+                            "Motion Chart" = 17,
+                            "Annotation Time Line Chart" = 18),
+                       list("Scatter Plot" = 19,
+                            "Counts Plot" = 20,
+                            "Area Chart" = 21,
+                            "Ordered Bar Chart" = 22,
+                            "Histogram" = 23,
+                            "Density Plot" = 24,
+                            "Box Plot" = 25,
+                            "Pie Chart" = 26,
+                            "Bubble Plot" = 27,
+                            "Tree Map" = 28,
+                            "Marginal Histogram" = 29,
+                            "Marginal Boxplot" = 30,
+                            "Dendrogram" = 31,
+                            "Cluster for PCA" = 32),
+                       list("Scatter Plot" = 33,
+                            "Line Plot" = 34,
+                            "Filled Area Plot" = 35,
+                            "Box Plot" = 36,
+                            "Histogram" = 37,
+                            "2D Histogram" = 38,
+                            "Bubble Chart" = 39,
+                            "Heat Map" = 40,
+                            "Stacked Area Plot" = 41,
+                            "3D Scatter Plot" = 42,
+                            "3D Line Plot" = 43,
+                            "3D Mesh Plot" = 44,
+                            "3D Mesh Plot" = 45,
+                            "Parallel Coordinates Plot" = 46)
+                       )
+  
+  
+  
+  #### The Actual Code ####
+  
+  
+  plottingdata <- reactiveValues(
+    #current data for plotting
+    data = tapered_tari_parameter_and_yield_data,
+    filtered_data = tapered_tari_parameter_and_yield_data,
+    plotdata = tapered_tari_parameter_and_yield_data
+  )
+  
+  output$graphchoiceoutput <- renderUI(
+    selectInput(inputId = "graphtype",
+                #the graphs available are dependent on the graph package
+                label = "Select a Chart/Graph Type",
+                choices = listofgraphs[[as.numeric(input$graphpackage)]]
+    )
+  )
+  
   
   graphinformation <- reactiveValues(
     graphaxeshtml = NULL
@@ -486,6 +489,7 @@ server <- function(input, output, session) {
   
   
   observeEvent(input$graphtype,{
+    #for googleplots
     
     graphtypeid <- input$graphtype #gets the graph id that lets the program know what type of graph
     
@@ -504,226 +508,226 @@ server <- function(input, output, session) {
                          Null,
                        "5" = #not curerntly available
                          Null,
-                       "6" = #googleVis Scatter Plot
-                         tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
-                                              choices = list("No" = 0, "Yes" = 1),
-                                              selected = "0"),
-                                 conditionalPanel(
-                                   condition = "input.isxcategorical == '0'",
-                                   #if the user does NOT want the x-axis to be categorical
-                                   selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                               choices = colnames(tapered_tari_parameter_and_yield_data),
-                                               selected = NULL)
-                                 ),
-                                   #if the user does want the x-axis to be categorical
-                                 conditionalPanel(
-                                   condition = "input.isxcategorical == '1'",
-                                   #if the user does want the x-axis to be categorical
-                                   radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
-                                                choices = list("Material Number" = 1, "Line" = 2, 
-                                                               "SAP Batch Number" = 3, "The Columns" = 4),
-                                                selected = "1"),
-                                   uiOutput("xaxis_data_render")
-                                   #the xaxis data will be inputted here by inserUI in the observe
-                                   #event of xcategoricalselection
-                                 ), #end conditionPanel
-                                 selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                                          choices = list("Linear" = 1, "Log" = 2),
-                                          selected = NULL),
-                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL)
-                              ),
-                       "7" = #googleVis Line Chart
-                         list(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
-                                          choices = list("No" = 0, "Yes" = 1),
-                                          selected = "0"),
-                              conditionalPanel(
-                                condition = "input.isxcategorical == '0'",
-                                #if the user does NOT want the x-axis to be categorical
-                                selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                            choices = colnames(tapered_tari_parameter_and_yield_data),
-                                            selected = NULL)
-                              ),
-                              #if the user does want the x-axis to be categorical
-                              conditionalPanel(
-                                condition = "input.isxcategorical == '1'",
-                                #if the user does want the x-axis to be categorical
-                                radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
-                                             choices = list("Material Number" = 1, "Line" = 2, 
-                                                            "SAP Batch Number" = 3, "The Columns" = 4),
-                                             selected = "1"),
-                                uiOutput("xaxis_data_render")
-                                #the xaxis data will be inputted here by inserUI in the observe
-                                #event of xcategoricalselection
-                              ), #end conditionPanel
-                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL),
-                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL)
-                              ),
-                       "8" = #googleVis Line Chart with 2 Y-Axes
-                         tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
-                                             choices = list("No" = 0, "Yes" = 1),
-                                             selected = "0"),
-                                 conditionalPanel(
-                                   condition = "input.isxcategorical == '0'",
-                                   #if the user does NOT want the x-axis to be categorical
-                                   selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                               choices = colnames(tapered_tari_parameter_and_yield_data),
-                                               selected = NULL)
-                                 ),
-                                 #if the user does want the x-axis to be categorical
-                                 conditionalPanel(
-                                   condition = "input.isxcategorical == '1'",
-                                   #if the user does want the x-axis to be categorical
-                                   radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
-                                                choices = list("Material Number" = 1, "Line" = 2, 
-                                                               "SAP Batch Number" = 3, "The Columns" = 4),
-                                                selected = "1"),
-                                   uiOutput("xaxis_data_render")
-                                   #the xaxis data will be inputted here by inserUI in the observe
-                                   #event of xcategoricalselection
-                                 ), #end conditionPanel
-                              selectInput("yaxis_data1", "Choose Data for the First Y-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("yaxis_data2", "Choose Data for the Second Y-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL),
-                              radioButtons("yaxis_scale1", "Choose a Scale for the First Y-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL),
-                              radioButtons("yaxis_scale2", "Choose a Scale for the Second Y-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL)
-                              ),
-                       "9" = #googleVis Bar Chart
-                         tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL)
-                         ),
-                       "10" = #googleVis Column Chart
-                         list(selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL)
-                         ),
-                       "11" = #googleVis Area Chart
-                         tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL),
-                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL)
-                         ),
-                       "12" = #googleVis Stepped Area Chart
-                         list(selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL),
-                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL)
-                         ),
-                       "13" = #not curerntly available
-                         Null,
-                       "14" = #googleVis Bubble Chart
-                         tagList(selectInput("idaxis_data", "Choose Grouping for the ID of the Bubble",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL),
-                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL),
-                              selectInput("coloraxis_data", "Choose Grouping for the Color",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("sizeaxis_data", "Choose Data for the Size of the Bubble",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL)
-                         ),
-                       "15" = #googleVis Pie Chart
-                         tagList(selectInput("idaxis_data", "Choose Data for the ID of Each Slice",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("comparisonaxis_data", "Choose Data for Comparison",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL)
-                         ),
-                       "16" = #googleVis Histogram
-                         tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL)
-                         ),
-                       "17" = #googleVis Motion Chart
-                         tagList(selectInput("idaxis_data", "Choose Data for ID of Each Bubble",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("timeaxis_data", "Choose Data for the Time Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL)
-                         )
-                         ,
-                       "18" = #googleVis Annotation Chart
-                         tagList(#the time-axis will be chosen automatically as the start date,
-                              selectInput("timeaxis_data", "Choose Data for the Time Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                          choices = colnames(tapered_tari_parameter_and_yield_data),
-                                          selected = NULL),
-                              radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                                           choices = list("Linear" = 1, "Log" = 2),
-                                           selected = NULL)
-                         ),
+                       # "6" = #googleVis Scatter Plot
+                       #   tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                       #                        choices = list("No" = 0, "Yes" = 1),
+                       #                        selected = "0"),
+                       #           conditionalPanel(
+                       #             condition = "input.isxcategorical == '0'",
+                       #             #if the user does NOT want the x-axis to be categorical
+                       #             selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                         choices = colnames(plottingdata$data),
+                       #                         selected = NULL)
+                       #           ),
+                       #             #if the user does want the x-axis to be categorical
+                       #           conditionalPanel(
+                       #             condition = "input.isxcategorical == '1'",
+                       #             #if the user does want the x-axis to be categorical
+                       #             radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                       #                          choices = list("Material Number" = 1, "Line" = 2, 
+                       #                                         "SAP Batch Number" = 3, "The Columns" = 4),
+                       #                          selected = "1"),
+                       #             uiOutput("xaxis_data_render")
+                       #             #the xaxis data will be inputted here by inserUI in the observe
+                       #             #event of xcategoricalselection
+                       #           ), #end conditionPanel
+                       #           selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                    choices = list("Linear" = 1, "Log" = 2),
+                       #                    selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #        ),
+                       # "7" = #googleVis Line Chart
+                       #   list(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                       #                    choices = list("No" = 0, "Yes" = 1),
+                       #                    selected = "0"),
+                       #        conditionalPanel(
+                       #          condition = "input.isxcategorical == '0'",
+                       #          #if the user does NOT want the x-axis to be categorical
+                       #          selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                      choices = colnames(plottingdata$data),
+                       #                      selected = NULL)
+                       #        ),
+                       #        #if the user does want the x-axis to be categorical
+                       #        conditionalPanel(
+                       #          condition = "input.isxcategorical == '1'",
+                       #          #if the user does want the x-axis to be categorical
+                       #          radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                       #                       choices = list("Material Number" = 1, "Line" = 2, 
+                       #                                      "SAP Batch Number" = 3, "The Columns" = 4),
+                       #                       selected = "1"),
+                       #          uiOutput("xaxis_data_render")
+                       #          #the xaxis data will be inputted here by inserUI in the observe
+                       #          #event of xcategoricalselection
+                       #        ), #end conditionPanel
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #        ),
+                       # "8" = #googleVis Line Chart with 2 Y-Axes
+                       #   tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                       #                       choices = list("No" = 0, "Yes" = 1),
+                       #                       selected = "0"),
+                       #           conditionalPanel(
+                       #             condition = "input.isxcategorical == '0'",
+                       #             #if the user does NOT want the x-axis to be categorical
+                       #             selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                         choices = colnames(plottingdata$data),
+                       #                         selected = NULL)
+                       #           ),
+                       #           #if the user does want the x-axis to be categorical
+                       #           conditionalPanel(
+                       #             condition = "input.isxcategorical == '1'",
+                       #             #if the user does want the x-axis to be categorical
+                       #             radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                       #                          choices = list("Material Number" = 1, "Line" = 2, 
+                       #                                         "SAP Batch Number" = 3, "The Columns" = 4),
+                       #                          selected = "1"),
+                       #             uiOutput("xaxis_data_render")
+                       #             #the xaxis data will be inputted here by inserUI in the observe
+                       #             #event of xcategoricalselection
+                       #           ), #end conditionPanel
+                       #        selectInput("yaxis_data1", "Choose Data for the First Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data2", "Choose Data for the Second Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale1", "Choose a Scale for the First Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale2", "Choose a Scale for the Second Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #        ),
+                       # "9" = #googleVis Bar Chart
+                       #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ),
+                       # "10" = #googleVis Column Chart
+                       #   list(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ),
+                       # "11" = #googleVis Area Chart
+                       #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ),
+                       # "12" = #googleVis Stepped Area Chart
+                       #   list(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ),
+                       # "13" = #not curerntly available
+                       #   Null,
+                       # "14" = #googleVis Bubble Chart
+                       #   tagList(selectInput("idaxis_data", "Choose Grouping for the ID of the Bubble",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        selectInput("coloraxis_data", "Choose Grouping for the Color",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("sizeaxis_data", "Choose Data for the Size of the Bubble",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL)
+                       #   ),
+                       # "15" = #googleVis Pie Chart
+                       #   tagList(selectInput("idaxis_data", "Choose Data for the ID of Each Slice",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("comparisonaxis_data", "Choose Data for Comparison",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL)
+                       #   ),
+                       # "16" = #googleVis Histogram
+                       #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ),
+                       # "17" = #googleVis Motion Chart
+                       #   tagList(selectInput("idaxis_data", "Choose Data for ID of Each Bubble",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("timeaxis_data", "Choose Data for the Time Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL)
+                       #   )
+                       #   ,
+                       # "18" = #googleVis Annotation Chart
+                       #   tagList(#the time-axis will be chosen automatically as the start date,
+                       #        selectInput("timeaxis_data", "Choose Data for the Time Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ), #perhaps these will be used later
                        "19" = #GGplot2 Scatter Plot
                          tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
                                               choices = list("No" = 0, "Yes" = 1),
@@ -732,8 +736,17 @@ server <- function(input, output, session) {
                                    condition = "input.isxcategorical == '0'",
                                    #if the user does NOT want the x-axis to be categorical
                                    selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                               choices = colnames(tapered_tari_parameter_and_yield_data),
-                                               selected = NULL)
+                                               choices = colnames(plottingdata$data),
+                                               selected = NULL),
+                                   selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                               choices = colnames(plottingdata$data),
+                                               selected = NULL),
+                                   radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                                                choices = list("Linear" = 1, "Log" = 2),
+                                                selected = NULL),
+                                   radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                                choices = list("Linear" = 1, "Log" = 2),
+                                                selected = NULL)
                                  ),
                                  #if the user does want the x-axis to be categorical
                                  conditionalPanel(
@@ -743,19 +756,16 @@ server <- function(input, output, session) {
                                                 choices = list("Material Number" = 1, "Line" = 2, 
                                                                "SAP Batch Number" = 3, "The Columns" = 4),
                                                 selected = "1"),
-                                   uiOutput("xaxis_data_render")
+                                   uiOutput("xaxis_data_render"),
+                                   selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                               choices = colnames(plottingdata$data),
+                                               selected = NULL),
+                                   radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                                choices = list("Linear" = 1, "Log" = 2),
+                                                selected = NULL)
                                    #the xaxis data will be inputted here by inserUI in the observe
                                    #event of xcategoricalselection
-                                 ), #end conditionPanel
-                                 selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                             choices = colnames(tapered_tari_parameter_and_yield_data),
-                                             selected = NULL),
-                                 radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                                              choices = list("Linear" = 1, "Log" = 2),
-                                              selected = NULL),
-                                 radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                                              choices = list("Linear" = 1, "Log" = 2),
-                                              selected = NULL)
+                                 ) #end conditionPanel
                          ),
                        "20" = tagList(),
                        "21" = tagList(),
@@ -793,6 +803,8 @@ server <- function(input, output, session) {
   
   })#end observeEvent(input$graphtype)
   
+
+  
   output$graphaxeshtmloutput <- renderUI({
     #will render the information the user has to input for the axes of the specif graph
     return(graphinformation$graphaxeshtml)
@@ -805,10 +817,10 @@ server <- function(input, output, session) {
     choice_options <- switch(input$xcategoricalselection,
                              #based on waht the user selected for the categorical variable, this
                              #will change
-                      "1" = unique(tapered_tari_parameter_and_yield_data$`Material Number`),
-                      "2" = unique(tapered_tari_parameter_and_yield_data$Line),
-                      "3" = unique(tapered_tari_parameter_and_yield_data$`SAP Batch Number`),
-                      "4" = colnames(tapered_tari_parameter_and_yield_data)
+                      "1" = unique(plottingdata$data[,"Material Number"]),
+                      "2" = unique(plottingdata$data[,"Line"]),
+                      "3" = unique(plottingdata$data[,"SAP Batch Number"]),
+                      "4" = colnames(plottingdata$data)
     )
     
     whatisselected <- switch(input$xcategoricalselection,
@@ -831,13 +843,86 @@ server <- function(input, output, session) {
       )#end output$xaxis_data_render
   })
   
+  output$batchfilterchoicesoutput <- renderUI(
+    #the UI for choosing the batches for the batch filter
+    selectizeInput(inputId = "batchfilterchoices",
+                   label = "Select the Batch Numbers",
+                   choices = unique(plottingdata$data[,"SAP Batch Number"]),
+                   selected = unique(plottingdata$data[,"SAP Batch Number"]),
+                   multiple = TRUE)
+  )
+  
+  output$materialfilterchoicesoutput <- renderUI(
+    #the UI for choosing the batches for the material filter
+    selectizeInput(inputId = "materialfilterchoices",
+                   label = "Select the Material Numbers",
+                   choices = unique(plottingdata$data[,"Material Number"]),
+                   selected = unique(plottingdata$data[,"Material Number"]),
+                   multiple = TRUE)
+  )
+  
+  output$linefilterchoicesoutput <- renderUI(
+    #the UI for choosing the batches for the line filter
+    selectizeInput(inputId = "linefilterchoices",
+                   label = "Select the Lines",
+                   choices = unique(plottingdata$data[,"Line"]),
+                   selected = unique(plottingdata$data[,"Line"]),
+                   multiple = TRUE)
+  )
+  
+  output$daterangefilteroutput <- renderUI(
+    #Ui for the daterange filter
+    dateRangeInput(inputId = "daterangefilter",
+                   label = 'Start Date range input: yyyy-mm-dd',
+                   start = min(plottingdata$data[,"Start Date"]), 
+                   end = max(plottingdata$data[,"Start Date"])
+    )
+  )
+  
+  output$firstcolumnchoiceoutput <- renderUI(
+    #UI for columnn to choose the first column filter
+    selectInput(inputId = "firstcolumnchoice",
+                #'user selects the column to filter
+                label = "Select a Column to Filter",
+                choices = (colnames(plottingdata$data)[which(colnames(plottingdata$data)
+                                                             %out%
+                                                               c("SAP Batch Number",
+                                                                 "Material Number",
+                                                                 "Line",
+                                                                 "Start Date")
+                                                             )
+                                                       ]
+                           ),
+                #removes columns that already have filters in place
+                selected = NULL
+    )
+  )
+  
+  output$secondcolumnchoiceoutput <- renderUI(
+    #UI for columnn to choose the first column filter
+    selectInput(inputId = "secondcolumnchoice",
+                #'user selects the column to filter
+                label = "Select a Column to Filter",
+                choices = (colnames(plottingdata$data)[which(colnames(plottingdata$data)
+                                                             %out%
+                                                               c("SAP Batch Number",
+                                                                 "Material Number",
+                                                                 "Line",
+                                                                 "Start Date")
+                                                             )
+                                                       ]
+                           ),
+                #removes columns that already have filters in place
+                selected = NULL
+    )
+  )
   
   output$firstcolumnfilter <- renderUI(
     #output for the user to select the values for the first column filter
     selectizeInput(inputId = "firstcolumnvalues",
                    label = "Choose the Values",
-                   choices = unique(tapered_tari_parameter_and_yield_data[,input$firstcolumnchoice]),
-                   selected = unique(tapered_tari_parameter_and_yield_data[,input$firstcolumnchoice]),
+                   choices = unique(plottingdata$data[,input$firstcolumnchoice]),
+                   selected = unique(plottingdata$data[,input$firstcolumnchoice]),
                    multiple = TRUE
                    )
   )
@@ -846,28 +931,300 @@ server <- function(input, output, session) {
     #output for the user to select the values for the second column filter
     selectizeInput(inputId = "secondcolumnvalues",
                    label = "Choose the Values",
-                   choices = unique(tapered_tari_parameter_and_yield_data[,input$secondcolumnchoice]),
-                   selected = unique(tapered_tari_parameter_and_yield_data[,input$secondcolumnchoice]),
+                   choices = unique(plottingdata$data[,input$secondcolumnchoice]),
+                   selected = unique(plottingdata$data[,input$secondcolumnchoice]),
                    multiple = TRUE
     )
   )
   
-  
-  output$googleplot <- renderGvis(
-    gvisLineChart(data = test_data,
-                  xvar = "Start Date",
-                  yvar = "Yield Percentage",
-                  options=list(explorer="{actions: ['dragToZoom', 
-                                          'rightClickToReset'],
-                               maxZoomIn:0.05}",
-                               crosshair="{trigger:'both'}",
-                               chartArea="{width:'85%',height:'80%'}",
-                               height= 1000,
-                               width = 1000,
-                               gvis.editor="Edit me!"),
-                  chartid = "googleplotid"
-                  )
+  output$mainggroupchoiceoutput <- renderUI(
+    #choosing column for the main grouping
+    selectInput(inputId = "mainggroupchoice",
+                label = "Please Select a Column for the Main Grouping (Color)",
+                choices = colnames(plottingdata$data),
+                selected = "Material Number",
+                multiple = FALSE)
   )
+  
+  output$subgroupchoiceoutput <- renderUI(
+    #choosing column for the main grouping
+    selectInput(inputId = "subgroupchoice",
+                label = "Please Select a Column for the Sub Grouping (Shape)",
+                choices = colnames(plottingdata$data),
+                selected = "Material Number",
+                multiple = FALSE)
+  )
+  
+  
+  # output$googleplot <- renderGvis(
+  #   gvisLineChart(data = test_data,
+  #                 xvar = "Start Date",
+  #                 yvar = "Yield Percentage",
+  #                 options=list(gvis.editor="Edit me!",
+  #                              explorer="{actions: ['dragToZoom','rightClickToReset'],maxZoomIn:0.05}",
+  #                              crosshair="{trigger:'both'}",
+  #                              chartArea="{width:'85%',height:'80%'}",
+  #                              height= 1000,
+  #                              width = 1000),
+  #                 chartid = "googleplotid"
+  #                 )
+  # ) #perhaps this will be used later
+  
+  
+  
+  #### filtering functions ####
+  
+  observe({
+    #observe for filtering the data
+    
+    placeholder_data <- plottingdata$data
+    
+    usematerialfilter <- input$usematerialfilter == "1"
+    usebatchfilter <- input$usebatchfilter == "1"
+    uselinefilter <- input$uselinefilter == "1"
+    usedatefilter <- input$usedatefilter == "1"
+    usefirstcolumnfilter <- input$usefirstcolumnfilter == "1"
+    usesecondcolumnfilter <- input$usesecondcolumnfilter == "1"
+    
+    if (usematerialfilter){
+      #filters the data based on the user's material selections
+      placeholder_data <- specificfilter(placeholder_data,
+                                         "Material Number", 
+                                         input$includeexcludematerial,
+                                         input$materialfilterchoices
+                                         )
+    }
+    if (usebatchfilter){
+      #filters the data based on the user's batch selections
+      placeholder_data <- specificfilter(placeholder_data,
+                                         "SAP Batch Number", 
+                                         input$includeexcludebatch,
+                                         input$batchfilterchoices
+      )
+    }
+    if (uselinefilter){
+      #filters the data based on the user's line selections
+      placeholder_data <- specificfilter(placeholder_data,
+                                         "Line", 
+                                         input$includeexcludeline,
+                                         input$linefilterchoices
+      )
+    }
+    
+    if (usedatefilter){
+      #filters the date data
+      start <- input$daterangefilter[1]
+      end <- input$daterangefilter[2]
+      
+      placeholder_data <- placeholder_data[placeholder_data[,"Start Date"] >= start,]
+      placeholder_data <- placeholder_data[placeholder_data[,"Start Date"] <= end,]
+      
+    }
+    
+    first_need_condition <- need(input$firstcolumnchoice, message = FALSE)
+    
+    if (usefirstcolumnfilter && is.null(first_need_condition)){
+      if (input$firstcolumnoperator == "1"){
+        inequality <- input$firstcolumninequality #inequality symbol
+        
+        placeholder_data <- switch(inequality,
+                                   "1" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          < input$firstcolumninequalityinput,],
+                                   "2" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          <= input$firstcolumninequalityinput,],
+                                   "3" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          >= input$firstcolumninequalityinput,],
+                                   "4" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          > input$firstcolumninequalityinput,]
+                                   )
+        
+      }
+      else if (input$firstcolumnoperator == "2"){
+        #range filter
+        
+        firstinequality <- input$firstcolumnrangemininequality #inequality symbol
+        
+        placeholder_data <- switch(firstinequality,
+                                   "1" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          < input$firstcolumnrangemininput,],
+                                   "2" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          <= input$firstcolumnrangemininput,],
+                                   "3" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          >= input$firstcolumnrangemininput,],
+                                   "4" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          > input$firstcolumnrangemininput,]
+        )
+        secondinequality <- input$firstcolumnrangemaxinequality #inequality symbol
+        
+        placeholder_data <- switch(secondinequality,
+                                   "1" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          < input$firstcolumnrangemaxinput,],
+                                   "2" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          <= input$firstcolumnrangemaxinput,],
+                                   "3" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          >= input$firstcolumnrangemaxinput,],
+                                   "4" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          > input$firstcolumnrangemaxinput,]
+        )
+      }
+      else if (input$firstcolumnoperator == "3"){
+        #matching values filter
+        
+        includeorexclude <- input$firstcolumnvaluesie #(1 for include, 0 for exclude)
+        
+        if (includeorexclude == "1"){
+          #include
+          placeholder_data <- placeholder_data[which(placeholder_data[,input$firstcolumnchoice]
+                                                     %in% input$firstcolumnvalues),]
+        }
+        else if (includeorexclude == "0"){
+          #exclude
+          placeholder_data <- placeholder_data[which(placeholder_data[,input$firstcolumnchoice]
+                                                     %out% input$firstcolumnvalues),]
+        }
+        
+      }
+    }#end use first column filter
+    
+    second_need_condition <- need(input$secondcolumnchoice, message = FALSE)
+    
+    if (usesecondcolumnfilter && is.null(second_need_condition)){
+      if (input$secondcolumnoperator == "1"){
+        inequality <- input$secondcolumninequality #inequality symbol
+        
+        placeholder_data <- switch(inequality,
+                                   "1" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          < input$secondcolumninequalityinput,],
+                                   "2" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          <= input$secondcolumninequalityinput,],
+                                   "3" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          >= input$secondcolumninequalityinput,],
+                                   "4" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          > input$secondcolumninequalityinput,]
+        )
+        
+      }
+      else if (input$secondcolumnoperator == "2"){
+        #range filter
+        
+        secondinequality <- input$secondcolumnrangemininequality #inequality symbol
+        
+        placeholder_data <- switch(secondinequality,
+                                   "1" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          < input$secondcolumnrangemininput,],
+                                   "2" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          <= input$secondcolumnrangemininput,],
+                                   "3" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          >= input$secondcolumnrangemininput,],
+                                   "4" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          > input$secondcolumnrangemininput,]
+        )
+        secondinequality <- input$secondcolumnrangemaxinequality #inequality symbol
+        
+        placeholder_data <- switch(secondinequality,
+                                   "1" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          < input$secondcolumnrangemaxinput,],
+                                   "2" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          <= input$secondcolumnrangemaxinput,],
+                                   "3" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          >= input$secondcolumnrangemaxinput,],
+                                   "4" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          > input$secondcolumnrangemaxinput,]
+        )
+      }
+      else if (input$secondcolumnoperator == "3"){
+        #matching values filter
+        
+        includeorexclude <- input$secondcolumnvaluesie #(1 for include, 0 for exclude)
+        
+        if (includeorexclude == "1"){
+          #include
+          placeholder_data <- placeholder_data[which(placeholder_data[,input$secondcolumnchoice]
+                                                     %in% input$secondcolumnvalues),]
+        }
+        else if (includeorexclude == "0"){
+          #exclude
+          placeholder_data <- placeholder_data[which(placeholder_data[,input$secondcolumnchoice]
+                                                     %out% input$secondcolumnvalues),]
+        }
+        
+      }
+    }#end use second column filter
+    
+    plottingdata$filtered_data <- placeholder_data
+    
+    
+    plot_data <- placeholder_data
+    colnames(plot_data) <- make.names(colnames(plot_data))
+    
+    # print(colnames(plot_data))
+    # print(make.names(input$xaxis_data))
+    # print(make.names(input$yaxis_data))
+    
+    
+  })
+  
+  specificfilter <- function(dataframe, column, includeoption, inputs){
+    #takes the material, batch, and line filter to filter the data based on include or exclude
+    #and the inputs the user has selected
+    
+    data <- dataframe
+    
+    include <- includeoption == "1" #did the user choose to include the data selected
+    
+    if (include){
+      #the user chose to include
+      data <- data[which(data[,column] %in% inputs),] #the rows of the data that match
+    }
+    else{
+      #the user chose to exclude
+      data <- data[which(data[,column] %out% inputs),] #the rows of the data that match
+    }
+    
+    
+    return(data)
+    
+  }#end specific filter
+  
+  
+  #### Ggplot rendering ####
+  
+  output$testdatatable <- renderDataTable({
+    return(plottingdata$filtered_data)
+  },
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  
+  
+  
+  output$mainplotoutput <- renderPlot({
+    data <- plottingdata$filtered_data
+    xdata <- data[,input$xaxis_data]
+    ydata <- data[,input$yaxis_data]
+    
+    plot <- ggplot(data, aes(xdata, ydata)) + geom_point()
+    
+    return(plot)
+    
+    
+  })
+  
+  
+  
+  #### Special Functions ####
+  
+  `%out%` <- function(a,b){
+    ! a %in% b
+  } 
+  
                                            
                                            
   

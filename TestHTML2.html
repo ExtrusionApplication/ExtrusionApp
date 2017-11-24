@@ -102,19 +102,26 @@ options["width"] = 1000;
   function openEditorgoogleplotid() {
   var editor = new google.visualization.ChartEditor();
   google.visualization.events.addListener(editor, 'ok',
-  function() { 
-  chartgoogleplotid = editor.getChartWrapper();
-  chartgoogleplotid.setOptions({
-    width: 1000,
-    height: 1000,
-    chartArea: {width:'85%',height:'80%'},
-    crosshair:{trigger:'both'},
-    explorer: {actions: ['dragToZoom','rightClickToReset'],maxZoomIn:0.05}
-  })
-  chartgoogleplotid.draw(document.getElementById('googleplotid')); 
+  function() {
+    chartgoogleplotid = editor.getChartWrapper();
+    redrawChart();
+  
   }); 
   editor.openDialog(chartgoogleplotid);
   }
+  
+  function redrawChart() {
+            var height;
+            var width;
+
+            height = 1000;
+            width = 1000;
+
+            wrapper.setOption('height', height);
+            wrapper.setOption('width', width);
+
+            chartgoogleplotid.draw(document.getElementById('googleplotid')); 
+        }
     
  
 // jsDisplayChart
@@ -163,7 +170,7 @@ callbacks.shift()();
  
 <!-- divChart -->
 <input type='button' onclick='openEditorgoogleplotid()' value='Edit me!'/>  
-<div id="googleplotid"
+<div id="googleplotid" 
   style="width: 1000; height: 1000;">
 </div>
  <div><span>Data: data &#8226; Chart ID: <a href="Chart_googleplotid.html">googleplotid</a> &#8226; <a href="https://github.com/mages/googleVis">googleVis-0.6.2</a></span><br /> 
