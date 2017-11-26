@@ -54,10 +54,8 @@ ui <- dashboardPage(
                           radioButtons(inputId = "graphpackage",
                                        #'this controls what type of graphs are available
                                        label = "Select a Chart/Graph Type",
-                                       choiceNames = c("Google Plot",
-                                                       "GGplot2 (Recommended)",
-                                                       "Plotly"),
-                                       choiceValues = c(1,2,3)
+                                       choiceNames = c("GGplot2"),
+                                       choiceValues = c(2)
                           )
                         ),#end conditionPanel of PD Custom
                         #'the selectinputs for the graph type are all the same, which package
@@ -367,7 +365,7 @@ ui <- dashboardPage(
                         conditionalPanel(#appears if the filter will be used
                           condition = "input.usemaingroup == '1'",
                           #if the user has selected to use the material filter
-                          uiOutput("mainggroupchoiceoutput"),
+                          uiOutput("maingroupchoiceoutput"),
                           radioButtons(inputId = "usesubgroup",
                                        label = "Do you want use a secondary grouping for the data?",
                                        choices = list("Yes" = 1, "No" = 0),
@@ -380,6 +378,46 @@ ui <- dashboardPage(
                         )#end conditionPanel
                     )#end Box
                   )#end wellPanel
+                ),#end column
+                column(
+                  width = 8,
+                  wellPanel(#a well panel to store the box for choosing the grouping
+                    id = "ploteditwellpanel", style = "overflow-y:scroll; height: 600px",
+                    tabBox(
+                      title = "Edit Plot Formatting",
+                      id = "ploteditbox",
+                      tabPanel("Edit Axes",
+                               radioButtons("changexticks", "Change the Spacing for the X Axis Ticks?",
+                                            choices = list("No" = 0, "Yes" = 1),
+                                            selected = "0"),
+                               conditionalPanel(#appears if the ticks will be changed
+                                 condition = "input.changexticks == '1'",
+                                 textInput(inputId = "xtickspacing", 
+                                           label = "Input the Spacing for the Tick Marks", 
+                                           value = "10"
+                                           )
+                               ),#end conditionPanel
+                               radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                                            choices = list("Linear" = 1, "Log" = 2),
+                                            selected = NULL),
+                               
+                               radioButtons("changeyticks", "Change the Spacing for the Y Axis Ticks?",
+                                            choices = list("No" = 0, "Yes" = 1),
+                                            selected = "0"),
+                               conditionalPanel(#appears if the ticks will be changed
+                                 condition = "input.changeyticks == '1'",
+                                 textInput(inputId = "ytickspacing", 
+                                           label = "Input the Spacing for the Tick Marks", 
+                                           value = "10"
+                                 )
+                               ),#end conditionPanel
+                               radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                            choices = list("Linear" = 1, "Log" = 2),
+                                            selected = NULL)
+                               ),
+                      tabPanel("Edit Legend")
+                      ) #end tabbox
+                    )#end wellPanel
                 )#end column
               ),#end fluidRow for the second row
               fluidRow(
@@ -390,15 +428,36 @@ ui <- dashboardPage(
               ),
               fluidRow(
                 #fluid row to hold the plots
-                plotOutput("mainplotoutput",height = 800, width = 800,
-                           hover = hoverOpts(id = "plot_hover", delay = 0),
-                           brush = brushOpts(
-                             id = "mainplot_brush",
-                             # delay = 0,
-                             # delayType = input$brush_policy,
-                             # direction = input$brush_dir,
-                             resetOnNew = TRUE)) #end plotui
+                column(
+                  width = 12,
+                  plotOutput("mainplotoutput",
+                             hover = hoverOpts(id = "mainplot_hover", delay = 300),
+                             brush = brushOpts(
+                               id = "mainplot_brush",
+                               # delay = 0,
+                               # delayType = input$brush_policy,
+                               # direction = input$brush_dir,
+                               resetOnNew = TRUE)), #end plotui
+                  uiOutput("mainplot_hover_info")
+                  
+                )
+              ), #end fluid Row for main plot
+              fluidRow(#zoom plot plot
+                column(
+                  width = 12,
+                  plotOutput("zoomplot",
+                             hover = hoverOpts(id = "zoomplot_hover", delay = 300)
+                             ),
+                  uiOutput("zoomplot_hover_info")
+                )
+              ),
+              fluidRow(
+                column(
+                  width = 12,
+                  dataTableOutput("zoomdatatable") 
+                )
               )
+                
               # fluidRow(
               #   column(
               #     width = 12,
@@ -470,8 +529,7 @@ server <- function(input, output, session) {
   plottingdata <- reactiveValues(
     #current data for plotting
     data = tapered_tari_parameter_and_yield_data,
-    filtered_data = tapered_tari_parameter_and_yield_data,
-    plotdata = tapered_tari_parameter_and_yield_data
+    filtered_data = tapered_tari_parameter_and_yield_data
   )
   
   output$graphchoiceoutput <- renderUI(
@@ -740,13 +798,7 @@ server <- function(input, output, session) {
                                                selected = NULL),
                                    selectInput("yaxis_data", "Choose Data for the Y-Axis",
                                                choices = colnames(plottingdata$data),
-                                               selected = NULL),
-                                   radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                                                choices = list("Linear" = 1, "Log" = 2),
-                                                selected = NULL),
-                                   radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                                                choices = list("Linear" = 1, "Log" = 2),
-                                                selected = NULL)
+                                               selected = NULL)
                                  ),
                                  #if the user does want the x-axis to be categorical
                                  conditionalPanel(
@@ -759,10 +811,7 @@ server <- function(input, output, session) {
                                    uiOutput("xaxis_data_render"),
                                    selectInput("yaxis_data", "Choose Data for the Y-Axis",
                                                choices = colnames(plottingdata$data),
-                                               selected = NULL),
-                                   radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                                                choices = list("Linear" = 1, "Log" = 2),
-                                                selected = NULL)
+                                               selected = NULL)
                                    #the xaxis data will be inputted here by inserUI in the observe
                                    #event of xcategoricalselection
                                  ) #end conditionPanel
@@ -817,10 +866,10 @@ server <- function(input, output, session) {
     choice_options <- switch(input$xcategoricalselection,
                              #based on waht the user selected for the categorical variable, this
                              #will change
-                      "1" = unique(plottingdata$data[,"Material Number"]),
-                      "2" = unique(plottingdata$data[,"Line"]),
-                      "3" = unique(plottingdata$data[,"SAP Batch Number"]),
-                      "4" = colnames(plottingdata$data)
+                      "1" = unique(tapered_tari_parameter_and_yield_data[,"Material Number"]),
+                      "2" = unique(tapered_tari_parameter_and_yield_data[,"Line"]),
+                      "3" = unique(tapered_tari_parameter_and_yield_data[,"SAP Batch Number"]),
+                      "4" = colnames(tapered_tari_parameter_and_yield_data)
     )
     
     whatisselected <- switch(input$xcategoricalselection,
@@ -847,26 +896,27 @@ server <- function(input, output, session) {
     #the UI for choosing the batches for the batch filter
     selectizeInput(inputId = "batchfilterchoices",
                    label = "Select the Batch Numbers",
-                   choices = unique(plottingdata$data[,"SAP Batch Number"]),
-                   selected = unique(plottingdata$data[,"SAP Batch Number"]),
+                   choices = unique(tapered_tari_parameter_and_yield_data[,"SAP Batch Number"]),
+                   selected = unique(tapered_tari_parameter_and_yield_data[,"SAP Batch Number"]),
                    multiple = TRUE)
   )
   
-  output$materialfilterchoicesoutput <- renderUI(
+  output$materialfilterchoicesoutput <- renderUI({
     #the UI for choosing the batches for the material filter
-    selectizeInput(inputId = "materialfilterchoices",
+    ui <- selectizeInput(inputId = "materialfilterchoices",
                    label = "Select the Material Numbers",
-                   choices = unique(plottingdata$data[,"Material Number"]),
-                   selected = unique(plottingdata$data[,"Material Number"]),
+                   choices = unique(tapered_tari_parameter_and_yield_data[,"Material Number"]),
+                   selected = unique(tapered_tari_parameter_and_yield_data[,"Material Number"]),
                    multiple = TRUE)
-  )
+    return(ui)
+  })
   
   output$linefilterchoicesoutput <- renderUI(
     #the UI for choosing the batches for the line filter
     selectizeInput(inputId = "linefilterchoices",
                    label = "Select the Lines",
-                   choices = unique(plottingdata$data[,"Line"]),
-                   selected = unique(plottingdata$data[,"Line"]),
+                   choices = unique(tapered_tari_parameter_and_yield_data[,"Line"]),
+                   selected = unique(tapered_tari_parameter_and_yield_data[,"Line"]),
                    multiple = TRUE)
   )
   
@@ -874,8 +924,8 @@ server <- function(input, output, session) {
     #Ui for the daterange filter
     dateRangeInput(inputId = "daterangefilter",
                    label = 'Start Date range input: yyyy-mm-dd',
-                   start = min(plottingdata$data[,"Start Date"]), 
-                   end = max(plottingdata$data[,"Start Date"])
+                   start = min(plottingdata$filtered_data[,"Start Date"]), 
+                   end = max(plottingdata$filtered_data[,"Start Date"])
     )
   )
   
@@ -884,7 +934,7 @@ server <- function(input, output, session) {
     selectInput(inputId = "firstcolumnchoice",
                 #'user selects the column to filter
                 label = "Select a Column to Filter",
-                choices = (colnames(plottingdata$data)[which(colnames(plottingdata$data)
+                choices = (colnames(tapered_tari_parameter_and_yield_data)[which(colnames(tapered_tari_parameter_and_yield_data)
                                                              %out%
                                                                c("SAP Batch Number",
                                                                  "Material Number",
@@ -903,13 +953,13 @@ server <- function(input, output, session) {
     selectInput(inputId = "secondcolumnchoice",
                 #'user selects the column to filter
                 label = "Select a Column to Filter",
-                choices = (colnames(plottingdata$data)[which(colnames(plottingdata$data)
-                                                             %out%
-                                                               c("SAP Batch Number",
-                                                                 "Material Number",
-                                                                 "Line",
-                                                                 "Start Date")
-                                                             )
+                choices = (colnames(tapered_tari_parameter_and_yield_data)[which(colnames(tapered_tari_parameter_and_yield_data)
+                                                                      %out%
+                                                                        c("SAP Batch Number",
+                                                                          "Material Number",
+                                                                          "Line",
+                                                                          "Start Date")
+                                                                      )
                                                        ]
                            ),
                 #removes columns that already have filters in place
@@ -921,8 +971,8 @@ server <- function(input, output, session) {
     #output for the user to select the values for the first column filter
     selectizeInput(inputId = "firstcolumnvalues",
                    label = "Choose the Values",
-                   choices = unique(plottingdata$data[,input$firstcolumnchoice]),
-                   selected = unique(plottingdata$data[,input$firstcolumnchoice]),
+                   choices = unique(tapered_tari_parameter_and_yield_data),
+                   selected = unique(tapered_tari_parameter_and_yield_data),
                    multiple = TRUE
                    )
   )
@@ -931,17 +981,17 @@ server <- function(input, output, session) {
     #output for the user to select the values for the second column filter
     selectizeInput(inputId = "secondcolumnvalues",
                    label = "Choose the Values",
-                   choices = unique(plottingdata$data[,input$secondcolumnchoice]),
-                   selected = unique(plottingdata$data[,input$secondcolumnchoice]),
+                   choices = unique(tapered_tari_parameter_and_yield_data),
+                   selected = unique(tapered_tari_parameter_and_yield_data),
                    multiple = TRUE
     )
   )
   
-  output$mainggroupchoiceoutput <- renderUI(
+  output$maingroupchoiceoutput <- renderUI(
     #choosing column for the main grouping
-    selectInput(inputId = "mainggroupchoice",
+    selectInput(inputId = "maingroupchoice",
                 label = "Please Select a Column for the Main Grouping (Color)",
-                choices = colnames(plottingdata$data),
+                choices = colnames(tapered_tari_parameter_and_yield_data),
                 selected = "Material Number",
                 multiple = FALSE)
   )
@@ -950,7 +1000,7 @@ server <- function(input, output, session) {
     #choosing column for the main grouping
     selectInput(inputId = "subgroupchoice",
                 label = "Please Select a Column for the Sub Grouping (Shape)",
-                choices = colnames(plottingdata$data),
+                choices = colnames(tapered_tari_parameter_and_yield_data),
                 selected = "Material Number",
                 multiple = FALSE)
   )
@@ -986,6 +1036,8 @@ server <- function(input, output, session) {
     usefirstcolumnfilter <- input$usefirstcolumnfilter == "1"
     usesecondcolumnfilter <- input$usesecondcolumnfilter == "1"
     
+    need_material <- need(input$materialfilterchoices, message = FALSE)
+    isolate({
     if (usematerialfilter){
       #filters the data based on the user's material selections
       placeholder_data <- specificfilter(placeholder_data,
@@ -994,6 +1046,7 @@ server <- function(input, output, session) {
                                          input$materialfilterchoices
                                          )
     }
+    })
     if (usebatchfilter){
       #filters the data based on the user's batch selections
       placeholder_data <- specificfilter(placeholder_data,
@@ -1020,6 +1073,7 @@ server <- function(input, output, session) {
       placeholder_data <- placeholder_data[placeholder_data[,"Start Date"] <= end,]
       
     }
+    
     
     first_need_condition <- need(input$firstcolumnchoice, message = FALSE)
     
@@ -1154,14 +1208,6 @@ server <- function(input, output, session) {
     plottingdata$filtered_data <- placeholder_data
     
     
-    plot_data <- placeholder_data
-    colnames(plot_data) <- make.names(colnames(plot_data))
-    
-    # print(colnames(plot_data))
-    # print(make.names(input$xaxis_data))
-    # print(make.names(input$yaxis_data))
-    
-    
   })
   
   specificfilter <- function(dataframe, column, includeoption, inputs){
@@ -1187,6 +1233,29 @@ server <- function(input, output, session) {
   }#end specific filter
   
   
+  
+  #### Edit Plots ####
+  
+  tickspacing <- reactiveValues(
+    #sotes the user's inputs for the spacing of the ticks marks for the graph
+    x_spacing = NULL,
+    y_spacin = NULL
+  )
+  
+  observe({
+    
+    xspacing <- input$xtickspacing
+    yspacing <- input$ytickspacing
+    
+    xpresent <- need(xspacing, message = FALSE)
+    x_is_integer <- as.integer(xspacing)
+    if (is.null(xpresent) && !is.na(x_is_integer)){
+      #if it is present and is an integer, it will update the tick spacing
+      tickspacing
+    }
+    
+  })
+  
   #### Ggplot rendering ####
   
   output$testdatatable <- renderDataTable({
@@ -1202,6 +1271,11 @@ server <- function(input, output, session) {
                  autoWidth=TRUE,
                  colReorder = TRUE))
   
+  plots <- reactiveValues(
+    #storing the plots, things when then be added to these base plots as the user edits the plots
+    mainplot = NULL,
+    zoomplot = NULL
+  )
   
   
   
@@ -1210,11 +1284,158 @@ server <- function(input, output, session) {
     xdata <- data[,input$xaxis_data]
     ydata <- data[,input$yaxis_data]
     
-    plot <- ggplot(data, aes(xdata, ydata)) + geom_point()
+    plot <- ggplot(data, aes(xdata, ydata))
+    
+    if (input$usemaingroup == "1" && input$usesubgroup == "0"){
+      #main grouping but not subgroupind
+      maingroup <- factor(data[,input$maingroupchoice])
+      plot <- plot + geom_point(aes(colour=maingroup))
+    }
+    else if (input$usemaingroup == "1" && input$usesubgroup == "1"){
+      maingroup <- factor(data[,input$maingroupchoice])
+      subgroup <- factor(data[,input$subgroupchoice])
+      plot <- plot + geom_point(aes(colour=maingroup,shape=subgroup)) + scale_shape_manual(values=1:nlevels(subgroup))
+      #use main grouping and subgrouping
+    }
+    else{
+      plot <- plot + geom_point()
+    }
+    
+    
+    changexticks <- input$changexticks == "1"
+    if(changexticks){
+      
+    }
     
     return(plot)
     
     
+  })
+  
+  brushselection <- reactiveValues(x = NULL, y = NULL) #the values for the brush area
+  
+  observe({
+    #editing the brush if it is selected
+    brush <- input$mainplot_brush
+    if (!is.null(brush)) {
+      brushselection$x <- c(brush$xmin, brush$xmax)
+      brushselection$y <- c(brush$ymin, brush$ymax)
+      
+    } else {
+      brushselection$x <- NULL
+      brushselection$y <- NULL
+    }
+  })
+  
+  output$zoomplot <- renderPlot({
+    #the plot that is zoomed in
+    data <- plottingdata$filtered_data
+    xdata <- data[,input$xaxis_data]
+    ydata <- data[,input$yaxis_data]
+    
+    plot <- ggplot(data, aes(xdata, ydata))
+    
+    if (input$usemaingroup == "1" && input$usesubgroup == "0"){
+      #main grouping but not subgroupind
+      maingroup <- factor(data[,input$maingroupchoice])
+      plot <- plot + geom_point(aes(colour=maingroup)) + coord_cartesian(xlim = brushselection$x, ylim = brushselection$y, expand = FALSE)
+    }
+    else if (input$usemaingroup == "1" && input$usesubgroup == "1"){
+      maingroup <- factor(data[,input$maingroupchoice])
+      subgroup <- factor(data[,input$subgroupchoice])
+      plot <- plot + geom_point(aes(colour=maingroup,shape=subgroup)) + scale_shape_manual(values=1:nlevels(subgroup)) + coord_cartesian(xlim = brushselection$x, ylim = brushselection$y, expand = FALSE)
+      #use main grouping and subgrouping
+    }
+    else{
+      plot <- plot + geom_point() + coord_cartesian(xlim = brushselection$x, ylim = brushselection$y, expand = FALSE)
+    }
+    
+    return(plot)
+  })
+  
+  brushed_data<-reactive({
+    brushed_data <- brushedPoints(plottingdata$filtered_data, input$mainplot_brush,
+                                  xvar=input$xaxis_data,yvar=input$yaxis_data)
+    data<-data.frame(brushed_data, stringsAsFactors = FALSE, check.names = FALSE)
+    return(data)
+  })
+
+  output$zoomdatatable <-DT::renderDataTable({
+    return(brushed_data())
+  },
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  
+  ## Plot Hovers
+  
+  output$mainplot_hover_info <- renderUI({
+    hover <- input$mainplot_hover
+    
+    point <- nearPoints(plottingdata$filtered_data, hover, 
+                        xvar=input$xaxis_data,yvar=input$yaxis_data,
+                        threshold = 5, maxpoints = 1, addDist = TRUE)
+    
+    if (nrow(point) == 0) return(NULL)
+    
+    left_pct <- (hover$x - hover$domain$left) / (hover$domain$right - hover$domain$left)
+    top_pct <- (hover$domain$top - hover$y) / (hover$domain$top - hover$domain$bottom)
+    
+    left_px <- hover$range$left + left_pct * (hover$range$right - hover$range$left)
+    top_px <- hover$range$top + top_pct * (hover$range$bottom - hover$range$top)
+    
+    style <- paste0("position:absolute; z-index:100; background-color: rgba(245, 245, 245, 0.85); ",
+                    "left:", left_px + 2, "px; top:", top_px + 2, "px;")
+    
+    wellPanel(
+      style = style,
+      p(HTML(paste0("<b> SAP Batch Number: ", point$"SAP Batch Number", "</b>", 
+                    "<br> Material Number: ", point$"Material Number",
+                    "<br> Line: ", point$"Line",
+                    "<br>", input$xaxis_data, ": ", point[,input$xaxis_data],
+                    "<br>", input$yaxis_data, ": ", point[,input$yaxis_data]
+                    )
+             )
+        )
+    )
+  })
+  
+  output$zoomplot_hover_info <- renderUI({
+    hover <- input$zoomplot_hover
+    
+    point <- nearPoints(plottingdata$filtered_data, hover, 
+                        xvar=input$xaxis_data,yvar=input$yaxis_data,
+                        threshold = 5, maxpoints = 1, addDist = TRUE)
+    
+    if (nrow(point) == 0) return(NULL)
+    
+    left_pct <- (hover$x - hover$domain$left) / (hover$domain$right - hover$domain$left)
+    top_pct <- (hover$domain$top - hover$y) / (hover$domain$top - hover$domain$bottom)
+    
+    left_px <- hover$range$left + left_pct * (hover$range$right - hover$range$left)
+    top_px <- hover$range$top + top_pct * (hover$range$bottom - hover$range$top)
+    
+    style <- paste0("position:absolute; z-index:100; background-color: rgba(245, 245, 245, 0.85); ",
+                    "left:", left_px + 2, "px; top:", top_px + 2, "px;")
+    
+    wellPanel(
+      style = style,
+      p(HTML(paste0("<b> SAP Batch Number: ", point$"SAP Batch Number", "</b>", 
+                    "<br> Material Number: ", point$"Material Number",
+                    "<br> Line: ", point$"Line",
+                    "<br>", input$xaxis_data, ": ", point[,input$xaxis_data],
+                    "<br>", input$yaxis_data, ": ", point[,input$yaxis_data]
+      )
+      )
+      )
+    )
   })
   
   
