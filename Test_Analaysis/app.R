@@ -456,6 +456,13 @@ ui <- dashboardPage(
                   width = 12,
                   dataTableOutput("zoomdatatable") 
                 )
+              ),
+              fluidRow(
+                column(
+                  width = 12,
+                  tags$h2("Omitted Data Beacause it was NA or Empty"),
+                  dataTableOutput("omitteddatatable") 
+                )
               )
                 
               # fluidRow(
@@ -529,7 +536,8 @@ server <- function(input, output, session) {
   plottingdata <- reactiveValues(
     #current data for plotting
     data = tapered_tari_parameter_and_yield_data,
-    filtered_data = tapered_tari_parameter_and_yield_data
+    filtered_data = tapered_tari_parameter_and_yield_data,
+    omitted_data = NULL #stores the data remove because the values are NA
   )
   
   output$graphchoiceoutput <- renderUI(
@@ -1205,8 +1213,43 @@ server <- function(input, output, session) {
       }
     }#end use second column filter
     
-    plottingdata$filtered_data <- placeholder_data
     
+    
+    #cleans the data to plot by removing NA and blank values
+    
+    if (is.null(need(input$xaxis_data, message = FALSE)) && 
+        is.null(need(input$yaxis_data, message = FALSE))){
+      #if both are present, then clean the data to remove NAs and blanks ("")
+      
+      
+      clean_data <- placeholder_data[which(!is.na(placeholder_data[, input$xaxis_data])),]
+      clean_data <- clean_data[which(!is.na(clean_data[, input$yaxis_data])),]
+      
+      omitted_datax1 <- placeholder_data[which(is.na(placeholder_data[, input$xaxis_data])),]
+      omitted_datay1 <- placeholder_data[which(is.na(placeholder_data[, input$yaxis_data])),]
+      
+      clean_data <- clean_data[which(clean_data[, input$xaxis_data] != ""),]
+      clean_data <- clean_data[which(clean_data[, input$yaxis_data] != ""),]
+      
+      omitted_datax2 <- placeholder_data[which(placeholder_data[, input$xaxis_data] == ""),]
+      omitted_datay2 <- placeholder_data[which(placeholder_data[, input$yaxis_data] == ""),]
+      
+      omitted_data <- rbind(omitted_datax1, omitted_datay1, omitted_datax2, omitted_datay2)
+      #removes duplicate batches
+      omitted_data <- omitted_data[which(!duplicated(omitted_data[,"SAP Batch Number"])),]
+      
+      plottingdata$omitted_data <- omitted_data
+      
+      if (nrow(clean_data) != 0){
+        clean_data[,input$xaxis_data] <- numericIfPossible(clean_data[,input$xaxis_data])
+        clean_data[,input$yaxis_data] <- numericIfPossible(clean_data[,input$yaxis_data])
+      }
+      
+      plottingdata$filtered_data <- clean_data
+    }
+    else{
+      plottingdata$filtered_data <- placeholder_data
+    }
     
   })
   
@@ -1247,12 +1290,28 @@ server <- function(input, output, session) {
     xspacing <- input$xtickspacing
     yspacing <- input$ytickspacing
     
-    xpresent <- need(xspacing, message = FALSE)
-    x_is_integer <- as.integer(xspacing)
-    if (is.null(xpresent) && !is.na(x_is_integer)){
-      #if it is present and is an integer, it will update the tick spacing
-      tickspacing
+    
+    if (input$changexticks == "1"){
+      #selected to change
+      xpresent <- need(xspacing, message = FALSE)
+      x_is_integer <- as.integer(xspacing)
+      if (is.null(xpresent) && !is.na(x_is_integer)){
+        #if it is present and is an integer, it will update the tick spacing
+        values <- plottingdata$filtered_data[,isolate(input$xaxis_data)]
+        tickspacing$x_spacing <- values[seq(1, length(values), length.out = as.numeric(xspacing))]
+      }
     }
+    
+    if (input$changeyticks == "1"){
+      ypresent <- need(yspacing, message = FALSE)
+      y_is_integer <- as.integer(yspacing)
+      if (is.null(ypresent) && !is.na(y_is_integer)){
+        #if it is present and is an integer, it will update the tick spacing
+        values <- plottingdata$filtered_data[,isolate(input$yaxis_data)]
+        tickspacing$y_spacing <- values[seq(1, length(values), length.out = as.numeric(yspacing))]
+      }
+    }
+    
     
   })
   
@@ -1304,9 +1363,28 @@ server <- function(input, output, session) {
     
     changexticks <- input$changexticks == "1"
     if(changexticks){
+      if (is.numeric(xdata)){
+        #continuous if numeric
+        plot <- plot + scale_x_continuous(breaks=c(tickspacing$x_spacing))
+      }
+      else{
+        #discrete if not
+        plot <- plot + scale_x_discrete(breaks=c(tickspacing$x_spacing))
+      }
       
     }
     
+    changeyticks <- input$changeyticks == "1"
+    if(changeyticks){
+      if (is.numeric(xdata)){
+        plot <- plot + scale_y_continuous(breaks=c(tickspacing$y_spacing))
+      }
+      else{
+        plot <- plot + scale_y_discrete(breaks=c(tickspacing$y_spacing))
+      }
+      
+    }
+
     return(plot)
     
     
@@ -1352,6 +1430,19 @@ server <- function(input, output, session) {
     
     return(plot)
   })
+  
+  output$omitteddatatable <-DT::renderDataTable({
+    return(plottingdata$omitted_data)
+  },
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
   
   brushed_data<-reactive({
     brushed_data <- brushedPoints(plottingdata$filtered_data, input$mainplot_brush,
@@ -1445,6 +1536,16 @@ server <- function(input, output, session) {
   `%out%` <- function(a,b){
     ! a %in% b
   } 
+  
+  
+  numericIfPossible <- function(vector){
+    #converts the vector to numeric if possible
+    if (suppressWarnings(all(!is.na(as.numeric(as.character(vector)))))) {
+      return(as.numeric(as.character(vector)))
+    } else {
+      return(vector)
+    }
+  }
   
                                            
                                            
