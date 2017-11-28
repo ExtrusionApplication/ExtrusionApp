@@ -498,14 +498,21 @@ ui <- dashboardPage(
                   tags$h2("Omitted Data Beacause it was NA or Empty"),
                   dataTableOutput("omitteddatatable") 
                 )
+              ),
+              fluidRow(
+                column(
+                  width = 3,
+                  downloadButton('downloadfiltereddata','Download Filtered Data')
+                ),
+                column(
+                  width = 3,
+                  downloadButton('downloadzoomdata','Download Zoom Data')
+                ),
+                column(
+                  width = 3,
+                  downloadButton('downloadomitteddata','Download Omitted Data')
+                )
               )
-                
-              # fluidRow(
-              #   column(
-              #     width = 12,
-              #     htmlOutput("googleplot") #perhaps this will be used later
-              #     )#end column
-              # )#end fluid row
               
               
       ) #end tabItem for testanalysis
@@ -1803,6 +1810,36 @@ server <- function(input, output, session) {
       icon = icon("info-circle")
     )
   })
+  
+  
+  #### Download buttons ####
+  
+  output$downloadfiltereddata <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Filtered Data", '.csv', sep='') },
+    content = function(file) {
+      output <- plottingdata$filtered_data
+      write.csv(output, file, row.names = FALSE)
+    }
+  )
+  
+  output$downloadzoomdata <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Zoom Data", '.csv', sep='') },
+    content = function(file) {
+      output <- brushed_data()
+      write.csv(output, file, row.names = FALSE)
+    }
+  )
+  
+  output$downloadomitteddata <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Omitted Data", '.csv', sep='') },
+    content = function(file) {
+      output <- plottingdata$omitted_data
+      write.csv(output, file, row.names = FALSE)
+    }
+  )
   
   
   
