@@ -5974,292 +5974,301 @@ server<-function(input,output,session){
   )
   
   
-  observeEvent(input$graphtype,{
+  observe({
     #for googleplots
     
     graphtypeid <- input$graphtype #gets the graph id that lets the program know what type of graph
     
     #'this will store the html to render the next questions that the user must answer to plot the
     #'data.
+    #'
+    data <- plottingdata$data
     
+    if (is.null(need(graphtypeid, message = FALSE))){
+      #the need makes sure the data is present
+      axeshtml <- switch(graphtypeid,
+                         "1" = #not curerntly available
+                           Null,
+                         "2" = #not curerntly available
+                           Null,
+                         "3" = #not curerntly available
+                           Null,
+                         "4" = #not curerntly available
+                           Null,
+                         "5" = #not curerntly available
+                           Null,
+                         # "6" = #googleVis Scatter Plot
+                         #   tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                         #                        choices = list("No" = 0, "Yes" = 1),
+                         #                        selected = "0"),
+                         #           conditionalPanel(
+                         #             condition = "input.isxcategorical == '0'",
+                         #             #if the user does NOT want the x-axis to be categorical
+                         #             selectInput("xaxis_data", "Choose Data for the X-Axis",
+                         #                         choices = colnames(plottingdata$data),
+                         #                         selected = NULL)
+                         #           ),
+                         #             #if the user does want the x-axis to be categorical
+                         #           conditionalPanel(
+                         #             condition = "input.isxcategorical == '1'",
+                         #             #if the user does want the x-axis to be categorical
+                         #             radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                         #                          choices = list("Material Number" = 1, "Line" = 2, 
+                         #                                         "SAP Batch Number" = 3, "The Columns" = 4),
+                         #                          selected = "1"),
+                         #             uiOutput("xaxis_data_render")
+                         #             #the xaxis data will be inputted here by inserUI in the observe
+                         #             #event of xcategoricalselection
+                         #           ), #end conditionPanel
+                         #           selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                         #                    choices = list("Linear" = 1, "Log" = 2),
+                         #                    selected = NULL),
+                         #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL)
+                         #        ),
+                         # "7" = #googleVis Line Chart
+                         #   list(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                         #                    choices = list("No" = 0, "Yes" = 1),
+                         #                    selected = "0"),
+                         #        conditionalPanel(
+                         #          condition = "input.isxcategorical == '0'",
+                         #          #if the user does NOT want the x-axis to be categorical
+                         #          selectInput("xaxis_data", "Choose Data for the X-Axis",
+                         #                      choices = colnames(plottingdata$data),
+                         #                      selected = NULL)
+                         #        ),
+                         #        #if the user does want the x-axis to be categorical
+                         #        conditionalPanel(
+                         #          condition = "input.isxcategorical == '1'",
+                         #          #if the user does want the x-axis to be categorical
+                         #          radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                         #                       choices = list("Material Number" = 1, "Line" = 2, 
+                         #                                      "SAP Batch Number" = 3, "The Columns" = 4),
+                         #                       selected = "1"),
+                         #          uiOutput("xaxis_data_render")
+                         #          #the xaxis data will be inputted here by inserUI in the observe
+                         #          #event of xcategoricalselection
+                         #        ), #end conditionPanel
+                         #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL),
+                         #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL)
+                         #        ),
+                         # "8" = #googleVis Line Chart with 2 Y-Axes
+                         #   tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                         #                       choices = list("No" = 0, "Yes" = 1),
+                         #                       selected = "0"),
+                         #           conditionalPanel(
+                         #             condition = "input.isxcategorical == '0'",
+                         #             #if the user does NOT want the x-axis to be categorical
+                         #             selectInput("xaxis_data", "Choose Data for the X-Axis",
+                         #                         choices = colnames(plottingdata$data),
+                         #                         selected = NULL)
+                         #           ),
+                         #           #if the user does want the x-axis to be categorical
+                         #           conditionalPanel(
+                         #             condition = "input.isxcategorical == '1'",
+                         #             #if the user does want the x-axis to be categorical
+                         #             radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                         #                          choices = list("Material Number" = 1, "Line" = 2, 
+                         #                                         "SAP Batch Number" = 3, "The Columns" = 4),
+                         #                          selected = "1"),
+                         #             uiOutput("xaxis_data_render")
+                         #             #the xaxis data will be inputted here by inserUI in the observe
+                         #             #event of xcategoricalselection
+                         #           ), #end conditionPanel
+                         #        selectInput("yaxis_data1", "Choose Data for the First Y-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("yaxis_data2", "Choose Data for the Second Y-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL),
+                         #        radioButtons("yaxis_scale1", "Choose a Scale for the First Y-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL),
+                         #        radioButtons("yaxis_scale2", "Choose a Scale for the Second Y-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL)
+                         #        ),
+                         # "9" = #googleVis Bar Chart
+                         #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL)
+                         #   ),
+                         # "10" = #googleVis Column Chart
+                         #   list(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL)
+                         #   ),
+                         # "11" = #googleVis Area Chart
+                         #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL),
+                         #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL)
+                         #   ),
+                         # "12" = #googleVis Stepped Area Chart
+                         #   list(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL),
+                         #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL)
+                         #   ),
+                         # "13" = #not curerntly available
+                         #   Null,
+                         # "14" = #googleVis Bubble Chart
+                         #   tagList(selectInput("idaxis_data", "Choose Grouping for the ID of the Bubble",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("xaxis_data", "Choose Data for the X-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL),
+                         #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL),
+                         #        selectInput("coloraxis_data", "Choose Grouping for the Color",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("sizeaxis_data", "Choose Data for the Size of the Bubble",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL)
+                         #   ),
+                         # "15" = #googleVis Pie Chart
+                         #   tagList(selectInput("idaxis_data", "Choose Data for the ID of Each Slice",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("comparisonaxis_data", "Choose Data for Comparison",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL)
+                         #   ),
+                         # "16" = #googleVis Histogram
+                         #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL)
+                         #   ),
+                         # "17" = #googleVis Motion Chart
+                         #   tagList(selectInput("idaxis_data", "Choose Data for ID of Each Bubble",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("timeaxis_data", "Choose Data for the Time Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL)
+                         #   )
+                         #   ,
+                         # "18" = #googleVis Annotation Chart
+                         #   tagList(#the time-axis will be chosen automatically as the start date,
+                         #        selectInput("timeaxis_data", "Choose Data for the Time Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                         #                    choices = colnames(plottingdata$data),
+                         #                    selected = NULL),
+                         #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                         #                     choices = list("Linear" = 1, "Log" = 2),
+                         #                     selected = NULL)
+                         #   ), #perhaps these will be used later
+                         "19" = #GGplot2 Scatter Plot
+                           tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                                                choices = list("No" = 0, "Yes" = 1),
+                                                selected = "0"),
+                                   selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                               choices = colnames(plottingdata$data),
+                                               selected = "SAP Batch Number"),
+                                   selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                               choices = colnames(plottingdata$data),
+                                               selected = "Yield Qty")
+                           ),
+                         "20" = tagList(),
+                         "21" = tagList(),
+                         "22" = tagList(),
+                         "23" = tagList(),
+                         "24" = tagList(),
+                         "25" = tagList(),
+                         "26" = tagList(),
+                         "27" = tagList(),
+                         "28" = tagList(),
+                         "29" = tagList(),
+                         "30" = tagList(),
+                         "31" = tagList(),
+                         "32" = tagList(),
+                         "33" = tagList(),
+                         "34" = tagList(),
+                         "35" = tagList(),
+                         "36" = tagList(),
+                         "37" = tagList(),
+                         "38" = tagList(),
+                         "39" = tagList(),
+                         "40" = tagList(),
+                         "41" = tagList(),
+                         "42" = tagList(),
+                         "43" = tagList(),
+                         "44" = tagList(),
+                         "45" = tagList(),
+                         "46" = tagList(),
+                         "47" = tagList(),
+                         "48" = tagList(),
+                         "49" = tagList()
+      )
+      
+      graphinformation$graphaxeshtml <- axeshtml
+    }
+    else{
+      graphinformation$graphaxeshtml <- tags$h2("No Data in the Data Set.")
+    }
     
-    axeshtml <- switch(graphtypeid,
-                       "1" = #not curerntly available
-                         Null,
-                       "2" = #not curerntly available
-                         Null,
-                       "3" = #not curerntly available
-                         Null,
-                       "4" = #not curerntly available
-                         Null,
-                       "5" = #not curerntly available
-                         Null,
-                       # "6" = #googleVis Scatter Plot
-                       #   tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
-                       #                        choices = list("No" = 0, "Yes" = 1),
-                       #                        selected = "0"),
-                       #           conditionalPanel(
-                       #             condition = "input.isxcategorical == '0'",
-                       #             #if the user does NOT want the x-axis to be categorical
-                       #             selectInput("xaxis_data", "Choose Data for the X-Axis",
-                       #                         choices = colnames(plottingdata$data),
-                       #                         selected = NULL)
-                       #           ),
-                       #             #if the user does want the x-axis to be categorical
-                       #           conditionalPanel(
-                       #             condition = "input.isxcategorical == '1'",
-                       #             #if the user does want the x-axis to be categorical
-                       #             radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
-                       #                          choices = list("Material Number" = 1, "Line" = 2, 
-                       #                                         "SAP Batch Number" = 3, "The Columns" = 4),
-                       #                          selected = "1"),
-                       #             uiOutput("xaxis_data_render")
-                       #             #the xaxis data will be inputted here by inserUI in the observe
-                       #             #event of xcategoricalselection
-                       #           ), #end conditionPanel
-                       #           selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                       #                    choices = list("Linear" = 1, "Log" = 2),
-                       #                    selected = NULL),
-                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL)
-                       #        ),
-                       # "7" = #googleVis Line Chart
-                       #   list(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
-                       #                    choices = list("No" = 0, "Yes" = 1),
-                       #                    selected = "0"),
-                       #        conditionalPanel(
-                       #          condition = "input.isxcategorical == '0'",
-                       #          #if the user does NOT want the x-axis to be categorical
-                       #          selectInput("xaxis_data", "Choose Data for the X-Axis",
-                       #                      choices = colnames(plottingdata$data),
-                       #                      selected = NULL)
-                       #        ),
-                       #        #if the user does want the x-axis to be categorical
-                       #        conditionalPanel(
-                       #          condition = "input.isxcategorical == '1'",
-                       #          #if the user does want the x-axis to be categorical
-                       #          radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
-                       #                       choices = list("Material Number" = 1, "Line" = 2, 
-                       #                                      "SAP Batch Number" = 3, "The Columns" = 4),
-                       #                       selected = "1"),
-                       #          uiOutput("xaxis_data_render")
-                       #          #the xaxis data will be inputted here by inserUI in the observe
-                       #          #event of xcategoricalselection
-                       #        ), #end conditionPanel
-                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL),
-                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL)
-                       #        ),
-                       # "8" = #googleVis Line Chart with 2 Y-Axes
-                       #   tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
-                       #                       choices = list("No" = 0, "Yes" = 1),
-                       #                       selected = "0"),
-                       #           conditionalPanel(
-                       #             condition = "input.isxcategorical == '0'",
-                       #             #if the user does NOT want the x-axis to be categorical
-                       #             selectInput("xaxis_data", "Choose Data for the X-Axis",
-                       #                         choices = colnames(plottingdata$data),
-                       #                         selected = NULL)
-                       #           ),
-                       #           #if the user does want the x-axis to be categorical
-                       #           conditionalPanel(
-                       #             condition = "input.isxcategorical == '1'",
-                       #             #if the user does want the x-axis to be categorical
-                       #             radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
-                       #                          choices = list("Material Number" = 1, "Line" = 2, 
-                       #                                         "SAP Batch Number" = 3, "The Columns" = 4),
-                       #                          selected = "1"),
-                       #             uiOutput("xaxis_data_render")
-                       #             #the xaxis data will be inputted here by inserUI in the observe
-                       #             #event of xcategoricalselection
-                       #           ), #end conditionPanel
-                       #        selectInput("yaxis_data1", "Choose Data for the First Y-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("yaxis_data2", "Choose Data for the Second Y-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL),
-                       #        radioButtons("yaxis_scale1", "Choose a Scale for the First Y-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL),
-                       #        radioButtons("yaxis_scale2", "Choose a Scale for the Second Y-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL)
-                       #        ),
-                       # "9" = #googleVis Bar Chart
-                       #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL)
-                       #   ),
-                       # "10" = #googleVis Column Chart
-                       #   list(selectInput("xaxis_data", "Choose Data for the X-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL)
-                       #   ),
-                       # "11" = #googleVis Area Chart
-                       #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL),
-                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL)
-                       #   ),
-                       # "12" = #googleVis Stepped Area Chart
-                       #   list(selectInput("xaxis_data", "Choose Data for the X-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL),
-                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL)
-                       #   ),
-                       # "13" = #not curerntly available
-                       #   Null,
-                       # "14" = #googleVis Bubble Chart
-                       #   tagList(selectInput("idaxis_data", "Choose Grouping for the ID of the Bubble",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("xaxis_data", "Choose Data for the X-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL),
-                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL),
-                       #        selectInput("coloraxis_data", "Choose Grouping for the Color",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("sizeaxis_data", "Choose Data for the Size of the Bubble",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL)
-                       #   ),
-                       # "15" = #googleVis Pie Chart
-                       #   tagList(selectInput("idaxis_data", "Choose Data for the ID of Each Slice",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("comparisonaxis_data", "Choose Data for Comparison",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL)
-                       #   ),
-                       # "16" = #googleVis Histogram
-                       #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL)
-                       #   ),
-                       # "17" = #googleVis Motion Chart
-                       #   tagList(selectInput("idaxis_data", "Choose Data for ID of Each Bubble",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("timeaxis_data", "Choose Data for the Time Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL)
-                       #   )
-                       #   ,
-                       # "18" = #googleVis Annotation Chart
-                       #   tagList(#the time-axis will be chosen automatically as the start date,
-                       #        selectInput("timeaxis_data", "Choose Data for the Time Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                       #                    choices = colnames(plottingdata$data),
-                       #                    selected = NULL),
-                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
-                       #                     choices = list("Linear" = 1, "Log" = 2),
-                       #                     selected = NULL)
-                       #   ), #perhaps these will be used later
-                       "19" = #GGplot2 Scatter Plot
-                         tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
-                                              choices = list("No" = 0, "Yes" = 1),
-                                              selected = "0"),
-                                 selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                             choices = colnames(plottingdata$data),
-                                             selected = NULL),
-                                 selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                             choices = colnames(plottingdata$data),
-                                             selected = NULL)
-                         ),
-                       "20" = tagList(),
-                       "21" = tagList(),
-                       "22" = tagList(),
-                       "23" = tagList(),
-                       "24" = tagList(),
-                       "25" = tagList(),
-                       "26" = tagList(),
-                       "27" = tagList(),
-                       "28" = tagList(),
-                       "29" = tagList(),
-                       "30" = tagList(),
-                       "31" = tagList(),
-                       "32" = tagList(),
-                       "33" = tagList(),
-                       "34" = tagList(),
-                       "35" = tagList(),
-                       "36" = tagList(),
-                       "37" = tagList(),
-                       "38" = tagList(),
-                       "39" = tagList(),
-                       "40" = tagList(),
-                       "41" = tagList(),
-                       "42" = tagList(),
-                       "43" = tagList(),
-                       "44" = tagList(),
-                       "45" = tagList(),
-                       "46" = tagList(),
-                       "47" = tagList(),
-                       "48" = tagList(),
-                       "49" = tagList()
-    )
-    
-    graphinformation$graphaxeshtml <- axeshtml
     
   })#end observeEvent(input$graphtype)
+  
   
   
   
@@ -6619,8 +6628,12 @@ server<-function(input,output,session){
     #cleans the data to plot by removing NA and blank values
     
     if (is.null(need(input$xaxis_data, message = FALSE)) && 
-        is.null(need(input$yaxis_data, message = FALSE))){
+        is.null(need(input$yaxis_data, message = FALSE)) &&
+        length(grep(input$xaxis_data, colnames(plottingdata$data))) != 0 &&
+        length(grep(input$yaxis_data, colnames(plottingdata$data))) != 0){
       #if both are present, then clean the data to remove NAs and blanks ("")
+      #the grep is to stop the rerending of a new dataset from breaking to due to the old selected
+      #columns not being in the new dataset.
       
       
       clean_data <- placeholder_data[which(!is.na(placeholder_data[, input$xaxis_data])),]
