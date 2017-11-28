@@ -51,13 +51,18 @@ server<-function(input,output,session){
       
     }
     else if (length(grep(paste(c("number", "print"), collapse = "|"), 
-                         index_name, ignore.case = TRUE)) != 0){
-      #this will catch part number, part description, resin number, resin description, and
+                         index_name, ignore.case = TRUE)) != 0
+             && length(grep("Resin Number", index_name)) == 0){
+      #this will catch part number, part description, resin description, and
       #pps numbers
+      #it ensures that resin number will not be caught
       
       string_to_search <- gsub("\\| ", "|", gsub(";", "|", value))
       #this replaces semi-colons with a or for grep. It also removes spaces for example:
       #"90161; 123124;435 -> 90161|123124|435
+      
+      string_to_search <- cleanStringSearch(string_to_search) #handles special characters
+
       
       
       column_index <- grep(paste0("^",index_name), names(df), ignore.case = TRUE)
@@ -70,12 +75,17 @@ server<-function(input,output,session){
       return(new_df)
       
     }
-    else if(length(grep("description", index_name, ignore.case = TRUE)) != 0){
+    else if(length(grep(paste(c("description", "Resin Number"), collapse = "|"), 
+                        index_name, ignore.case = TRUE)) != 0){
       #catches description because we cannot string split
+      #also catches resin number
       
       string_to_search <- gsub("\\| ", "|", gsub(";", "|", value))
       #this replaces semi-colons with a or for grep. It also removes spaces for example:
       #"90161; 123124;435 -> 90161|123124|435
+      
+      string_to_search <- cleanStringSearch(string_to_search) #handles special characters
+      
       
       column_index <- grep(paste0("^",index_name), names(df), ignore.case = TRUE)
       
@@ -1472,13 +1482,16 @@ server<-function(input,output,session){
       
     }
     else if (length(grep(paste(c("number", "print"), collapse = "|"), 
-                         index_name, ignore.case = TRUE)) != 0){
+                         index_name, ignore.case = TRUE)) != 0
+             && length(grep("Resin Number", index_name)) == 0){
       #this will catch part number, resin number, resin description, and
       #pps numbers
       
       string_to_search <- gsub("\\| ", "|", gsub(";", "|", value))
       #this replaces semi-colons with a or for grep. It also removes spaces for example:
       #"90161; 123124;435 -> 90161|123124|435
+      
+      string_to_search <- cleanStringSearch(string_to_search) #handles special characters
       
       column_index <- grep(paste0("^",index_name), names(df), ignore.case = TRUE)
       
@@ -1494,12 +1507,16 @@ server<-function(input,output,session){
       return(new_df)
       
     }
-    else if(length(grep("description", index_name, ignore.case = TRUE)) != 0){
+    else if(length(grep(paste(c("description", "Resin Number"), collapse = "|"), 
+                        index_name, ignore.case = TRUE)) != 0){
       #catches description because we cannot string split
       
       string_to_search <- gsub("\\| ", "|", gsub(";", "|", value))
       #this replaces semi-colons with a or for grep. It also removes spaces for example:
       #"90161; 123124;435 -> 90161|123124|435
+      
+      string_to_search <- cleanStringSearch(string_to_search) #handles special characters
+      
       
       column_index <- grep(paste0("^",index_name), names(df), ignore.case = TRUE)
       
@@ -5640,131 +5657,131 @@ server<-function(input,output,session){
   #***********Analysis Tools*********************
   
   
-  #MES Data Analysis
-  
-  # Swith the data set
-  plotdata <- reactive({
-    switch(input$Data_set, "Single" = single_tari_parametersandyield_reactive(), 
-           "Multi"=multi_tari_parametersandyield_reactive(),
-           "Tapered"=tapered_tari_parametersandyield_reactive())
-  })
-  
-  
-  #X-variable& Y-variable
-  output$Xvar_ui<-renderUI({
-    selectInput("Xvar","X-value",choices=names(plotdata()),selected = "Start Date")
-  })
-  
-  output$Yvar_ui<-renderUI({
-    selectInput("Yvar","Y-value",choices=names(plotdata()),selected="Yield Qty")
-  })
-  
-  #get the x-value
-  xvar<-reactive({
-    data<-input$Xvar
-    return(data)
-  })
-  xvals<-reactive({
-    data<-plotdata()[[xvar()]]
-  })
-  #get the y-value
-  yvar<-reactive({
-    data<-input$Yvar
-    return(data)
-  })
-  yvals<-reactive({
-    data<-plotdata()[[yvar()]]
-  })
-  
-  
-  #Group by
-  output$Groupby_ui<-renderUI({
-    selectInput(
-      "Groupby","Group by:",
-      choices=names(plotdata()),selected = "Material Number"
-    )
-  })
-  
-  
-  Text1<-reactive({
-    #Filter1<-input$Filter1
-    Group<-input$Groupby
-    return(Group)
-  })
-  
-  
-  ranges2 <- reactiveValues(x = NULL, y = NULL)
-  
-  output$MES_plot1 <- renderPlot({
-    Groupby<-factor(plotdata()[,input$Groupby]) #factorize the variables
-    # Plot Type will depends on the chosen plot type by user
-    if(length(input$PlotType)==1){
-      if(input$PlotType=="Scatter"){
-        print(xvals())
-        p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))#+geom_line(aes(colour=Groupby))
-      } else if (input$PlotType=="Line"){
-        p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_line(aes(colour=Groupby))+geom_line(aes(colour=Groupby))
-      }
-    } 
-    else if (length(input$PlotType)==2){
-      p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))
-    }
-    p<-p+labs(x=xvar(),y=yvar(),title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
-                                                                                                                 plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))+labs(caption=paste("The plot is group by:\n",Text1()))
-    p
-  })
-  
-  output$plotui<-renderUI({
-    plotOutput("MES_plot1",height = 400,
-               hover = hoverOpts(id = "plot_hover", delay = 0),
-               brush = brushOpts(
-                 id = "MES_plot1_brush",
-                 # delay = 0,
-                 # delayType = input$brush_policy,
-                 # direction = input$brush_dir,
-                 resetOnNew = TRUE))}) #end plotui
-  
-  observe({
-    brush <- input$MES_plot1_brush
-    if (!is.null(brush)) {
-      ranges2$x <- c(brush$xmin, brush$xmax)
-      ranges2$y <- c(brush$ymin, brush$ymax)
-      
-    } else {
-      ranges2$x <- NULL
-      ranges2$y <- NULL
-    }
-  })
-  
-  output$MES_plot2 <- renderPlot({
-    Groupby<-factor(plotdata()[,input$Groupby])
-    p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+coord_cartesian(xlim = ranges2$x, ylim = ranges2$y, expand = FALSE)
-    p+labs(x=xvar(),y=yvar())
-  })
-  
-  #display brushed points
-  brushed_data<-reactive({
-    brushed_data <- brushedPoints(plotdata(), input$MES_plot1_brush,xvar=xvar(),yvar=yvar())
-    data<-datatable(brushed_data)
-    return(data)
-  })
-  
-  
-  output$plot_brushed_points <-DT::renderDataTable(
-    {brushed_data()},
-    options = list(orderClasses = TRUE,
-                   columnDefs = list(list(className = 'dt-center',
-                                          targets = "_all"
-                   )
-                   ),
-                   scrollX=TRUE,
-                   scrollY=500,
-                   autoWidth=TRUE),
-    filter = "top",
-    rownames = FALSE, 
-    escape = FALSE, #escape allows for html elements to be rendered in the table
-    server = FALSE
-  )
+  # #MES Data Analysis
+  # 
+  # # Swith the data set
+  # plotdata <- reactive({
+  #   switch(input$Data_set, "Single" = single_tari_parametersandyield_reactive(), 
+  #          "Multi"=multi_tari_parametersandyield_reactive(),
+  #          "Tapered"=tapered_tari_parametersandyield_reactive())
+  # })
+  # 
+  # 
+  # #X-variable& Y-variable
+  # output$Xvar_ui<-renderUI({
+  #   selectInput("Xvar","X-value",choices=names(plotdata()),selected = "Start Date")
+  # })
+  # 
+  # output$Yvar_ui<-renderUI({
+  #   selectInput("Yvar","Y-value",choices=names(plotdata()),selected="Yield Qty")
+  # })
+  # 
+  # #get the x-value
+  # xvar<-reactive({
+  #   data<-input$Xvar
+  #   return(data)
+  # })
+  # xvals<-reactive({
+  #   data<-plotdata()[[xvar()]]
+  # })
+  # #get the y-value
+  # yvar<-reactive({
+  #   data<-input$Yvar
+  #   return(data)
+  # })
+  # yvals<-reactive({
+  #   data<-plotdata()[[yvar()]]
+  # })
+  # 
+  # 
+  # #Group by
+  # output$Groupby_ui<-renderUI({
+  #   selectInput(
+  #     "Groupby","Group by:",
+  #     choices=names(plotdata()),selected = "Material Number"
+  #   )
+  # })
+  # 
+  # 
+  # Text1<-reactive({
+  #   #Filter1<-input$Filter1
+  #   Group<-input$Groupby
+  #   return(Group)
+  # })
+  # 
+  # 
+  # ranges2 <- reactiveValues(x = NULL, y = NULL)
+  # 
+  # output$MES_plot1 <- renderPlot({
+  #   Groupby<-factor(plotdata()[,input$Groupby]) #factorize the variables
+  #   # Plot Type will depends on the chosen plot type by user
+  #   if(length(input$PlotType)==1){
+  #     if(input$PlotType=="Scatter"){
+  #       print(xvals())
+  #       p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))#+geom_line(aes(colour=Groupby))
+  #     } else if (input$PlotType=="Line"){
+  #       p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_line(aes(colour=Groupby))+geom_line(aes(colour=Groupby))
+  #     }
+  #   } 
+  #   else if (length(input$PlotType)==2){
+  #     p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+geom_line(aes(colour=Groupby))
+  #   }
+  #   p<-p+labs(x=xvar(),y=yvar(),title=input$plottitle,subtitle=paste("Group by: ",subtitle=input$Groupby))+theme(legend.position = "right",plot.title = element_text(hjust = 0.5,face="bold",color="#000000",size=30),
+  #                                                                                                                plot.subtitle = element_text(hjust = 0.5,face="bold",color="#000000",size=15))+labs(caption=paste("The plot is group by:\n",Text1()))
+  #   p
+  # })
+  # 
+  # output$plotui<-renderUI({
+  #   plotOutput("MES_plot1",height = 400,
+  #              hover = hoverOpts(id = "plot_hover", delay = 0),
+  #              brush = brushOpts(
+  #                id = "MES_plot1_brush",
+  #                # delay = 0,
+  #                # delayType = input$brush_policy,
+  #                # direction = input$brush_dir,
+  #                resetOnNew = TRUE))}) #end plotui
+  # 
+  # observe({
+  #   brush <- input$MES_plot1_brush
+  #   if (!is.null(brush)) {
+  #     ranges2$x <- c(brush$xmin, brush$xmax)
+  #     ranges2$y <- c(brush$ymin, brush$ymax)
+  #     
+  #   } else {
+  #     ranges2$x <- NULL
+  #     ranges2$y <- NULL
+  #   }
+  # })
+  # 
+  # output$MES_plot2 <- renderPlot({
+  #   Groupby<-factor(plotdata()[,input$Groupby])
+  #   p<-ggplot(plotdata(), aes(xvals(), yvals())) +geom_point(aes(colour=Groupby,shape=Groupby))+coord_cartesian(xlim = ranges2$x, ylim = ranges2$y, expand = FALSE)
+  #   p+labs(x=xvar(),y=yvar())
+  # })
+  # 
+  # #display brushed points
+  # brushed_data<-reactive({
+  #   brushed_data <- brushedPoints(plotdata(), input$MES_plot1_brush,xvar=xvar(),yvar=yvar())
+  #   data<-datatable(brushed_data)
+  #   return(data)
+  # })
+  # 
+  # 
+  # output$plot_brushed_points <-DT::renderDataTable(
+  #   {brushed_data()},
+  #   options = list(orderClasses = TRUE,
+  #                  columnDefs = list(list(className = 'dt-center',
+  #                                         targets = "_all"
+  #                  )
+  #                  ),
+  #                  scrollX=TRUE,
+  #                  scrollY=500,
+  #                  autoWidth=TRUE),
+  #   filter = "top",
+  #   rownames = FALSE, 
+  #   escape = FALSE, #escape allows for html elements to be rendered in the table
+  #   server = FALSE
+  # )
   
   
 
@@ -5855,8 +5872,35 @@ server<-function(input,output,session){
   
   
   
-  #### Analysis Tab ####
+  #### Analysis Tab Updated ####
   
+  
+  
+  
+  
+  
+  
+  
+  #### Extra Functions ####
+  
+  cleanStringSearch <- function(search_term){
+    #escapes special characters for the regex search in grep
+    search_term <- gsub("\\(", "\\\\(", search_term) #checks for (
+    search_term <- gsub("\\)", "\\\\)", search_term) #checks for )
+    search_term <- gsub("\\$", "\\\\$", search_term) #checks for $
+    search_term <- gsub("\\[", "\\\\[", search_term) #checks for [
+    search_term <- gsub("\\]", "\\\\]", search_term) #checks for ]
+    search_term <- gsub("\\//", "\\\\//", search_term) #checks for //
+    search_term <- gsub("\\{", "\\\\{", search_term) #checks for {
+    search_term <- gsub("\\}", "\\\\}", search_term) #checks for }
+    search_term <- gsub("\\$", "\\\\$", search_term) #checks for $
+    search_term <- gsub("\\^", "\\\\^", search_term) #checks for ^
+    search_term <- gsub("\\?", "\\\\?", search_term) #checks for ?
+    
+    
+    return(search_term)
+    
+  }#end cleanStringSearch
   
   
   
