@@ -1240,7 +1240,10 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcartparts$data$'Part'),2:ncol(single_pps_data)]
+    raw_parts <- unlist(strsplit(unlist(strsplit(single_pps_data$`Part Number`, ">")), "<"))
+    clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+    
+    data <- single_pps_data[which(clean_parts %in% singleshoppingcartparts$data$'Part'),2:ncol(single_pps_data)]
     return(data)
     
   },
@@ -1261,7 +1264,23 @@ server<-function(input,output,session){
     #downlaod the single PPS data from the shopping cart
     filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(single_pps_data[which(single_pps_data$`Part Number` %in% singleshoppingcartparts$data$'Part'),2:ncol(single_pps_data)], 
+      
+      output <- single_pps_data
+      
+      if (length(grep("Part Number", colnames(output), ignore.case = TRUE) > 0)){
+        #removes the html from the part number
+        raw_parts <- unlist(strsplit(unlist(strsplit(output$`Part Number`, ">")), "<"))
+        clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+        output$'Part Number' <- clean_parts
+      }
+      
+      if (length(grep("PPS Number", colnames(output), ignore.case = TRUE) > 0)){
+        #removes the html from the PPS number
+        raw_pps <- unlist(strsplit(unlist(strsplit(output$`PPS Number`, ">")), "<"))
+        clean_pps <- raw_parts[seq(3,length(raw_pps), 4)]
+        output$'PPS Number' <- clean_pps
+      }
+      write.csv(output[which(output$`Part Number` %in% singleshoppingcartparts$data$'Part'),2:ncol(single_pps_data)], 
                 file, row.names = FALSE)
     }
   )
@@ -2691,7 +2710,10 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcartparts$data$'Part'),2:ncol(multi_pps_data)]
+    raw_parts <- unlist(strsplit(unlist(strsplit(multi_pps_data$`Part Number`, ">")), "<"))
+    clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+    
+    data <- multi_pps_data[which(clean_parts %in% multishoppingcartparts$data$'Part'),2:ncol(multi_pps_data)]
     return(data)
     
   },
@@ -2712,7 +2734,24 @@ server<-function(input,output,session){
     #downlaod the multi PPS data from the shopping cart
     filename = function() { paste("Single PPS Shopping Cart Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(multi_pps_data[which(multi_pps_data$`Part Number` %in% multishoppingcart$data$'Part'),2:ncol(multi_pps_data)], 
+      
+      output <- multi_pps_data
+      
+      if (length(grep("Part Number", colnames(output), ignore.case = TRUE) > 0)){
+        #removes the html from the part number
+        raw_parts <- unlist(strsplit(unlist(strsplit(output$`Part Number`, ">")), "<"))
+        clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+        output$'Part Number' <- clean_parts
+      }
+      
+      if (length(grep("PPS Number", colnames(output), ignore.case = TRUE) > 0)){
+        #removes the html from the PPS number
+        raw_pps <- unlist(strsplit(unlist(strsplit(output$`PPS Number`, ">")), "<"))
+        clean_pps <- raw_parts[seq(3,length(raw_pps), 4)]
+        output$'PPS Number' <- clean_pps
+      }
+      
+      write.csv(output[which(output$`Part Number` %in% multishoppingcartparts$data$'Part'),2:ncol(multi_pps_data)], 
                 file, row.names = FALSE)
     }
   )
@@ -4040,21 +4079,14 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcartparts$data$'Part'),2:ncol(tapered_pps_data)]
+    raw_parts <- unlist(strsplit(unlist(strsplit(tapered_pps_data$`Part Number`, ">")), "<"))
+    clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+    
+    data <- tapered_pps_data[which(clean_parts %in% taperedshoppingcartparts$data$'Part'),2:ncol(tapered_pps_data)]
     return(data)
     
   },
-
-  options = list(orderClasses = TRUE,
-                 columnDefs = list(list(className = 'dt-center',
-                                        targets = "_all"
-                 )
-                 ),
-                 scrollX=TRUE,
-                 scrollY=500,
-                 autoWidth=TRUE),
   filter = "top",
-
   rownames = FALSE,
   escape = FALSE,
   server = FALSE,
@@ -4072,7 +4104,24 @@ server<-function(input,output,session){
     #downlaod the tapered PPS data from the shopping cart
     filename = function() { paste("Tapered PPS Shopping Cart Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(tapered_pps_data[which(tapered_pps_data$`Part Number` %in% taperedshoppingcart$data$'Part'),2:ncol(tapered_pps_data)], 
+      
+      output <- tapered_pps_data
+      
+      if (length(grep("Part Number", colnames(output), ignore.case = TRUE) > 0)){
+        #removes the html from the part number
+        raw_parts <- unlist(strsplit(unlist(strsplit(output$`Part Number`, ">")), "<"))
+        clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+        output$'Part Number' <- clean_parts
+      }
+      
+      if (length(grep("PPS Number", colnames(output), ignore.case = TRUE) > 0)){
+        #removes the html from the PPS number
+        raw_pps <- unlist(strsplit(unlist(strsplit(output$`PPS Number`, ">")), "<"))
+        clean_pps <- raw_parts[seq(3,length(raw_pps), 4)]
+        output$'PPS Number' <- clean_pps
+      }
+      
+      write.csv(output[which(output$`Part Number` %in% taperedshoppingcartparts$data$'Part'),2:ncol(tapered_pps_data)], 
                 file, row.names = FALSE)
     }
   )
@@ -4344,7 +4393,10 @@ server<-function(input,output,session){
     #this is to render a datatable that has all the PPS information of parts that have been saved
     #to the shopping cart
     
-    data <- total_pps_data[which(total_pps_data$`Part Number` %in% totalshoppingcartparts$data$'Part'),]
+    raw_parts <- unlist(strsplit(unlist(strsplit(total_pps_data$`Part Number`, ">")), "<"))
+    clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+    
+    data <- total_pps_data[which(clean_parts %in% totalshoppingcartparts$data$'Part'),]
     return(data)
     
   },
@@ -4362,9 +4414,26 @@ server<-function(input,output,session){
   
   output$totalcartdownloadpps <- downloadHandler(
     #downlaod the tapered PPS data from the shopping cart
-    filename = function() { paste("Tapered PPS Shopping Cart Data", '.csv', sep='') },
+    filename = function() { paste("Total PPS Shopping Cart Data", '.csv', sep='') },
     content = function(file) {
-      write.csv(total_pps_data[which(total_pps_data$`Part Number` %in% totalshoppingcartparts$data$'Part'),], 
+      
+      output <- total_pps_data
+      
+      if (length(grep("Part Number", colnames(output), ignore.case = TRUE) > 0)){
+        #removes the html from the part number
+        raw_parts <- unlist(strsplit(unlist(strsplit(output$`Part Number`, ">")), "<"))
+        clean_parts <- raw_parts[seq(3,length(raw_parts), 4)]
+        output$'Part Number' <- clean_parts
+      }
+      
+      if (length(grep("PPS Number", colnames(output), ignore.case = TRUE) > 0)){
+        #removes the html from the PPS number
+        raw_pps <- unlist(strsplit(unlist(strsplit(output$`PPS Number`, ">")), "<"))
+        clean_pps <- raw_parts[seq(3,length(raw_pps), 4)]
+        output$'PPS Number' <- clean_pps
+      }
+      
+      write.csv(output[which(output$`Part Number` %in% totalshoppingcartparts$data$'Part'),], 
                 file, row.names = FALSE)
     }
   )

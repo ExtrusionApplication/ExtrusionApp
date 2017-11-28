@@ -2,6 +2,8 @@ require(shiny)
 require(bootstrap)
 require(jpeg)
 require(ggplot2)
+require(ggExtra)
+require(ggdendro)
 require(DT)
 require(stringr)
 require(gsubfn)
@@ -9,7 +11,10 @@ require(proto)
 require(sqldf)
 require(shinyjs)
 require(shinyBS)
-library(shinydashboard)
+require(shinydashboard)
+require(plotly)
+require(googleVis)
+require(lubridate)
 
 
 #_s:name of the checkbox
@@ -3093,144 +3098,148 @@ ui<-dashboardPage(
                        )
                 )
               )
-      ), #end tabItem
-      
+      ), #end tabItem for totalshippingcarttabe
       tabItem(tabName="MESDataAnalysis",
-        # Some custom CSS
-        tags$head(
-          tags$style(HTML("
-                          /* Smaller font for preformatted text */
-                          pre, table.table {
-                          font-size: smaller;
-                          }
-                          
-                          body {
-                          min-height: 2000px;
-                          }
-                          
-                          .option-group {
-                          border: 1px solid #ccc;
-                          border-radius: 6px;
-                          padding: 0px 5px;
-                          margin: 5px -10px;
-                          background-color: #c1c1c1;
-                          }
-                          
-                          .option-header {
-                          color: #000000;
-                          text-transform: uppercase;
-                          margin-bottom: 5px;
-                          }
-                          .option-label{
-                          color: #000000;
-                          margin-bottom: 1px;
-                          padding: 0px 5px;
-                          }
-                          .inputbox{
-                          background-color: #000000;
-                          }
-                          "))),
-        
-        fluidRow(
-          column(width = 3,
-                 box(title = "Explorer",
-                     solidHeader = TRUE, status = "info", collapsible = TRUE, width = 12,
-                     div(class = "option-group",
-                         radioButtons("Data_set", "Data Set",
-                                      c("Single", "Multi","Tapered","Upload"), inline = TRUE),
-                         conditionalPanel(
-                           "input.Data_set ==='Upload'",
-                           div(style="display: inline-block;vertical-align:top;width: 250px;",
-                               fileInput("uploadfile", "Choose csv File",
-                                         multiple = TRUE,
-                                         accept = c("text/csv",
-                                                    "text/comma-separated-values,text/plain",
-                                                    ".csv"))),
-                           div(style="display: inline-block;vertical-align:top;width: 50px;",
-                               checkboxInput("header", "Header", TRUE)),
-                           checkboxInput("Preview","Preview",F),
-                           #preview the uploaded dataset
-                           conditionalPanel(
-                             condition="input.Preview",
-                             DT::dataTableOutput("UploadDataPreview")
-                           )
-                           
-                         )#end conditional panel for the upload file
-                     ),# end Data Set section
-                     
-                     div(class="option-group",
-                         div(class="option-header","Plot"),
-                         textInput("plottitle","Plot Title",placeholder = NULL),
-                         
-                         
-                         div(style="display: inline-block;vertical-align:top;width: 150px;",
-                             uiOutput("Xvar_ui")),
-                         div(style="display: inline-block;vertical-align:top;width: 150px;",
-                             uiOutput("Yvar_ui")),
-                         
-                         conditionalPanel(
-                           condition = "input.Data_set !='Upload'",
-                           checkboxGroupInput("PlotType","Plot Type",
-                                              choiceNames = 
-                                                list("Scatter","Line"),
-                                              choiceValues = 
-                                                list("Scatter","Line"),
-                                              selected = "Scatter",inline = T
-                           ),
-                           uiOutput("Groupby_ui")
-                         ) # End conditionalpanel for Mtcars
-                     ),#end Plot section
-                     
-                     div(class="option-group",
-                         div(class="option-header","Filters"),
-                         
-                         dateRangeInput("daterange6", "Date range:",
-                                        startview = "decade")
-                         
-                         # dropdownButton(
-                         #     label = "Filter",status = "default", width = 80,
-                         #     #actionButton(inputId = "de", label = "Sort A to Z", icon = icon("sort-alpha-asc")),# filter  (filter icon)
-                         #     #actionButton(inputId = "as", label = "Sort Z to A", icon = icon("sort-alpha-desc")),
-                         # 
-                         #     tags$div(
-                         #       class = "container",
-                         #       uiOutput("filter_ui")   # to have reactive dropdown list
-                         #     ),
-                         #     actionButton(inputId = "filter_select", label = "(un)select all")  #an action button to select or unselect all
-                         #   ) #end Filter
-                         
-                     ),#End Filter section
-                     div(class = "option-group",
-                         div(class = "option-header", "Download"),
-                         radioButtons('GraphFormat', 'Graph format', c('PDF', 'png'),
-                                      inline = TRUE),
-                         downloadButton("GraphDownload_DataAnalysis","Download Graph")
-                     )#end download secion
-                 )
-                 
-          ), #end plot managing section
-          
-          column(width = 9, class = "well",
-                 box(title = "Plot", solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
-                     column(width = 6,
-                            uiOutput("plotui")
-                     ),
-                     column(width = 6,
-                            plotOutput("MES_plot2")
-                     )),#end plot section
-                 
-                 
-                 fluidRow(
-                   h4("Points selected by brushing"),
-                   DT::dataTableOutput("plot_brushed_points")
-                 ), #end brushed points section
-                 
-                 fluidRow(
-                   downloadButton("SelectedDataDownload_DataAnalysis","Download Selected Data")
-                 )# end download dataset section
-                 )
-          )
-        )#end Analysis Tool
+        "Hello"
+      ) #end tabItem for MES DataAnalysis
+      
+      ## Only Analysis Tab ##
+      # tabItem(tabName="MESDataAnalysis",
+      #   # Some custom CSS
+      #   tags$head(
+      #     tags$style(HTML("
+      #                     /* Smaller font for preformatted text */
+      #                     pre, table.table {
+      #                     font-size: smaller;
+      #                     }
+      #                     
+      #                     body {
+      #                     min-height: 2000px;
+      #                     }
+      #                     
+      #                     .option-group {
+      #                     border: 1px solid #ccc;
+      #                     border-radius: 6px;
+      #                     padding: 0px 5px;
+      #                     margin: 5px -10px;
+      #                     background-color: #c1c1c1;
+      #                     }
+      #                     
+      #                     .option-header {
+      #                     color: #000000;
+      #                     text-transform: uppercase;
+      #                     margin-bottom: 5px;
+      #                     }
+      #                     .option-label{
+      #                     color: #000000;
+      #                     margin-bottom: 1px;
+      #                     padding: 0px 5px;
+      #                     }
+      #                     .inputbox{
+      #                     background-color: #000000;
+      #                     }
+      #                     "))),
+      #   
+      #   fluidRow(
+      #     column(width = 3,
+      #            box(title = "Explorer",
+      #                solidHeader = TRUE, status = "info", collapsible = TRUE, width = 12,
+      #                div(class = "option-group",
+      #                    radioButtons("Data_set", "Data Set",
+      #                                 c("Single", "Multi","Tapered","Upload"), inline = TRUE),
+      #                    conditionalPanel(
+      #                      "input.Data_set ==='Upload'",
+      #                      div(style="display: inline-block;vertical-align:top;width: 250px;",
+      #                          fileInput("uploadfile", "Choose csv File",
+      #                                    multiple = TRUE,
+      #                                    accept = c("text/csv",
+      #                                               "text/comma-separated-values,text/plain",
+      #                                               ".csv"))),
+      #                      div(style="display: inline-block;vertical-align:top;width: 50px;",
+      #                          checkboxInput("header", "Header", TRUE)),
+      #                      checkboxInput("Preview","Preview",F),
+      #                      #preview the uploaded dataset
+      #                      conditionalPanel(
+      #                        condition="input.Preview",
+      #                        DT::dataTableOutput("UploadDataPreview")
+      #                      )
+      #                      
+      #                    )#end conditional panel for the upload file
+      #                ),# end Data Set section
+      #                
+      #                div(class="option-group",
+      #                    div(class="option-header","Plot"),
+      #                    textInput("plottitle","Plot Title",placeholder = NULL),
+      #                    
+      #                    
+      #                    div(style="display: inline-block;vertical-align:top;width: 150px;",
+      #                        uiOutput("Xvar_ui")),
+      #                    div(style="display: inline-block;vertical-align:top;width: 150px;",
+      #                        uiOutput("Yvar_ui")),
+      #                    
+      #                    conditionalPanel(
+      #                      condition = "input.Data_set !='Upload'",
+      #                      checkboxGroupInput("PlotType","Plot Type",
+      #                                         choiceNames = 
+      #                                           list("Scatter","Line"),
+      #                                         choiceValues = 
+      #                                           list("Scatter","Line"),
+      #                                         selected = "Scatter",inline = T
+      #                      ),
+      #                      uiOutput("Groupby_ui")
+      #                    ) # End conditionalpanel for Mtcars
+      #                ),#end Plot section
+      #                
+      #                div(class="option-group",
+      #                    div(class="option-header","Filters"),
+      #                    
+      #                    dateRangeInput("daterange6", "Date range:",
+      #                                   startview = "decade")
+      #                    
+      #                    # dropdownButton(
+      #                    #     label = "Filter",status = "default", width = 80,
+      #                    #     #actionButton(inputId = "de", label = "Sort A to Z", icon = icon("sort-alpha-asc")),# filter  (filter icon)
+      #                    #     #actionButton(inputId = "as", label = "Sort Z to A", icon = icon("sort-alpha-desc")),
+      #                    # 
+      #                    #     tags$div(
+      #                    #       class = "container",
+      #                    #       uiOutput("filter_ui")   # to have reactive dropdown list
+      #                    #     ),
+      #                    #     actionButton(inputId = "filter_select", label = "(un)select all")  #an action button to select or unselect all
+      #                    #   ) #end Filter
+      #                    
+      #                ),#End Filter section
+      #                div(class = "option-group",
+      #                    div(class = "option-header", "Download"),
+      #                    radioButtons('GraphFormat', 'Graph format', c('PDF', 'png'),
+      #                                 inline = TRUE),
+      #                    downloadButton("GraphDownload_DataAnalysis","Download Graph")
+      #                )#end download secion
+      #            )
+      #            
+      #     ), #end plot managing section
+      #     
+      #     column(width = 9, class = "well",
+      #            box(title = "Plot", solidHeader = TRUE, status = "primary", collapsible = TRUE, width = 12,
+      #                column(width = 6,
+      #                       uiOutput("plotui")
+      #                ),
+      #                column(width = 6,
+      #                       plotOutput("MES_plot2")
+      #                )),#end plot section
+      #            
+      #            
+      #            fluidRow(
+      #              h4("Points selected by brushing"),
+      #              DT::dataTableOutput("plot_brushed_points")
+      #            ), #end brushed points section
+      #            
+      #            fluidRow(
+      #              downloadButton("SelectedDataDownload_DataAnalysis","Download Selected Data")
+      #            )# end download dataset section
+      #            )
+      #     )
+      #   )#end Analysis Tool
       
    
       
