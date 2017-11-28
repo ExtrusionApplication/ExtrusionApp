@@ -14,6 +14,7 @@ require(shinyBS)
 require(shinydashboard)
 require(plotly)
 require(googleVis)
+require(lubridate)
 
 # Define UI for application that draws a histogram
 ui <- dashboardPage(
@@ -33,7 +34,18 @@ ui <- dashboardPage(
       
       tabItem(tabName = "testanalysis", 
               ###this is the test analysis tab for analyzing the MES Data
-              
+              fluidRow(
+                valueBoxOutput("sapbatchboxoutput", width = 3),
+                valueBoxOutput("materialboxoutput", width = 3),
+                valueBoxOutput("lineboxoutput", width = 3),
+                valueBoxOutput("operatorboxoutput", width = 3)
+              ), #end fluidRow for value boxes
+              fluidRow(
+                valueBoxOutput("startdateboxoutput", width = 3),
+                valueBoxOutput("enddateboxoutput", width = 3),
+                valueBoxOutput("monthlyrunsboxoutput", width = 3),
+                valueBoxOutput("averageyieldboxoutput", width = 3)
+              ), #end fluidRow for value boxes
               fluidRow(
                 column(
                   width = 4,
@@ -399,7 +411,7 @@ ui <- dashboardPage(
                                ),#end conditionPanel
                                radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
                                             choices = list("Linear" = 1, "Log" = 2),
-                                            selected = NULL),
+                                            selected = "1"),
                                
                                radioButtons("changeyticks", "Change the Spacing for the Y Axis Ticks?",
                                             choices = list("No" = 0, "Yes" = 1),
@@ -413,13 +425,35 @@ ui <- dashboardPage(
                                ),#end conditionPanel
                                radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
                                             choices = list("Linear" = 1, "Log" = 2),
-                                            selected = NULL)
+                                            selected = "1")
                                ),
                       tabPanel("Edit Legend")
                       ) #end tabbox
                     )#end wellPanel
                 )#end column
               ),#end fluidRow for the second row
+              fluidRow(
+                #fluid row for the analysis
+                column(
+                  width = 4,
+                  wellPanel(#a well panel to store the box for choosing the grouping
+                    id = "overlaywellpanel", style = "overflow-y:scroll; height: 600px",
+                    box(title = "Choose Data and Graph", solidHeader = TRUE, 
+                        status = "primary", collapsible = FALSE, width = 12,
+                        radioButtons(inputId = "boxplotinput",
+                                     "Would you like to overlay a boxplot?",
+                                     choices = list("No" = 0, "Yes" = 1),
+                                     selected = "0"
+                                     ),
+                        radioButtons(inputId = "usejitter",
+                                     "Would you like to jitter the points to increase their seperation? (Hover and Color Grouping will not Work)",
+                                     choices = list("No" = 0, "Yes" = 1),
+                                     selected = "0"
+                        )
+                    ) #end box
+                  )#end wellPanel
+                )#end column
+              ), #end fluidRow
               fluidRow(
                 column(
                   width = 12,
@@ -457,6 +491,7 @@ ui <- dashboardPage(
                   dataTableOutput("zoomdatatable") 
                 )
               ),
+              hr(),
               fluidRow(
                 column(
                   width = 12,
@@ -798,31 +833,12 @@ server <- function(input, output, session) {
                          tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
                                               choices = list("No" = 0, "Yes" = 1),
                                               selected = "0"),
-                                 conditionalPanel(
-                                   condition = "input.isxcategorical == '0'",
-                                   #if the user does NOT want the x-axis to be categorical
-                                   selectInput("xaxis_data", "Choose Data for the X-Axis",
-                                               choices = colnames(plottingdata$data),
-                                               selected = NULL),
-                                   selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                               choices = colnames(plottingdata$data),
-                                               selected = NULL)
-                                 ),
-                                 #if the user does want the x-axis to be categorical
-                                 conditionalPanel(
-                                   condition = "input.isxcategorical == '1'",
-                                   #if the user does want the x-axis to be categorical
-                                   radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
-                                                choices = list("Material Number" = 1, "Line" = 2, 
-                                                               "SAP Batch Number" = 3, "The Columns" = 4),
-                                                selected = "1"),
-                                   uiOutput("xaxis_data_render"),
-                                   selectInput("yaxis_data", "Choose Data for the Y-Axis",
-                                               choices = colnames(plottingdata$data),
-                                               selected = NULL)
-                                   #the xaxis data will be inputted here by inserUI in the observe
-                                   #event of xcategoricalselection
-                                 ) #end conditionPanel
+                                 selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                             choices = colnames(plottingdata$data),
+                                             selected = NULL),
+                                 selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                             choices = colnames(plottingdata$data),
+                                             selected = NULL)
                          ),
                        "20" = tagList(),
                        "21" = tagList(),
@@ -1279,42 +1295,8 @@ server <- function(input, output, session) {
   
   #### Edit Plots ####
   
-  tickspacing <- reactiveValues(
-    #sotes the user's inputs for the spacing of the ticks marks for the graph
-    x_spacing = NULL,
-    y_spacin = NULL
-  )
-  
-  observe({
-    
-    xspacing <- input$xtickspacing
-    yspacing <- input$ytickspacing
-    
-    
-    if (input$changexticks == "1"){
-      #selected to change
-      xpresent <- need(xspacing, message = FALSE)
-      x_is_integer <- as.integer(xspacing)
-      if (is.null(xpresent) && !is.na(x_is_integer)){
-        #if it is present and is an integer, it will update the tick spacing
-        values <- plottingdata$filtered_data[,isolate(input$xaxis_data)]
-        tickspacing$x_spacing <- values[seq(1, length(values), length.out = as.numeric(xspacing))]
-      }
-    }
-    
-    if (input$changeyticks == "1"){
-      ypresent <- need(yspacing, message = FALSE)
-      y_is_integer <- as.integer(yspacing)
-      if (is.null(ypresent) && !is.na(y_is_integer)){
-        #if it is present and is an integer, it will update the tick spacing
-        values <- plottingdata$filtered_data[,isolate(input$yaxis_data)]
-        tickspacing$y_spacing <- values[seq(1, length(values), length.out = as.numeric(yspacing))]
-      }
-    }
-    
-    
-  })
-  
+
+
   #### Ggplot rendering ####
   
   output$testdatatable <- renderDataTable({
@@ -1343,6 +1325,59 @@ server <- function(input, output, session) {
     xdata <- data[,input$xaxis_data]
     ydata <- data[,input$yaxis_data]
     
+    if (input$isxcategorical == "1"){
+      #user has selected for the variable to be categorical
+      #this will really only apply to numerical data, but I will convert it to character
+      xdata <- as.character(xdata)
+      plottingdata$filtered_data[,input$xaxis_data] <- xdata
+    }
+    
+    if (input$xaxis_scale == "2"){
+      #user has selected a log scale for the data
+      if (is.numeric(xdata)){
+        #if it is numeric, change to a log scale
+        xdata <-  log10(xdata)
+      }
+      else{
+        #if it is not numeric, output a popup box that says a log scale cannot be used
+        #for a categorical variable
+        #also updates the radio button to be linear
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A log scale cannot be applied to a categorical varibale.",
+          easyClose = T
+        ))
+        updateRadioButtons(session, 
+                           inputId = "xaxis_scale", 
+                           label = "Choose a Scale for the X-Axis",
+                           choices = list("Linear" = 1, "Log" = 2),
+                           selected = "1")
+      }
+    }
+    
+    if (input$yaxis_scale == "2"){
+      #user has selected a log scale for the data
+      if (is.numeric(ydata)){
+        #if it is numeric, change to a log scale
+        ydata <-  log10(ydata)
+      }
+      else{
+        #if it is not numeric, output a popup box that says a log scale cannot be used
+        #for a categorical variable
+        #also updates the radio button to be linear
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A log scale cannot be applied to a categorical varibale.",
+          easyClose = T
+        ))
+        updateRadioButtons(session, 
+                           inputId = "xaxis_scale", 
+                           label = "Choose a Scale for the X-Axis",
+                           choices = list("Linear" = 1, "Log" = 2),
+                           selected = "1")
+      }
+    }
+    
     plot <- ggplot(data, aes(xdata, ydata))
     
     if (input$usemaingroup == "1" && input$usesubgroup == "0"){
@@ -1363,27 +1398,89 @@ server <- function(input, output, session) {
     
     changexticks <- input$changexticks == "1"
     if(changexticks){
-      if (is.numeric(xdata)){
-        #continuous if numeric
-        plot <- plot + scale_x_continuous(breaks=c(tickspacing$x_spacing))
-      }
-      else{
-        #discrete if not
-        plot <- plot + scale_x_discrete(breaks=c(tickspacing$x_spacing))
+      xspacing <- input$xtickspacing
+      
+      if (input$changexticks == "1"){
+        #selected to change
+        xpresent <- need(xspacing, message = FALSE)
+        x_is_integer <- as.integer(xspacing)
+        if (is.null(xpresent) && !is.na(x_is_integer)){
+          #if it is present and is an integer, it will update the tick spacing
+          values <- plottingdata$filtered_data[,isolate(input$xaxis_data)]
+          
+          
+          if (is.numeric(xdata)){
+            #continuous if numeric
+            xtick_spacing <- seq(min(values), max(values), length.out = as.numeric(xspacing))
+            plot <- plot + scale_x_continuous(breaks=c(xtick_spacing))
+          }
+          else{
+            #discrete if not
+            xtick_spacing<- values[seq(1, length(values), length.out = as.numeric(xspacing))]
+            plot <- plot + scale_x_discrete(breaks=c(xtick_spacing))
+          }
+          
+        }
       }
       
     }
     
     changeyticks <- input$changeyticks == "1"
     if(changeyticks){
-      if (is.numeric(xdata)){
-        plot <- plot + scale_y_continuous(breaks=c(tickspacing$y_spacing))
-      }
-      else{
-        plot <- plot + scale_y_discrete(breaks=c(tickspacing$y_spacing))
+      yspacing <- input$ytickspacing
+      
+      if (input$changeyticks == "1"){
+        #selected to change
+        ypresent <- need(yspacing, message = FALSE)
+        y_is_integer <- as.integer(yspacing)
+        if (is.null(ypresent) && !is.na(y_is_integer)){
+          #if it is present and is an integer, it will update the tick spacing
+          values <- plottingdata$filtered_data[,isolate(input$yaxis_data)]
+          
+          if (is.numeric(ydata)){
+            #continuous if numeric
+            ytick_spacing <- seq(min(values), max(values), length.out = as.numeric(yspacing))
+            plot <- plot + scale_y_continuous(breaks=c(ytick_spacing))
+          }
+          else{
+            #discrete if not
+            ytick_spacing<- values[seq(1, length(values), length.out = as.numeric(yspacing))]
+            plot <- plot + scale_ydiscrete(breaks=c(ytick_spacing))
+          }
+          
+        }
       }
       
     }
+    
+    if (input$boxplotinput == "1"){
+      if (is.numeric(xdata)){
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A boxplot cannot be applied to a continuous X-Axis.",
+          easyClose = T
+        ))
+        updateRadioButtons(session, 
+                           inputId = "boxplotinput", 
+                           label = "Would you like to overlay a boxplot?",
+                           choices = list("No" = 0, "Yes" = 1),
+                           selected = "0")
+      }
+      else{
+        plot <- plot + geom_boxplot()
+      }
+    }
+    if (input$usejitter == "1"){
+      plot <- plot + geom_jitter()
+      if (is.numeric(xdata)){
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "It is not recommended to jitter on a continuous X-Axis.",
+          easyClose = T
+        ))
+      }
+    }
+    
 
     return(plot)
     
@@ -1411,6 +1508,34 @@ server <- function(input, output, session) {
     xdata <- data[,input$xaxis_data]
     ydata <- data[,input$yaxis_data]
     
+    if (input$isxcategorical == "1"){
+      #user has selected for the variable to be categorical
+      #this will really only apply to numerical data, but I will convert it to character
+      xdata <- as.character(xdata)
+    }
+    
+    if (input$xaxis_scale == "2"){
+      #user has selected a log scale for the data
+      if (is.numeric(xdata)){
+        #if it is numeric, change to a log scale
+        xdata <-  log10(xdata)
+      }
+      else{
+        #do nothing
+      }
+    }
+    
+    if (input$yaxis_scale == "2"){
+      #user has selected a log scale for the data
+      if (is.numeric(ydata)){
+        #if it is numeric, change to a log scale
+        ydata <-  log10(ydata)
+      }
+      else{
+        #do nothing
+      }
+    }
+    
     plot <- ggplot(data, aes(xdata, ydata))
     
     if (input$usemaingroup == "1" && input$usesubgroup == "0"){
@@ -1426,6 +1551,77 @@ server <- function(input, output, session) {
     }
     else{
       plot <- plot + geom_point() + coord_cartesian(xlim = brushselection$x, ylim = brushselection$y, expand = FALSE)
+    }
+    
+    changexticks <- input$changexticks == "1"
+    if(changexticks){
+      xspacing <- input$xtickspacing
+      
+      if (input$changexticks == "1"){
+        #selected to change
+        xpresent <- need(xspacing, message = FALSE)
+        x_is_integer <- as.integer(xspacing)
+        if (is.null(xpresent) && !is.na(x_is_integer)){
+          #if it is present and is an integer, it will update the tick spacing
+          values <- plottingdata$filtered_data[,isolate(input$xaxis_data)]
+          
+          
+          if (is.numeric(xdata)){
+            #continuous if numeric
+            xtick_spacing <- seq(min(values), max(values), length.out = as.numeric(xspacing))
+            plot <- plot + scale_x_continuous(breaks=c(xtick_spacing))
+          }
+          else{
+            #discrete if not
+            xtick_spacing<- values[seq(1, length(values), length.out = as.numeric(xspacing))]
+            plot <- plot + scale_x_discrete(breaks=c(xtick_spacing))
+          }
+          
+        }
+      }
+      
+    }
+    
+    changeyticks <- input$changeyticks == "1"
+    if(changeyticks){
+      yspacing <- input$ytickspacing
+      
+      if (input$changeyticks == "1"){
+        #selected to change
+        ypresent <- need(yspacing, message = FALSE)
+        y_is_integer <- as.integer(yspacing)
+        if (is.null(ypresent) && !is.na(y_is_integer)){
+          #if it is present and is an integer, it will update the tick spacing
+          values <- plottingdata$filtered_data[,isolate(input$yaxis_data)]
+          
+          if (is.numeric(ydata)){
+            #continuous if numeric
+            ytick_spacing <- seq(min(values), max(values), length.out = as.numeric(yspacing))
+            plot <- plot + scale_y_continuous(breaks=c(ytick_spacing))
+          }
+          else{
+            #discrete if not
+            ytick_spacing<- values[seq(1, length(values), length.out = as.numeric(yspacing))]
+            plot <- plot + scale_ydiscrete(breaks=c(ytick_spacing))
+          }
+          
+        }
+      }
+      
+    }
+    
+    
+    if (input$boxplotinput == "1"){
+      if (is.numeric(xdata)){
+        #do nothing if it is numeric
+      }
+      else{
+        plot <- plot + geom_boxplot()
+      }
+    }
+    
+    if (input$usejitter == "1"){
+      plot <- plot + geom_jitter()
     }
     
     return(plot)
@@ -1530,6 +1726,85 @@ server <- function(input, output, session) {
   })
   
   
+  #### Summary Boxes ####
+  
+  output$sapbatchboxoutput <- renderValueBox({
+    valueBox(
+      value = length(unique(tapered_tari_parameter_and_yield_data[,"SAP Batch Number"])),
+      subtitle = "SAP Batches",
+      icon = icon("info-circle")
+      )
+  })
+  
+  output$materialboxoutput <- renderValueBox({
+    valueBox(
+      value = length(unique(tapered_tari_parameter_and_yield_data[,"Material Number"])),
+      subtitle = "Materials",
+      icon = icon("info-circle")
+    )
+  })
+  
+  output$lineboxoutput <- renderValueBox({
+    valueBox(
+      value = length(unique(tapered_tari_parameter_and_yield_data[,"Line"])),
+      subtitle = "Lines",
+      icon = icon("info-circle")
+    )
+  })
+  
+  output$operatorboxoutput <- renderValueBox({
+    valueBox(
+      value = length(unique(tapered_tari_parameter_and_yield_data[,"Start Operator ID"])),
+      subtitle = "Start Operators",
+      icon = icon("info-circle")
+    )
+  })
+  
+  output$monthlyrunsboxoutput <- renderValueBox({
+    numberofmonths <- as.numeric((as.POSIXlt(max(tapered_tari_parameter_and_yield_data$`Start Date`), format="%Y-%m-%d") 
+                                  - 
+                                    as.POSIXlt(min(tapered_tari_parameter_and_yield_data$`Start Date`), format="%Y-%m-%d"))/30.44)
+    
+    ui <- valueBox(
+      value = signif(length(tapered_tari_parameter_and_yield_data[,"SAP Batch Number"])/numberofmonths, 
+                     digits = 4),
+      subtitle = "Runs Per Month",
+      icon = icon("info-circle")
+      )
+    return(ui)
+  })
+  
+  output$averageyieldboxoutput <- renderValueBox({
+    yieldqty <- sum(as.integer(tapered_tari_parameter_and_yield_data$`Yield Qty`[tapered_tari_parameter_and_yield_data$`Yield Qty` != ""]))
+    scrapqty <- sum(as.integer(tapered_tari_parameter_and_yield_data$`Scrap Qty`[tapered_tari_parameter_and_yield_data$`Scrap Qty` != ""]))
+    
+    ui <- valueBox(
+      value = signif(((yieldqty/(yieldqty + scrapqty))*100), 
+                     digits = 4),
+      subtitle = "Average Yield",
+      icon = icon("info-circle")
+    )
+    
+    return(ui)
+  })
+  
+  output$startdateboxoutput <- renderValueBox({
+    valueBox(
+      value = min(tapered_tari_parameter_and_yield_data[,"Start Date"]),
+      subtitle = "Earliest Run (Year-Month-Day)",
+      icon = icon("info-circle")
+    )
+  })
+  
+  output$enddateboxoutput <- renderValueBox({
+    valueBox(
+      value = max(tapered_tari_parameter_and_yield_data[,"Start Date"]),
+      subtitle = "Latest Run (Year-Month-Day)",
+      icon = icon("info-circle")
+    )
+  })
+  
+  
   
   #### Special Functions ####
   
@@ -1545,6 +1820,11 @@ server <- function(input, output, session) {
     } else {
       return(vector)
     }
+  }
+  
+  modeofvector <- function(x) {
+    ux <- unique(x)
+    ux[which.max(tabulate(match(x, ux)))]
   }
   
                                            
