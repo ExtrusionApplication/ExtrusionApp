@@ -2581,6 +2581,7 @@ ui<-dashboardPage(
                                               multiple = TRUE,
                                               selectize = TRUE,
                                               selected = c("Material Number", "SAP Batch Number",
+                                                           "Line", "Start Operator ID",
                                                            "Start Date", "Start Qty", "Start Qty Unit",
                                                            "Yield Qty", "Scrap Qty",
                                                            "Contribution to Plant Level Yield VOP",
@@ -2738,6 +2739,7 @@ ui<-dashboardPage(
                                          multiple = TRUE,
                                          selectize = TRUE,
                                                 selected = c("Material Number", "SAP Batch Number",
+                                                             "Line", "Start Operator ID",
                                                              "Start Date", "Start Qty", "Start Qty Unit",
                                                              "Yield Qty", "Scrap Qty",
                                                              "Contribution to Plant Level Yield VOP",
@@ -2895,6 +2897,7 @@ ui<-dashboardPage(
                                        multiple = TRUE,
                                        selectize = TRUE,
                                               selected = c("Material Number", "SAP Batch Number",
+                                                           "Line", "Start Operator ID",
                                                            "Start Date", "Start Qty", "Start Qty Unit",
                                                            "Yield Qty", "Scrap Qty",
                                                            "Contribution to Plant Level Yield VOP",
@@ -3100,7 +3103,486 @@ ui<-dashboardPage(
               )
       ), #end tabItem for totalshippingcarttabe
       tabItem(tabName="MESDataAnalysis",
-        "Hello"
+              ###this is the test analysis tab for analyzing the MES Data
+              fluidRow(
+                valueBoxOutput("sapbatchboxoutput", width = 3),
+                valueBoxOutput("materialboxoutput", width = 3),
+                valueBoxOutput("lineboxoutput", width = 3),
+                valueBoxOutput("operatorboxoutput", width = 3)
+              ), #end fluidRow for value boxes
+              fluidRow(
+                valueBoxOutput("startdateboxoutput", width = 3),
+                valueBoxOutput("enddateboxoutput", width = 3),
+                valueBoxOutput("monthlyrunsboxoutput", width = 3),
+                valueBoxOutput("averageyieldboxoutput", width = 3)
+              ), #end fluidRow for value boxes
+              fluidRow(
+                column(
+                  width = 4,
+                  wellPanel(#a well panel to store the box for choosing the data
+                    id = "datawellpanel", style = "overflow-y:scroll; height: 600px",
+                    box(title = "Choose Data and Graph", solidHeader = TRUE, 
+                        status = "primary", collapsible = FALSE, width = 12,
+                        #radio button to choose the data set
+                        radioButtons(inputId = "dataset",
+                                     #'this controls the data set a user chooses
+                                     label = "Choose a Data Set to Analyze",
+                                     choiceNames = c("Single", "Multi","Tapered"),
+                                     choiceValues = c(1,2,3)
+                        ),
+                        conditionalPanel(
+                          #only appears once a data set has been chosen
+                          condition = "input.dataset",
+                          radioButtons(inputId = "graphpackage",
+                                       #'this controls what type of graphs are available
+                                       label = "Select a Chart/Graph Type",
+                                       choiceNames = c("GGplot2"),
+                                       choiceValues = c(2)
+                          )
+                        ),#end conditionPanel of PD Custom
+                        #'the selectinputs for the graph type are all the same, which package
+                        #'is used to render the graph is determined by the choice value for the graph
+                        #'it follows this pattern:
+                        #'first integer -> graph group (1 = google, 2 = ggplot2, 3 = plotly)
+                        #'second integeger -> special or non special graph (0 = not-special,
+                        #'2 = dendrogram, 3 = parallel coordinates, 4 = google motion chart)
+                        #'third integer -> degrees of freedom
+                        #'fourth integer -> is color a degree of freedom (0 = no, 1 = yes)
+                        #'fifth integer -> is size a degree of freedom (0 = no, 1 = yes)
+                        #'sixth integer -> does the graph allow multiple traces (0 = no, 1 = yes)
+                        #'7 and 8 integer -> graph ID (currently starts at 06).
+                        
+                        uiOutput("graphchoiceoutput") #the choice for the user of which graph
+                        
+                    )#end box for choosing data set and graph
+                  )#end wellPanel
+                  
+                ),#end column
+                column(
+                  #'this column will contain the parameters needed to plot the graph such as
+                  #'defining the axes, defining the id, etc.
+                  width = 4,
+                  wellPanel(#a well panel to store the box for choosing the data
+                    id = "datawellpanel", style = "overflow-y:scroll; height: 600px",
+                    box(title = "Select the Parameters for the Graph", solidHeader = TRUE, 
+                        status = "primary", collapsible = FALSE, width = 12,
+                        uiOutput("graphaxeshtmloutput")
+                    )#end box
+                  )#end wellPanel
+                ),#end column
+                column(
+                  #'this column will contain the filters for the data
+                  width = 4,
+                  wellPanel(#a well panel to store the box for filtering the data
+                    id = "filterwellpanel", style = "overflow-y:scroll; max-height: 600px",
+                    box(title = "Material Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        #radio button choose whether the filter is allowed to be used
+                        #by default the filter will not eb used
+                        radioButtons(inputId = "usematerialfilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usematerialfilter == '1'",
+                          #if the user has selected to use the material filter
+                          radioButtons(inputId = "includeexcludematerial",
+                                       label = "Include or Exclude the Choices?",
+                                       choices = list("Include" = 1, "Exclude" = 0),
+                                       selected = "1"),
+                          uiOutput("materialfilterchoicesoutput")
+                        )#end conditionPanel
+                    ), #end box for Material Filter
+                    box(title = "SAP Batch Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        #radio button choose whether the filter is allowed to be used
+                        #by default the filter will not eb used
+                        radioButtons(inputId = "usebatchfilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usebatchfilter == '1'",
+                          #if the user has selected to use the material filter
+                          radioButtons(inputId = "includeexcludebatch",
+                                       label = "Include or Exclude the Choices?",
+                                       choices = list("Include" = 1, "Exclude" = 0),
+                                       selected = "1"),
+                          uiOutput("batchfilterchoicesoutput")#render the choices for the batch numbers
+                        )#end conditionPanel
+                    ),#end Box for SAP Batch filter
+                    box(title = "Line Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        #radio button choose whether the filter is allowed to be used
+                        #by default the filter will not eb used
+                        radioButtons(inputId = "uselinefilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.uselinefilter == '1'",
+                          #if the user has selected to use the material filter
+                          radioButtons(inputId = "includeexcludeline",
+                                       label = "Include or Exclude the Choices?",
+                                       choices = list("Include" = 1, "Exclude" = 0),
+                                       selected = "1"),
+                          uiOutput("linefilterchoicesoutput")
+                        )#end conditionPanel
+                    ),
+                    box(title = "Date Range Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        #radio button choose whether the filter is allowed to be used
+                        #by default the filter will not eb used
+                        radioButtons(inputId = "usedatefilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usedatefilter == '1'",
+                          #if the user has selected to use the material filter
+                          radioButtons(inputId = "includeexcludedate",
+                                       label = "Include or Exclude the Choices?",
+                                       choices = list("Include" = 1, "Exclude" = 0),
+                                       selected = "1"),
+                          uiOutput("daterangefilteroutput")
+                        )#end conditionPanel
+                    ),
+                    box(title = "Choose a Column to Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        radioButtons(inputId = "usefirstcolumnfilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usefirstcolumnfilter == '1'",
+                          uiOutput("firstcolumnchoiceoutput"),
+                          selectInput(inputId = "firstcolumnoperator",
+                                      #user selects operator
+                                      label = "Select an Operator",
+                                      choices = list("None" = 0,
+                                                     "Inequality" = 1, 
+                                                     "Range" = 2, 
+                                                     "Matching Values" = 3
+                                      ),
+                                      selected = "1"
+                          ),
+                          conditionalPanel(#user has selected Inequality
+                            condition = "input.firstcolumnoperator == '1'",
+                            fluidRow(
+                              column(width = 6,
+                                     selectInput(inputId = "firstcolumninequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ),#end column
+                              column(width = 6,
+                                     textInput(inputId = "firstcolumninequalityinput" ,
+                                               label = "")  
+                              )#end column
+                            )#end fluidRow
+                            
+                          ), #end conditionalPanel
+                          conditionalPanel(#user has selected range
+                            condition = "input.firstcolumnoperator == '2'",
+                            fluidRow(
+                              column(width = 6,
+                                     selectInput(inputId = "firstcolumnrangemininequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ),#end column
+                              column(width = 6,
+                                     textInput(inputId = "firstcolumnrangemininput" ,
+                                               label = "")  
+                              )#end column
+                            ),#end fluidRow
+                            fluidRow(
+                              column(width = 6,
+                                     textInput(inputId = "firstcolumnrangemaxinput" ,
+                                               label = "")  
+                              ), #end column
+                              column(width = 6,
+                                     selectInput(inputId = "firstcolumnrangemaxinequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ) #end column
+                            ) #end fluidRow
+                          ), #end conditionalPanel
+                          conditionalPanel(#user has selected matching values
+                            condition = "input.firstcolumnoperator == '3'",
+                            radioButtons(inputId = "firstcolumnvaluesie",
+                                         label = "Include or Exclude the Values?",
+                                         choices = list("Yes" = 1, "No" = 0),
+                                         selected = "1"),
+                            uiOutput("firstcolumnfilter")
+                          ) #end conditionalPanel 3
+                        )#end outer conditionalPanel
+                    ),
+                    box(title = "Choose a Column to Filter", solidHeader = TRUE, 
+                        status = "info", collapsible = TRUE, width = 12, collapsed = TRUE,
+                        radioButtons(inputId = "usesecondcolumnfilter",
+                                     label = "Do you want to use this filter?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usesecondcolumnfilter == '1'",
+                          uiOutput("secondcolumnchoiceoutput"),
+                          selectInput(inputId = "secondcolumnoperator",
+                                      #user selects operator
+                                      label = "Select an Operator",
+                                      choices = list("None" = 0,
+                                                     "Inequality" = 1, 
+                                                     "Range" = 2, 
+                                                     "Matching Values" = 3
+                                      ),
+                                      selected = "1"
+                          ),
+                          conditionalPanel(#user has selected Inequality
+                            condition = "input.secondcolumnoperator == '1'",
+                            fluidRow(
+                              column(width = 6,
+                                     selectInput(inputId = "secondcolumninequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ),#end column
+                              column(width = 6,
+                                     textInput(inputId = "secondcolumninequalityinput" ,
+                                               label = "")  
+                              )#end column
+                            )#end fluidRow
+                            
+                          ), #end conditionalPanel
+                          conditionalPanel(#user has selected range
+                            condition = "input.secondcolumnoperator == '2'",
+                            fluidRow(
+                              column(width = 12,
+                                     radioButtons(inputId = "secondcolumnrangeie",
+                                                  label = "Include or Exclude the Range?",
+                                                  choices = list("Include" = 1, "Exclude" = 0),
+                                                  selected = "1")
+                              )
+                            ),
+                            fluidRow(
+                              column(width = 6,
+                                     selectInput(inputId = "secondcolumnrangemininequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ),#end column
+                              column(width = 6,
+                                     textInput(inputId = "secondcolumnrangemininput" ,
+                                               label = "")  
+                              )#end column
+                            ),#end fluidRow
+                            fluidRow(
+                              column(width = 6,
+                                     textInput(inputId = "secondcolumnrangemaxinput" ,
+                                               label = "")  
+                              ), #end column
+                              column(width = 6,
+                                     selectInput(inputId = "secondcolumnrangemaxinequality",
+                                                 #user selects an equality function
+                                                 label = "",
+                                                 choices = list("X <" = 1,
+                                                                "X <=" = 2, 
+                                                                "X >=" = 3, 
+                                                                "X >" = 4
+                                                 )
+                                     )
+                              ) #end column
+                            ) #end fluidRow
+                          ), #end conditionalPanel
+                          conditionalPanel(#user has selected matching values
+                            condition = "input.secondcolumnoperator == '3'",
+                            radioButtons(inputId = "secondcolumnvaluesie",
+                                         label = "Include or Exclude the Values?",
+                                         choices = list("Yes" = 1, "No" = 0),
+                                         selected = "1"),
+                            uiOutput("secondcolumnfilter")
+                          ) #end conditionalPanel 3
+                        )#end outer conditionalPanel
+                    )
+                    
+                  )#end wellPanel for filters
+                )#end column for filters
+              ),#end fluidRow
+              fluidRow(
+                column(
+                  width = 4,
+                  wellPanel(#a well panel to store the box for choosing the grouping
+                    id = "groupingwellpanel", style = "overflow-y:scroll; height: 600px",
+                    box(title = "Choose Data and Graph", solidHeader = TRUE, 
+                        status = "primary", collapsible = FALSE, width = 12,
+                        radioButtons(inputId = "usemaingroup",
+                                     label = "Do you want to group the data?",
+                                     choices = list("Yes" = 1, "No" = 0),
+                                     selected = "0"),
+                        conditionalPanel(#appears if the filter will be used
+                          condition = "input.usemaingroup == '1'",
+                          #if the user has selected to use the material filter
+                          uiOutput("maingroupchoiceoutput"),
+                          radioButtons(inputId = "usesubgroup",
+                                       label = "Do you want use a secondary grouping for the data?",
+                                       choices = list("Yes" = 1, "No" = 0),
+                                       selected = "0"),
+                          conditionalPanel(#appears if the filter will be used
+                            condition = "input.usesubgroup == '1'",
+                            uiOutput("subgroupchoiceoutput")
+                          )#end conditionPanel
+                          
+                        )#end conditionPanel
+                    )#end Box
+                  )#end wellPanel
+                ),#end column
+                column(
+                  width = 8,
+                  wellPanel(#a well panel to store the box for choosing the grouping
+                    id = "ploteditwellpanel", style = "overflow-y:scroll; height: 600px",
+                    tabBox(
+                      title = "Edit Plot Formatting",
+                      id = "ploteditbox",
+                      tabPanel("Edit Axes",
+                               radioButtons("changexticks", "Change the Spacing for the X Axis Ticks?",
+                                            choices = list("No" = 0, "Yes" = 1),
+                                            selected = "0"),
+                               conditionalPanel(#appears if the ticks will be changed
+                                 condition = "input.changexticks == '1'",
+                                 textInput(inputId = "xtickspacing", 
+                                           label = "Input the Spacing for the Tick Marks", 
+                                           value = "10"
+                                 )
+                               ),#end conditionPanel
+                               radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                                            choices = list("Linear" = 1, "Log" = 2),
+                                            selected = "1"),
+                               
+                               radioButtons("changeyticks", "Change the Spacing for the Y Axis Ticks?",
+                                            choices = list("No" = 0, "Yes" = 1),
+                                            selected = "0"),
+                               conditionalPanel(#appears if the ticks will be changed
+                                 condition = "input.changeyticks == '1'",
+                                 textInput(inputId = "ytickspacing", 
+                                           label = "Input the Spacing for the Tick Marks", 
+                                           value = "10"
+                                 )
+                               ),#end conditionPanel
+                               radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                                            choices = list("Linear" = 1, "Log" = 2),
+                                            selected = "1")
+                      ),
+                      tabPanel("Edit Legend")
+                    ) #end tabbox
+                  )#end wellPanel
+                )#end column
+              ),#end fluidRow for the second row
+              fluidRow(
+                #fluid row for the analysis
+                column(
+                  width = 4,
+                  wellPanel(#a well panel to store the box for choosing the grouping
+                    id = "overlaywellpanel", style = "overflow-y:scroll; height: 600px",
+                    box(title = "Choose Data and Graph", solidHeader = TRUE, 
+                        status = "primary", collapsible = FALSE, width = 12,
+                        radioButtons(inputId = "boxplotinput",
+                                     "Would you like to overlay a boxplot?",
+                                     choices = list("No" = 0, "Yes" = 1),
+                                     selected = "0"
+                        ),
+                        radioButtons(inputId = "usejitter",
+                                     "Would you like to jitter the points to increase their seperation? (Hover and Color Grouping will not Work)",
+                                     choices = list("No" = 0, "Yes" = 1),
+                                     selected = "0"
+                        )
+                    ) #end box
+                  )#end wellPanel
+                )#end column
+              ), #end fluidRow
+              fluidRow(
+                column(
+                  width = 12,
+                  dataTableOutput("testdatatable") 
+                )
+              ),
+              fluidRow(
+                #fluid row to hold the plots
+                column(
+                  width = 12,
+                  plotOutput("mainplotoutput",
+                             hover = hoverOpts(id = "mainplot_hover", delay = 300),
+                             brush = brushOpts(
+                               id = "mainplot_brush",
+                               # delay = 0,
+                               # delayType = input$brush_policy,
+                               # direction = input$brush_dir,
+                               resetOnNew = TRUE)), #end plotui
+                  uiOutput("mainplot_hover_info")
+                  
+                )
+              ), #end fluid Row for main plot
+              fluidRow(#zoom plot plot
+                column(
+                  width = 12,
+                  plotOutput("zoomplot",
+                             hover = hoverOpts(id = "zoomplot_hover", delay = 300)
+                  ),
+                  uiOutput("zoomplot_hover_info")
+                )
+              ),
+              fluidRow(
+                column(
+                  width = 12,
+                  dataTableOutput("zoomdatatable") 
+                )
+              ),
+              hr(),
+              fluidRow(
+                column(
+                  width = 12,
+                  tags$h2("Omitted Data Beacause it was NA or Empty"),
+                  dataTableOutput("omitteddatatable") 
+                )
+              ),
+              fluidRow(
+                column(
+                  width = 3,
+                  downloadButton('downloadfiltereddata','Download Filtered Data')
+                ),
+                column(
+                  width = 3,
+                  downloadButton('downloadzoomdata','Download Zoom Data')
+                ),
+                column(
+                  width = 3,
+                  downloadButton('downloadomitteddata','Download Omitted Data')
+                )
+              )
       ) #end tabItem for MES DataAnalysis
       
       ## Only Analysis Tab ##

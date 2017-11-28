@@ -5944,9 +5944,1280 @@ server<-function(input,output,session){
   #### Analysis Tab Updated ####
   
   
+  observe({
+    data <- switch(input$dataset, "1" = single_tari_parametersandyield_reactive(),
+                   "2"=multi_tari_parametersandyield_reactive(),
+                   "3"=tapered_tari_parametersandyield_reactive())
+    plottingdata$data <- data
+    plottingdata$filtered_data <- data
+  })
+  
+  
+  plottingdata <- reactiveValues(
+    #current data for plotting
+    data = NULL,
+    filtered_data = NULL,
+    omitted_data = NULL #stores the data remove because the values are NA
+  )
+  
+  output$graphchoiceoutput <- renderUI(
+    selectInput(inputId = "graphtype",
+                #the graphs available are dependent on the graph package
+                label = "Select a Chart/Graph Type",
+                choices = listofgraphs[[as.numeric(input$graphpackage)]]
+    )
+  )
+  
+  
+  graphinformation <- reactiveValues(
+    graphaxeshtml = NULL
+  )
+  
+  
+  observeEvent(input$graphtype,{
+    #for googleplots
+    
+    graphtypeid <- input$graphtype #gets the graph id that lets the program know what type of graph
+    
+    #'this will store the html to render the next questions that the user must answer to plot the
+    #'data.
+    
+    
+    axeshtml <- switch(graphtypeid,
+                       "1" = #not curerntly available
+                         Null,
+                       "2" = #not curerntly available
+                         Null,
+                       "3" = #not curerntly available
+                         Null,
+                       "4" = #not curerntly available
+                         Null,
+                       "5" = #not curerntly available
+                         Null,
+                       # "6" = #googleVis Scatter Plot
+                       #   tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                       #                        choices = list("No" = 0, "Yes" = 1),
+                       #                        selected = "0"),
+                       #           conditionalPanel(
+                       #             condition = "input.isxcategorical == '0'",
+                       #             #if the user does NOT want the x-axis to be categorical
+                       #             selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                         choices = colnames(plottingdata$data),
+                       #                         selected = NULL)
+                       #           ),
+                       #             #if the user does want the x-axis to be categorical
+                       #           conditionalPanel(
+                       #             condition = "input.isxcategorical == '1'",
+                       #             #if the user does want the x-axis to be categorical
+                       #             radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                       #                          choices = list("Material Number" = 1, "Line" = 2, 
+                       #                                         "SAP Batch Number" = 3, "The Columns" = 4),
+                       #                          selected = "1"),
+                       #             uiOutput("xaxis_data_render")
+                       #             #the xaxis data will be inputted here by inserUI in the observe
+                       #             #event of xcategoricalselection
+                       #           ), #end conditionPanel
+                       #           selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                    choices = list("Linear" = 1, "Log" = 2),
+                       #                    selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #        ),
+                       # "7" = #googleVis Line Chart
+                       #   list(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                       #                    choices = list("No" = 0, "Yes" = 1),
+                       #                    selected = "0"),
+                       #        conditionalPanel(
+                       #          condition = "input.isxcategorical == '0'",
+                       #          #if the user does NOT want the x-axis to be categorical
+                       #          selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                      choices = colnames(plottingdata$data),
+                       #                      selected = NULL)
+                       #        ),
+                       #        #if the user does want the x-axis to be categorical
+                       #        conditionalPanel(
+                       #          condition = "input.isxcategorical == '1'",
+                       #          #if the user does want the x-axis to be categorical
+                       #          radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                       #                       choices = list("Material Number" = 1, "Line" = 2, 
+                       #                                      "SAP Batch Number" = 3, "The Columns" = 4),
+                       #                       selected = "1"),
+                       #          uiOutput("xaxis_data_render")
+                       #          #the xaxis data will be inputted here by inserUI in the observe
+                       #          #event of xcategoricalselection
+                       #        ), #end conditionPanel
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #        ),
+                       # "8" = #googleVis Line Chart with 2 Y-Axes
+                       #   tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                       #                       choices = list("No" = 0, "Yes" = 1),
+                       #                       selected = "0"),
+                       #           conditionalPanel(
+                       #             condition = "input.isxcategorical == '0'",
+                       #             #if the user does NOT want the x-axis to be categorical
+                       #             selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                         choices = colnames(plottingdata$data),
+                       #                         selected = NULL)
+                       #           ),
+                       #           #if the user does want the x-axis to be categorical
+                       #           conditionalPanel(
+                       #             condition = "input.isxcategorical == '1'",
+                       #             #if the user does want the x-axis to be categorical
+                       #             radioButtons("xcategoricalselection", "Select What Grouping You want for the X Axis",
+                       #                          choices = list("Material Number" = 1, "Line" = 2, 
+                       #                                         "SAP Batch Number" = 3, "The Columns" = 4),
+                       #                          selected = "1"),
+                       #             uiOutput("xaxis_data_render")
+                       #             #the xaxis data will be inputted here by inserUI in the observe
+                       #             #event of xcategoricalselection
+                       #           ), #end conditionPanel
+                       #        selectInput("yaxis_data1", "Choose Data for the First Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data2", "Choose Data for the Second Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale1", "Choose a Scale for the First Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale2", "Choose a Scale for the Second Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #        ),
+                       # "9" = #googleVis Bar Chart
+                       #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ),
+                       # "10" = #googleVis Column Chart
+                       #   list(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ),
+                       # "11" = #googleVis Area Chart
+                       #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ),
+                       # "12" = #googleVis Stepped Area Chart
+                       #   list(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ),
+                       # "13" = #not curerntly available
+                       #   Null,
+                       # "14" = #googleVis Bubble Chart
+                       #   tagList(selectInput("idaxis_data", "Choose Grouping for the ID of the Bubble",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("xaxis_scale", "Choose a Scale for the X-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL),
+                       #        selectInput("coloraxis_data", "Choose Grouping for the Color",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("sizeaxis_data", "Choose Data for the Size of the Bubble",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL)
+                       #   ),
+                       # "15" = #googleVis Pie Chart
+                       #   tagList(selectInput("idaxis_data", "Choose Data for the ID of Each Slice",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("comparisonaxis_data", "Choose Data for Comparison",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL)
+                       #   ),
+                       # "16" = #googleVis Histogram
+                       #   tagList(selectInput("xaxis_data", "Choose Data for the X-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ),
+                       # "17" = #googleVis Motion Chart
+                       #   tagList(selectInput("idaxis_data", "Choose Data for ID of Each Bubble",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("timeaxis_data", "Choose Data for the Time Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL)
+                       #   )
+                       #   ,
+                       # "18" = #googleVis Annotation Chart
+                       #   tagList(#the time-axis will be chosen automatically as the start date,
+                       #        selectInput("timeaxis_data", "Choose Data for the Time Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                       #                    choices = colnames(plottingdata$data),
+                       #                    selected = NULL),
+                       #        radioButtons("yaxis_scale", "Choose a Scale for the Y-Axis",
+                       #                     choices = list("Linear" = 1, "Log" = 2),
+                       #                     selected = NULL)
+                       #   ), #perhaps these will be used later
+                       "19" = #GGplot2 Scatter Plot
+                         tagList(radioButtons("isxcategorical", "Would You Like to have the X-Axis be Categorical (Such as Having the X-Axis be Material Number, Line, Batch, Or Even Columns)",
+                                              choices = list("No" = 0, "Yes" = 1),
+                                              selected = "0"),
+                                 selectInput("xaxis_data", "Choose Data for the X-Axis",
+                                             choices = colnames(plottingdata$data),
+                                             selected = NULL),
+                                 selectInput("yaxis_data", "Choose Data for the Y-Axis",
+                                             choices = colnames(plottingdata$data),
+                                             selected = NULL)
+                         ),
+                       "20" = tagList(),
+                       "21" = tagList(),
+                       "22" = tagList(),
+                       "23" = tagList(),
+                       "24" = tagList(),
+                       "25" = tagList(),
+                       "26" = tagList(),
+                       "27" = tagList(),
+                       "28" = tagList(),
+                       "29" = tagList(),
+                       "30" = tagList(),
+                       "31" = tagList(),
+                       "32" = tagList(),
+                       "33" = tagList(),
+                       "34" = tagList(),
+                       "35" = tagList(),
+                       "36" = tagList(),
+                       "37" = tagList(),
+                       "38" = tagList(),
+                       "39" = tagList(),
+                       "40" = tagList(),
+                       "41" = tagList(),
+                       "42" = tagList(),
+                       "43" = tagList(),
+                       "44" = tagList(),
+                       "45" = tagList(),
+                       "46" = tagList(),
+                       "47" = tagList(),
+                       "48" = tagList(),
+                       "49" = tagList()
+    )
+    
+    graphinformation$graphaxeshtml <- axeshtml
+    
+  })#end observeEvent(input$graphtype)
   
   
   
+  output$graphaxeshtmloutput <- renderUI({
+    #will render the information the user has to input for the axes of the specif graph
+    return(graphinformation$graphaxeshtml)
+  })
+  
+  
+  observeEvent(input$xcategoricalselection,{
+    #this observes what the user seleced for the categorical variable
+    
+    choice_options <- switch(input$xcategoricalselection,
+                             #based on waht the user selected for the categorical variable, this
+                             #will change
+                             "1" = unique(plottingdata$data[,"Material Number"]),
+                             "2" = unique(plottingdata$data[,"Line"]),
+                             "3" = unique(plottingdata$data[,"SAP Batch Number"]),
+                             "4" = colnames(plottingdata$data)
+    )
+    
+    whatisselected <- switch(input$xcategoricalselection,
+                             #depend on the user's selection the initial choices selected changes
+                             #all have everything selected except for the "Column" selection
+                             "1" = choice_options,
+                             "2" = choice_options,
+                             "3" = choice_options,
+                             "4" = NULL
+                             
+    )
+    
+    output$xaxis_data_render <- renderUI(
+      selectizeInput(inputId = "xaxis_data",
+                     label = "Select the Inputs for the Category (multiple are allowed)", 
+                     choices = choice_options,
+                     selected = whatisselected,
+                     multiple = TRUE) 
+      
+    )#end output$xaxis_data_render
+  })
+  
+  output$batchfilterchoicesoutput <- renderUI(
+    #the UI for choosing the batches for the batch filter
+    selectizeInput(inputId = "batchfilterchoices",
+                   label = "Select the Batch Numbers",
+                   choices = unique(plottingdata$data[,"SAP Batch Number"]),
+                   selected = unique(plottingdata$data[,"SAP Batch Number"]),
+                   multiple = TRUE)
+  )
+  
+  output$materialfilterchoicesoutput <- renderUI({
+    #the UI for choosing the batches for the material filter
+    ui <- selectizeInput(inputId = "materialfilterchoices",
+                         label = "Select the Material Numbers",
+                         choices = unique(plottingdata$data[,"Material Number"]),
+                         selected = unique(plottingdata$data[,"Material Number"]),
+                         multiple = TRUE)
+    return(ui)
+  })
+  
+  output$linefilterchoicesoutput <- renderUI(
+    #the UI for choosing the batches for the line filter
+    selectizeInput(inputId = "linefilterchoices",
+                   label = "Select the Lines",
+                   choices = unique(plottingdata$data[,"Line"]),
+                   selected = unique(plottingdata$data[,"Line"]),
+                   multiple = TRUE)
+  )
+  
+  output$daterangefilteroutput <- renderUI(
+    #Ui for the daterange filter
+    dateRangeInput(inputId = "daterangefilter",
+                   label = 'Start Date range input: yyyy-mm-dd',
+                   start = min(plottingdata$filtered_data[,"Start Date"]), 
+                   end = max(plottingdata$filtered_data[,"Start Date"])
+    )
+  )
+  
+  output$firstcolumnchoiceoutput <- renderUI(
+    #UI for columnn to choose the first column filter
+    selectInput(inputId = "firstcolumnchoice",
+                #'user selects the column to filter
+                label = "Select a Column to Filter",
+                choices = (colnames(plottingdata$data)[which(colnames(plottingdata$data)
+                                                                                 %out%
+                                                                                   c("SAP Batch Number",
+                                                                                     "Material Number",
+                                                                                     "Line",
+                                                                                     "Start Date")
+                )
+                ]
+                ),
+                #removes columns that already have filters in place
+                selected = NULL
+    )
+  )
+  
+  output$secondcolumnchoiceoutput <- renderUI(
+    #UI for columnn to choose the first column filter
+    selectInput(inputId = "secondcolumnchoice",
+                #'user selects the column to filter
+                label = "Select a Column to Filter",
+                choices = (colnames(plottingdata$data)[which(colnames(plottingdata$data)
+                                                                                 %out%
+                                                                                   c("SAP Batch Number",
+                                                                                     "Material Number",
+                                                                                     "Line",
+                                                                                     "Start Date")
+                )
+                ]
+                ),
+                #removes columns that already have filters in place
+                selected = NULL
+    )
+  )
+  
+  output$firstcolumnfilter <- renderUI(
+    #output for the user to select the values for the first column filter
+    selectizeInput(inputId = "firstcolumnvalues",
+                   label = "Choose the Values",
+                   choices = unique(plottingdata$data),
+                   selected = unique(plottingdata$data),
+                   multiple = TRUE
+    )
+  )
+  
+  output$secondcolumnfilter <- renderUI(
+    #output for the user to select the values for the second column filter
+    selectizeInput(inputId = "secondcolumnvalues",
+                   label = "Choose the Values",
+                   choices = unique(plottingdata$data),
+                   selected = unique(plottingdata$data),
+                   multiple = TRUE
+    )
+  )
+  
+  output$maingroupchoiceoutput <- renderUI(
+    #choosing column for the main grouping
+    selectInput(inputId = "maingroupchoice",
+                label = "Please Select a Column for the Main Grouping (Color)",
+                choices = colnames(plottingdata$data),
+                selected = "Material Number",
+                multiple = FALSE)
+  )
+  
+  output$subgroupchoiceoutput <- renderUI(
+    #choosing column for the main grouping
+    selectInput(inputId = "subgroupchoice",
+                label = "Please Select a Column for the Sub Grouping (Shape)",
+                choices = colnames(plottingdata$data),
+                selected = "Material Number",
+                multiple = FALSE)
+  )
+  
+  
+  # output$googleplot <- renderGvis(
+  #   gvisLineChart(data = test_data,
+  #                 xvar = "Start Date",
+  #                 yvar = "Yield Percentage",
+  #                 options=list(gvis.editor="Edit me!",
+  #                              explorer="{actions: ['dragToZoom','rightClickToReset'],maxZoomIn:0.05}",
+  #                              crosshair="{trigger:'both'}",
+  #                              chartArea="{width:'85%',height:'80%'}",
+  #                              height= 1000,
+  #                              width = 1000),
+  #                 chartid = "googleplotid"
+  #                 )
+  # ) #perhaps this will be used later
+  
+  
+  
+  #### filtering functions ####
+  
+  observe({
+    #observe for filtering the data
+    
+    placeholder_data <- plottingdata$data
+    
+    usematerialfilter <- input$usematerialfilter == "1"
+    usebatchfilter <- input$usebatchfilter == "1"
+    uselinefilter <- input$uselinefilter == "1"
+    usedatefilter <- input$usedatefilter == "1"
+    usefirstcolumnfilter <- input$usefirstcolumnfilter == "1"
+    usesecondcolumnfilter <- input$usesecondcolumnfilter == "1"
+    
+    need_material <- need(input$materialfilterchoices, message = FALSE)
+    isolate({
+      if (usematerialfilter){
+        #filters the data based on the user's material selections
+        placeholder_data <- specificfilter(placeholder_data,
+                                           "Material Number", 
+                                           input$includeexcludematerial,
+                                           input$materialfilterchoices
+        )
+      }
+    })
+    if (usebatchfilter){
+      #filters the data based on the user's batch selections
+      placeholder_data <- specificfilter(placeholder_data,
+                                         "SAP Batch Number", 
+                                         input$includeexcludebatch,
+                                         input$batchfilterchoices
+      )
+    }
+    if (uselinefilter){
+      #filters the data based on the user's line selections
+      placeholder_data <- specificfilter(placeholder_data,
+                                         "Line", 
+                                         input$includeexcludeline,
+                                         input$linefilterchoices
+      )
+    }
+    
+    if (usedatefilter){
+      #filters the date data
+      start <- input$daterangefilter[1]
+      end <- input$daterangefilter[2]
+      
+      placeholder_data <- placeholder_data[placeholder_data[,"Start Date"] >= start,]
+      placeholder_data <- placeholder_data[placeholder_data[,"Start Date"] <= end,]
+      
+    }
+    
+    
+    first_need_condition <- need(input$firstcolumnchoice, message = FALSE)
+    
+    if (usefirstcolumnfilter && is.null(first_need_condition)){
+      if (input$firstcolumnoperator == "1"){
+        inequality <- input$firstcolumninequality #inequality symbol
+        
+        placeholder_data <- switch(inequality,
+                                   "1" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          < input$firstcolumninequalityinput,],
+                                   "2" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          <= input$firstcolumninequalityinput,],
+                                   "3" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          >= input$firstcolumninequalityinput,],
+                                   "4" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          > input$firstcolumninequalityinput,]
+        )
+        
+      }
+      else if (input$firstcolumnoperator == "2"){
+        #range filter
+        
+        firstinequality <- input$firstcolumnrangemininequality #inequality symbol
+        
+        placeholder_data <- switch(firstinequality,
+                                   "1" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          < input$firstcolumnrangemininput,],
+                                   "2" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          <= input$firstcolumnrangemininput,],
+                                   "3" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          >= input$firstcolumnrangemininput,],
+                                   "4" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          > input$firstcolumnrangemininput,]
+        )
+        secondinequality <- input$firstcolumnrangemaxinequality #inequality symbol
+        
+        placeholder_data <- switch(secondinequality,
+                                   "1" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          < input$firstcolumnrangemaxinput,],
+                                   "2" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          <= input$firstcolumnrangemaxinput,],
+                                   "3" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          >= input$firstcolumnrangemaxinput,],
+                                   "4" = placeholder_data[placeholder_data[,input$firstcolumnchoice]
+                                                          > input$firstcolumnrangemaxinput,]
+        )
+      }
+      else if (input$firstcolumnoperator == "3"){
+        #matching values filter
+        
+        includeorexclude <- input$firstcolumnvaluesie #(1 for include, 0 for exclude)
+        
+        if (includeorexclude == "1"){
+          #include
+          placeholder_data <- placeholder_data[which(placeholder_data[,input$firstcolumnchoice]
+                                                     %in% input$firstcolumnvalues),]
+        }
+        else if (includeorexclude == "0"){
+          #exclude
+          placeholder_data <- placeholder_data[which(placeholder_data[,input$firstcolumnchoice]
+                                                     %out% input$firstcolumnvalues),]
+        }
+        
+      }
+    }#end use first column filter
+    
+    second_need_condition <- need(input$secondcolumnchoice, message = FALSE)
+    
+    if (usesecondcolumnfilter && is.null(second_need_condition)){
+      if (input$secondcolumnoperator == "1"){
+        inequality <- input$secondcolumninequality #inequality symbol
+        
+        placeholder_data <- switch(inequality,
+                                   "1" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          < input$secondcolumninequalityinput,],
+                                   "2" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          <= input$secondcolumninequalityinput,],
+                                   "3" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          >= input$secondcolumninequalityinput,],
+                                   "4" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          > input$secondcolumninequalityinput,]
+        )
+        
+      }
+      else if (input$secondcolumnoperator == "2"){
+        #range filter
+        
+        secondinequality <- input$secondcolumnrangemininequality #inequality symbol
+        
+        placeholder_data <- switch(secondinequality,
+                                   "1" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          < input$secondcolumnrangemininput,],
+                                   "2" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          <= input$secondcolumnrangemininput,],
+                                   "3" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          >= input$secondcolumnrangemininput,],
+                                   "4" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          > input$secondcolumnrangemininput,]
+        )
+        secondinequality <- input$secondcolumnrangemaxinequality #inequality symbol
+        
+        placeholder_data <- switch(secondinequality,
+                                   "1" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          < input$secondcolumnrangemaxinput,],
+                                   "2" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          <= input$secondcolumnrangemaxinput,],
+                                   "3" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          >= input$secondcolumnrangemaxinput,],
+                                   "4" = placeholder_data[placeholder_data[,input$secondcolumnchoice]
+                                                          > input$secondcolumnrangemaxinput,]
+        )
+      }
+      else if (input$secondcolumnoperator == "3"){
+        #matching values filter
+        
+        includeorexclude <- input$secondcolumnvaluesie #(1 for include, 0 for exclude)
+        
+        if (includeorexclude == "1"){
+          #include
+          placeholder_data <- placeholder_data[which(placeholder_data[,input$secondcolumnchoice]
+                                                     %in% input$secondcolumnvalues),]
+        }
+        else if (includeorexclude == "0"){
+          #exclude
+          placeholder_data <- placeholder_data[which(placeholder_data[,input$secondcolumnchoice]
+                                                     %out% input$secondcolumnvalues),]
+        }
+        
+      }
+    }#end use second column filter
+    
+    
+    
+    #cleans the data to plot by removing NA and blank values
+    
+    if (is.null(need(input$xaxis_data, message = FALSE)) && 
+        is.null(need(input$yaxis_data, message = FALSE))){
+      #if both are present, then clean the data to remove NAs and blanks ("")
+      
+      
+      clean_data <- placeholder_data[which(!is.na(placeholder_data[, input$xaxis_data])),]
+      clean_data <- clean_data[which(!is.na(clean_data[, input$yaxis_data])),]
+      
+      omitted_datax1 <- placeholder_data[which(is.na(placeholder_data[, input$xaxis_data])),]
+      omitted_datay1 <- placeholder_data[which(is.na(placeholder_data[, input$yaxis_data])),]
+      
+      clean_data <- clean_data[which(clean_data[, input$xaxis_data] != ""),]
+      clean_data <- clean_data[which(clean_data[, input$yaxis_data] != ""),]
+      
+      omitted_datax2 <- placeholder_data[which(placeholder_data[, input$xaxis_data] == ""),]
+      omitted_datay2 <- placeholder_data[which(placeholder_data[, input$yaxis_data] == ""),]
+      
+      omitted_data <- rbind(omitted_datax1, omitted_datay1, omitted_datax2, omitted_datay2)
+      #removes duplicate batches
+      omitted_data <- omitted_data[which(!duplicated(omitted_data[,"SAP Batch Number"])),]
+      
+      plottingdata$omitted_data <- omitted_data
+      
+      if (nrow(clean_data) != 0){
+        clean_data[,input$xaxis_data] <- numericIfPossible(clean_data[,input$xaxis_data])
+        clean_data[,input$yaxis_data] <- numericIfPossible(clean_data[,input$yaxis_data])
+      }
+      
+      plottingdata$filtered_data <- clean_data
+    }
+    else{
+      plottingdata$filtered_data <- placeholder_data
+    }
+    
+  })
+  
+  specificfilter <- function(dataframe, column, includeoption, inputs){
+    #takes the material, batch, and line filter to filter the data based on include or exclude
+    #and the inputs the user has selected
+    
+    data <- dataframe
+    
+    include <- includeoption == "1" #did the user choose to include the data selected
+    
+    if (include){
+      #the user chose to include
+      data <- data[which(data[,column] %in% inputs),] #the rows of the data that match
+    }
+    else{
+      #the user chose to exclude
+      data <- data[which(data[,column] %out% inputs),] #the rows of the data that match
+    }
+    
+    
+    return(data)
+    
+  }#end specific filter
+  
+  
+  
+  #### Edit Plots ####
+  
+  
+  
+  #### Ggplot rendering ####
+  
+  output$testdatatable <- renderDataTable({
+    return(plottingdata$filtered_data)
+  },
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  plots <- reactiveValues(
+    #storing the plots, things when then be added to these base plots as the user edits the plots
+    mainplot = NULL,
+    zoomplot = NULL
+  )
+  
+  
+  
+  output$mainplotoutput <- renderPlot({
+    data <- plottingdata$filtered_data
+    xdata <- data[,input$xaxis_data]
+    ydata <- data[,input$yaxis_data]
+    
+    if (input$isxcategorical == "1"){
+      #user has selected for the variable to be categorical
+      #this will really only apply to numerical data, but I will convert it to character
+      xdata <- as.character(xdata)
+      plottingdata$filtered_data[,input$xaxis_data] <- xdata
+    }
+    
+    if (input$xaxis_scale == "2"){
+      #user has selected a log scale for the data
+      if (is.numeric(xdata)){
+        #if it is numeric, change to a log scale
+        xdata <-  log10(xdata)
+      }
+      else{
+        #if it is not numeric, output a popup box that says a log scale cannot be used
+        #for a categorical variable
+        #also updates the radio button to be linear
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A log scale cannot be applied to a categorical varibale.",
+          easyClose = T
+        ))
+        updateRadioButtons(session, 
+                           inputId = "xaxis_scale", 
+                           label = "Choose a Scale for the X-Axis",
+                           choices = list("Linear" = 1, "Log" = 2),
+                           selected = "1")
+      }
+    }
+    
+    if (input$yaxis_scale == "2"){
+      #user has selected a log scale for the data
+      if (is.numeric(ydata)){
+        #if it is numeric, change to a log scale
+        ydata <-  log10(ydata)
+      }
+      else{
+        #if it is not numeric, output a popup box that says a log scale cannot be used
+        #for a categorical variable
+        #also updates the radio button to be linear
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A log scale cannot be applied to a categorical varibale.",
+          easyClose = T
+        ))
+        updateRadioButtons(session, 
+                           inputId = "xaxis_scale", 
+                           label = "Choose a Scale for the X-Axis",
+                           choices = list("Linear" = 1, "Log" = 2),
+                           selected = "1")
+      }
+    }
+    
+    plot <- ggplot(data, aes(xdata, ydata))
+    
+    if (input$usemaingroup == "1" && input$usesubgroup == "0"){
+      #main grouping but not subgroupind
+      maingroup <- factor(data[,input$maingroupchoice])
+      plot <- plot + geom_point(aes(colour=maingroup))
+    }
+    else if (input$usemaingroup == "1" && input$usesubgroup == "1"){
+      maingroup <- factor(data[,input$maingroupchoice])
+      subgroup <- factor(data[,input$subgroupchoice])
+      plot <- plot + geom_point(aes(colour=maingroup,shape=subgroup)) + scale_shape_manual(values=1:nlevels(subgroup))
+      #use main grouping and subgrouping
+    }
+    else{
+      plot <- plot + geom_point()
+    }
+    
+    
+    changexticks <- input$changexticks == "1"
+    if(changexticks){
+      xspacing <- input$xtickspacing
+      
+      if (input$changexticks == "1"){
+        #selected to change
+        xpresent <- need(xspacing, message = FALSE)
+        x_is_integer <- as.integer(xspacing)
+        if (is.null(xpresent) && !is.na(x_is_integer)){
+          #if it is present and is an integer, it will update the tick spacing
+          values <- plottingdata$filtered_data[,isolate(input$xaxis_data)]
+          
+          
+          if (is.numeric(xdata)){
+            #continuous if numeric
+            xtick_spacing <- seq(min(values), max(values), length.out = as.numeric(xspacing))
+            plot <- plot + scale_x_continuous(breaks=c(xtick_spacing))
+          }
+          else{
+            #discrete if not
+            xtick_spacing<- values[seq(1, length(values), length.out = as.numeric(xspacing))]
+            plot <- plot + scale_x_discrete(breaks=c(xtick_spacing))
+          }
+          
+        }
+      }
+      
+    }
+    
+    changeyticks <- input$changeyticks == "1"
+    if(changeyticks){
+      yspacing <- input$ytickspacing
+      
+      if (input$changeyticks == "1"){
+        #selected to change
+        ypresent <- need(yspacing, message = FALSE)
+        y_is_integer <- as.integer(yspacing)
+        if (is.null(ypresent) && !is.na(y_is_integer)){
+          #if it is present and is an integer, it will update the tick spacing
+          values <- plottingdata$filtered_data[,isolate(input$yaxis_data)]
+          
+          if (is.numeric(ydata)){
+            #continuous if numeric
+            ytick_spacing <- seq(min(values), max(values), length.out = as.numeric(yspacing))
+            plot <- plot + scale_y_continuous(breaks=c(ytick_spacing))
+          }
+          else{
+            #discrete if not
+            ytick_spacing<- values[seq(1, length(values), length.out = as.numeric(yspacing))]
+            plot <- plot + scale_ydiscrete(breaks=c(ytick_spacing))
+          }
+          
+        }
+      }
+      
+    }
+    
+    if (input$boxplotinput == "1"){
+      if (is.numeric(xdata)){
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "A boxplot cannot be applied to a continuous X-Axis.",
+          easyClose = T
+        ))
+        updateRadioButtons(session, 
+                           inputId = "boxplotinput", 
+                           label = "Would you like to overlay a boxplot?",
+                           choices = list("No" = 0, "Yes" = 1),
+                           selected = "0")
+      }
+      else{
+        plot <- plot + geom_boxplot()
+      }
+    }
+    if (input$usejitter == "1"){
+      plot <- plot + geom_jitter()
+      if (is.numeric(xdata)){
+        showModal(modalDialog(
+          title = "Add Part Number",
+          "It is not recommended to jitter on a continuous X-Axis.",
+          easyClose = T
+        ))
+      }
+    }
+    
+    
+    return(plot)
+    
+    
+  })
+  
+  brushselection <- reactiveValues(x = NULL, y = NULL) #the values for the brush area
+  
+  observe({
+    #editing the brush if it is selected
+    brush <- input$mainplot_brush
+    if (!is.null(brush)) {
+      brushselection$x <- c(brush$xmin, brush$xmax)
+      brushselection$y <- c(brush$ymin, brush$ymax)
+      
+    } else {
+      brushselection$x <- NULL
+      brushselection$y <- NULL
+    }
+  })
+  
+  output$zoomplot <- renderPlot({
+    #the plot that is zoomed in
+    data <- plottingdata$filtered_data
+    xdata <- data[,input$xaxis_data]
+    ydata <- data[,input$yaxis_data]
+    
+    if (input$isxcategorical == "1"){
+      #user has selected for the variable to be categorical
+      #this will really only apply to numerical data, but I will convert it to character
+      xdata <- as.character(xdata)
+    }
+    
+    if (input$xaxis_scale == "2"){
+      #user has selected a log scale for the data
+      if (is.numeric(xdata)){
+        #if it is numeric, change to a log scale
+        xdata <-  log10(xdata)
+      }
+      else{
+        #do nothing
+      }
+    }
+    
+    if (input$yaxis_scale == "2"){
+      #user has selected a log scale for the data
+      if (is.numeric(ydata)){
+        #if it is numeric, change to a log scale
+        ydata <-  log10(ydata)
+      }
+      else{
+        #do nothing
+      }
+    }
+    
+    plot <- ggplot(data, aes(xdata, ydata))
+    
+    if (input$usemaingroup == "1" && input$usesubgroup == "0"){
+      #main grouping but not subgroupind
+      maingroup <- factor(data[,input$maingroupchoice])
+      plot <- plot + geom_point(aes(colour=maingroup)) + coord_cartesian(xlim = brushselection$x, ylim = brushselection$y, expand = FALSE)
+    }
+    else if (input$usemaingroup == "1" && input$usesubgroup == "1"){
+      maingroup <- factor(data[,input$maingroupchoice])
+      subgroup <- factor(data[,input$subgroupchoice])
+      plot <- plot + geom_point(aes(colour=maingroup,shape=subgroup)) + scale_shape_manual(values=1:nlevels(subgroup)) + coord_cartesian(xlim = brushselection$x, ylim = brushselection$y, expand = FALSE)
+      #use main grouping and subgrouping
+    }
+    else{
+      plot <- plot + geom_point() + coord_cartesian(xlim = brushselection$x, ylim = brushselection$y, expand = FALSE)
+    }
+    
+    changexticks <- input$changexticks == "1"
+    if(changexticks){
+      xspacing <- input$xtickspacing
+      
+      if (input$changexticks == "1"){
+        #selected to change
+        xpresent <- need(xspacing, message = FALSE)
+        x_is_integer <- as.integer(xspacing)
+        if (is.null(xpresent) && !is.na(x_is_integer)){
+          #if it is present and is an integer, it will update the tick spacing
+          values <- plottingdata$filtered_data[,isolate(input$xaxis_data)]
+          
+          
+          if (is.numeric(xdata)){
+            #continuous if numeric
+            xtick_spacing <- seq(min(values), max(values), length.out = as.numeric(xspacing))
+            plot <- plot + scale_x_continuous(breaks=c(xtick_spacing))
+          }
+          else{
+            #discrete if not
+            xtick_spacing<- values[seq(1, length(values), length.out = as.numeric(xspacing))]
+            plot <- plot + scale_x_discrete(breaks=c(xtick_spacing))
+          }
+          
+        }
+      }
+      
+    }
+    
+    changeyticks <- input$changeyticks == "1"
+    if(changeyticks){
+      yspacing <- input$ytickspacing
+      
+      if (input$changeyticks == "1"){
+        #selected to change
+        ypresent <- need(yspacing, message = FALSE)
+        y_is_integer <- as.integer(yspacing)
+        if (is.null(ypresent) && !is.na(y_is_integer)){
+          #if it is present and is an integer, it will update the tick spacing
+          values <- plottingdata$filtered_data[,isolate(input$yaxis_data)]
+          
+          if (is.numeric(ydata)){
+            #continuous if numeric
+            ytick_spacing <- seq(min(values), max(values), length.out = as.numeric(yspacing))
+            plot <- plot + scale_y_continuous(breaks=c(ytick_spacing))
+          }
+          else{
+            #discrete if not
+            ytick_spacing<- values[seq(1, length(values), length.out = as.numeric(yspacing))]
+            plot <- plot + scale_ydiscrete(breaks=c(ytick_spacing))
+          }
+          
+        }
+      }
+      
+    }
+    
+    
+    if (input$boxplotinput == "1"){
+      if (is.numeric(xdata)){
+        #do nothing if it is numeric
+      }
+      else{
+        plot <- plot + geom_boxplot()
+      }
+    }
+    
+    if (input$usejitter == "1"){
+      plot <- plot + geom_jitter()
+    }
+    
+    return(plot)
+  })
+  
+  output$omitteddatatable <-DT::renderDataTable({
+    return(plottingdata$omitted_data)
+  },
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  brushed_data<-reactive({
+    brushed_data <- brushedPoints(plottingdata$filtered_data, input$mainplot_brush,
+                                  xvar=input$xaxis_data,yvar=input$yaxis_data)
+    data<-data.frame(brushed_data, stringsAsFactors = FALSE, check.names = FALSE)
+    return(data)
+  })
+  
+  output$zoomdatatable <-DT::renderDataTable({
+    return(brushed_data())
+  },
+  filter = "none",
+  extensions = 'ColReorder',
+  rownames= FALSE,
+  options = list(orderClasses = TRUE,
+                 columnDefs = list(list(className = 'dt-center',targets = "_all")),
+                 scrollX=TRUE,
+                 scrollY=500,
+                 autoWidth=TRUE,
+                 colReorder = TRUE))
+  
+  
+  ## Plot Hovers
+  
+  output$mainplot_hover_info <- renderUI({
+    hover <- input$mainplot_hover
+    
+    point <- nearPoints(plottingdata$filtered_data, hover, 
+                        xvar=input$xaxis_data,yvar=input$yaxis_data,
+                        threshold = 5, maxpoints = 1, addDist = TRUE)
+    
+    if (nrow(point) == 0) return(NULL)
+    
+    left_pct <- (hover$x - hover$domain$left) / (hover$domain$right - hover$domain$left)
+    top_pct <- (hover$domain$top - hover$y) / (hover$domain$top - hover$domain$bottom)
+    
+    left_px <- hover$range$left + left_pct * (hover$range$right - hover$range$left)
+    top_px <- hover$range$top + top_pct * (hover$range$bottom - hover$range$top)
+    
+    style <- paste0("position:absolute; z-index:100; background-color: rgba(245, 245, 245, 0.85); ",
+                    "left:", left_px + 2, "px; top:", top_px + 2, "px;")
+    
+    wellPanel(
+      style = style,
+      p(HTML(paste0("<b> SAP Batch Number: ", point$"SAP Batch Number", "</b>", 
+                    "<br> Material Number: ", point$"Material Number",
+                    "<br> Line: ", point$"Line",
+                    "<br>", input$xaxis_data, ": ", point[,input$xaxis_data],
+                    "<br>", input$yaxis_data, ": ", point[,input$yaxis_data]
+      )
+      )
+      )
+    )
+  })
+  
+  output$zoomplot_hover_info <- renderUI({
+    hover <- input$zoomplot_hover
+    
+    point <- nearPoints(plottingdata$filtered_data, hover, 
+                        xvar=input$xaxis_data,yvar=input$yaxis_data,
+                        threshold = 5, maxpoints = 1, addDist = TRUE)
+    
+    if (nrow(point) == 0) return(NULL)
+    
+    left_pct <- (hover$x - hover$domain$left) / (hover$domain$right - hover$domain$left)
+    top_pct <- (hover$domain$top - hover$y) / (hover$domain$top - hover$domain$bottom)
+    
+    left_px <- hover$range$left + left_pct * (hover$range$right - hover$range$left)
+    top_px <- hover$range$top + top_pct * (hover$range$bottom - hover$range$top)
+    
+    style <- paste0("position:absolute; z-index:100; background-color: rgba(245, 245, 245, 0.85); ",
+                    "left:", left_px + 2, "px; top:", top_px + 2, "px;")
+    
+    wellPanel(
+      style = style,
+      p(HTML(paste0("<b> SAP Batch Number: ", point$"SAP Batch Number", "</b>", 
+                    "<br> Material Number: ", point$"Material Number",
+                    "<br> Line: ", point$"Line",
+                    "<br>", input$xaxis_data, ": ", point[,input$xaxis_data],
+                    "<br>", input$yaxis_data, ": ", point[,input$yaxis_data]
+      )
+      )
+      )
+    )
+  })
+  
+  
+  #### Summary Boxes ####
+  
+  output$sapbatchboxoutput <- renderValueBox({
+    valueBox(
+      value = length(unique(plottingdata$data[,"SAP Batch Number"])),
+      subtitle = "SAP Batches",
+      icon = icon("info-circle")
+    )
+  })
+  
+  output$materialboxoutput <- renderValueBox({
+    valueBox(
+      value = length(unique(plottingdata$data[,"Material Number"])),
+      subtitle = "Materials",
+      icon = icon("info-circle")
+    )
+  })
+  
+  output$lineboxoutput <- renderValueBox({
+    valueBox(
+      value = length(unique(plottingdata$data[,"Line"])),
+      subtitle = "Lines",
+      icon = icon("info-circle")
+    )
+  })
+  
+  output$operatorboxoutput <- renderValueBox({
+    valueBox(
+      value = length(unique(plottingdata$data[,"Start Operator ID"])),
+      subtitle = "Start Operators",
+      icon = icon("info-circle")
+    )
+  })
+  
+  output$monthlyrunsboxoutput <- renderValueBox({
+    numberofmonths <- as.numeric((as.POSIXlt(max(plottingdata$data$`Start Date`), format="%Y-%m-%d") 
+                                  - 
+                                    as.POSIXlt(min(plottingdata$data$`Start Date`), format="%Y-%m-%d"))/30.44)
+    
+    ui <- valueBox(
+      value = signif(length(plottingdata$data[,"SAP Batch Number"])/numberofmonths, 
+                     digits = 4),
+      subtitle = "Runs Per Month",
+      icon = icon("info-circle")
+    )
+    return(ui)
+  })
+  
+  output$averageyieldboxoutput <- renderValueBox({
+    yieldqty <- sum(as.integer(plottingdata$data$`Yield Qty`[plottingdata$data$`Yield Qty` != ""]))
+    scrapqty <- sum(as.integer(plottingdata$data$`Scrap Qty`[plottingdata$data$`Scrap Qty` != ""]))
+    
+    ui <- valueBox(
+      value = signif(((yieldqty/(yieldqty + scrapqty))*100), 
+                     digits = 4),
+      subtitle = "Average Yield",
+      icon = icon("info-circle")
+    )
+    
+    return(ui)
+  })
+  
+  output$startdateboxoutput <- renderValueBox({
+    valueBox(
+      value = min(plottingdata$data[,"Start Date"]),
+      subtitle = "Earliest Run (Year-Month-Day)",
+      icon = icon("info-circle")
+    )
+  })
+  
+  output$enddateboxoutput <- renderValueBox({
+    valueBox(
+      value = max(plottingdata$data[,"Start Date"]),
+      subtitle = "Latest Run (Year-Month-Day)",
+      icon = icon("info-circle")
+    )
+  })
+  
+  
+  #### Download buttons ####
+  
+  output$downloadfiltereddata <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Filtered Data", '.csv', sep='') },
+    content = function(file) {
+      output <- plottingdata$filtered_data
+      write.csv(output, file, row.names = FALSE)
+    }
+  )
+  
+  output$downloadzoomdata <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Zoom Data", '.csv', sep='') },
+    content = function(file) {
+      output <- brushed_data()
+      write.csv(output, file, row.names = FALSE)
+    }
+  )
+  
+  output$downloadomitteddata <- downloadHandler(
+    #downlaod the data
+    filename = function() { paste("Omitted Data", '.csv', sep='') },
+    content = function(file) {
+      output <- plottingdata$omitted_data
+      write.csv(output, file, row.names = FALSE)
+    }
+  )
   
   
   
@@ -5971,6 +7242,25 @@ server<-function(input,output,session){
     
   }#end cleanStringSearch
   
+  
+  `%out%` <- function(a,b){
+    ! a %in% b
+  } 
+  
+  
+  numericIfPossible <- function(vector){
+    #converts the vector to numeric if possible
+    if (suppressWarnings(all(!is.na(as.numeric(as.character(vector)))))) {
+      return(as.numeric(as.character(vector)))
+    } else {
+      return(vector)
+    }
+  }
+  
+  modeofvector <- function(x) {
+    ux <- unique(x)
+    ux[which.max(tabulate(match(x, ux)))]
+  }
   
   
   
