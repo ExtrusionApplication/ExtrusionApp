@@ -86,8 +86,7 @@ ui<-dashboardPage(
                menuSubItem("Scrap Analysis",tabName = "ScrapAnalysis"),
                menuSubItem("Financial Data",tabName = "FinancialDataAnalysis")
       ),#end menuItem
-      menuItem("Help", tabName = "help", icon = icon("question-circle-o")),
-      menuItem("Test Analaysis Tab", tabName = "testanalysis")
+      menuItem("Help", tabName = "help", icon = icon("question-circle-o"))
     ) #end sidebarMenu
     
   ), #end dashboardSidebar
@@ -489,11 +488,11 @@ ui<-dashboardPage(
                                conditionalPanel(
                                  condition = "input.PCSWT_d",
                                  column(6,numericInput("PCSWT_min",
-                                                       label = paste0("Insert Minimum Value ", "(Minimum is ", PCSODImin, ")"),
-                                                       value=PCSODImin,step=0.001)),
+                                                       label = paste0("Insert Minimum Value ", "(Minimum is ", PCSWTmin, ")"),
+                                                       value=PCSWTmin,step=0.001)),
                                  column(6,numericInput("PCSWT_max",
-                                                       label = paste0("Insert Maximum Value ", "(Maximum is ", PCSODImax, ")"),
-                                                       value=PCSODImax,step=0.001))
+                                                       label = paste0("Insert Maximum Value ", "(Maximum is ", PCSWTmax, ")"),
+                                                       value=PCSWTmax,step=0.001))
                                )
                              )
                       ),

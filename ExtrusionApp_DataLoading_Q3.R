@@ -227,21 +227,6 @@ screw_data <- read.csv(screw_pathfile, header = TRUE, stringsAsFactors = FALSE,
 ###
 
 
-#getting the tapered buttons
-count <- 1
-tapered_buttons_vector <- c(rep(0,nrow(tapered_pps_data)))
-while (count < nrow(tapered_pps_data) + 1){
-  #runs through the single PPS and creates a vector of html entries for action buttons for the
-  #single PPS data table.
-  tapered_buttons_vector[count] <- as.character(
-    actionButton(inputId = paste0("button_", tapered_pps_data[count,1]),
-                 label = "Add Part",
-                 onclick = 'Shiny.onInputChange(\"taperedadd_button\",  this.id)')
-  )
-  
-  count <- count + 1
-}#end tapered_pps_data buttons
-
 
 
 ##### DATA CLEANING For all Data Tables ####

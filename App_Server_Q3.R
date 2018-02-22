@@ -5944,6 +5944,49 @@ server<-function(input,output,session){
   #### Analysis Tab Updated ####
   
   
+  listofgraphs <- list(list("Scatter Chart" = 6,
+                            "Line Chart" = 7,
+                            "Line Chart with 2 Y-Axes" = 8,
+                            "Bar Chart (Horzintal Bars)" = 9,
+                            "Column Chart (Vertical Bars)" = 10,
+                            "Area Chart" = 11,
+                            "Stepped Area Chart" = 12,
+                            "Bubble Chart" = 14,
+                            "Pie Chart" = 15,
+                            "Histogram" = 16,
+                            "Motion Chart" = 17,
+                            "Annotation Time Line Chart" = 18),
+                       list("Scatter Plot" = 19,
+                            "Counts Plot" = 20,
+                            "Area Chart" = 21,
+                            "Ordered Bar Chart" = 22,
+                            "Histogram" = 23,
+                            "Density Plot" = 24,
+                            "Box Plot" = 25,
+                            "Pie Chart" = 26,
+                            "Bubble Plot" = 27,
+                            "Tree Map" = 28,
+                            "Marginal Histogram" = 29,
+                            "Marginal Boxplot" = 30,
+                            "Dendrogram" = 31,
+                            "Cluster for PCA" = 32),
+                       list("Scatter Plot" = 33,
+                            "Line Plot" = 34,
+                            "Filled Area Plot" = 35,
+                            "Box Plot" = 36,
+                            "Histogram" = 37,
+                            "2D Histogram" = 38,
+                            "Bubble Chart" = 39,
+                            "Heat Map" = 40,
+                            "Stacked Area Plot" = 41,
+                            "3D Scatter Plot" = 42,
+                            "3D Line Plot" = 43,
+                            "3D Mesh Plot" = 44,
+                            "3D Mesh Plot" = 45,
+                            "Parallel Coordinates Plot" = 46)
+  )
+  
+  
   observe({
     data <- switch(input$dataset, "1" = single_tari_parametersandyield_reactive(),
                    "2"=multi_tari_parametersandyield_reactive(),
@@ -7257,6 +7300,7 @@ server<-function(input,output,session){
   
   
   `%out%` <- function(a,b){
+    #determines which values of a are not in b
     ! a %in% b
   } 
   
@@ -7271,6 +7315,7 @@ server<-function(input,output,session){
   }
   
   modeofvector <- function(x) {
+    #gets the mode of the vector
     ux <- unique(x)
     ux[which.max(tabulate(match(x, ux)))]
   }
