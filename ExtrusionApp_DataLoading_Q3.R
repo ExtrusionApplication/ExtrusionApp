@@ -10,6 +10,8 @@ library(gsubfn)
 library(proto)
 library(sqldf)
 library(plyr)
+library(dplyr)
+library(data.table)
 
 
 #LOADING DATA
@@ -17,21 +19,6 @@ library(plyr)
 source("//Mgrovef1/shared/Operations/EXTRUSIO/Felipe Correa Netto/Extrusion Application/Extra Files/Resin_Cleaning.R")
 
 
-#Testing the appstats data
-test1 <- "//Mgrovef1/shared/Operations/EXTRUSIO/Felipe Correa Netto/Extrusion Application/Data/LaserLinc Data/AppStats Data_14986-01 LaserLinc.csv"
-test2 <- "//Mgrovef1/shared/Operations/EXTRUSIO/Felipe Correa Netto/Extrusion Application/Data/LaserLinc Data/AppStats Data_14986-01 Nexiv.csv"
-test3 <- "//Mgrovef1/shared/Operations/EXTRUSIO/Felipe Correa Netto/Extrusion Application/Data/LaserLinc Data/AppStats Data_14986-03 LaserLinc.csv"
-test4 <- "//Mgrovef1/shared/Operations/EXTRUSIO/Felipe Correa Netto/Extrusion Application/Data/LaserLinc Data/AppStats Data_14986-03 Nexiv.csv"
-ll1 <- read.csv(test1, header = TRUE, stringsAsFactors = FALSE, 
-                check.names = FALSE)
-n1 <- read.csv(test2, header = TRUE, stringsAsFactors = FALSE, 
-               check.names = FALSE)
-ll2 <- read.csv(test3, header = TRUE, stringsAsFactors = FALSE, 
-                check.names = FALSE)
-n2 <- read.csv(test4, header = TRUE, stringsAsFactors = FALSE, 
-               check.names = FALSE)
-nexiv <- rbind.fill(n1, n2)
-laserlinc <- rbind.fill(ll1, ll2)
 
 
 #Creating variables across all sessions
@@ -107,12 +94,18 @@ screw_pathfile <- paste(path, screw_file, sep = "/")
 ###
 
 
-single_pps_data <- read.csv(single_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
-                            check.names = FALSE)
-multi_pps_data <- read.csv(multi_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
-                           check.names = FALSE)
-tapered_pps_data <- read.csv(tapered_pps_pathfile, header = TRUE, stringsAsFactors = FALSE, 
-                             check.names = FALSE)
+single_pps_data <- fread(single_pps_pathfile, 
+                         header = TRUE, 
+                         na.strings = c("NA", ""), 
+                         stringsAsFactors = FALSE)
+multi_pps_data <- fread(multi_pps_pathfile, 
+                         header = TRUE, 
+                         na.strings = c("NA", ""), 
+                         stringsAsFactors = FALSE)
+tapered_pps_data <- fread(tapered_pps_pathfile, 
+                         header = TRUE, 
+                         na.strings = c("NA", ""), 
+                         stringsAsFactors = FALSE)
 
 single_sampling_data <- read.csv(single_sampling_pathfile, header = TRUE, stringsAsFactors = FALSE,
                                  check.names = FALSE)
